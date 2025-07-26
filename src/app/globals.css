@@ -7,8 +7,8 @@
   --card-foreground: 222.2 84% 4.9%;
   --popover: 0 0% 100%;
   --popover-foreground: 222.2 84% 4.9%;
-  --primary: 222.2 47.4% 11.2%;
-  --primary-foreground: 210 40% 98%;
+  --primary: 0 0% 0%;
+  --primary-foreground: 0 0% 100%;
   --secondary: 210 40% 96%;
   --secondary-foreground: 222.2 84% 4.9%;
   --muted: 210 40% 96%;
@@ -21,6 +21,37 @@
   --input: 214.3 31.8% 91.4%;
   --ring: 222.2 84% 4.9%;
   --radius: 0.5rem;
+
+  /* 活动页面配色方案 */
+  --primary-black: #000000;
+  --primary-white: #ffffff;
+  
+  /* 背景渐变 */
+  --bg-gradient-start: #f0f5ff;
+  --bg-gradient-end: #ffffff;
+  --circle-bg: #fef5f3;
+  
+  /* 文字颜色 */
+  --text-primary: #000000;
+  --text-secondary: #666666;
+  --text-tertiary: #999999;
+  
+  /* 渐变文字 */
+  --gradient-text-start: #4d8bff;
+  --gradient-text-middle: #ca6bff;
+  --gradient-text-end: #ff4d4f;
+  
+  /* 按钮 */
+  --button-primary: #000000;
+  --button-primary-hover: #333333;
+  --button-text: #ffffff;
+
+  /* 紫色主题 */
+  --purple-50: #faf5ff;
+  --purple-100: #f3e8ff;
+  --purple-200: #e9d5ff;
+  --purple-500: #8b5cf6;
+  --purple-600: #7c3aed;
 }
 
 .dark {
@@ -95,4 +126,108 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+}
+
+/* 着陆页动画 */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 2s ease-in-out infinite;
+}
+
+/* 渐变背景 */
+.gradient-bg {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* 玻璃效果 */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* 活动页面专用样式 */
+.landing-bg {
+  background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+}
+
+.circle-bg {
+  background-color: var(--circle-bg);
+}
+
+.text-primary-black {
+  color: var(--text-primary);
+}
+
+.text-secondary-gray {
+  color: var(--text-secondary);
+}
+
+.text-tertiary-gray {
+  color: var(--text-tertiary);
+}
+
+.gradient-text {
+  background: linear-gradient(90deg, var(--gradient-text-start) 0%, var(--gradient-text-middle) 50%, var(--gradient-text-end) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.btn-primary-black {
+  background-color: var(--button-primary);
+  color: var(--button-text);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: background-color 0.2s ease;
+}
+
+.btn-primary-black:hover {
+  background-color: var(--button-primary-hover);
+}
+
+/* 紫色主题样式 */
+.bg-purple-50 {
+  background-color: var(--purple-50);
+}
+
+.bg-purple-100 {
+  background-color: var(--purple-100);
+}
+
+.border-purple-200 {
+  border-color: var(--purple-200);
+}
+
+.text-purple-600 {
+  color: var(--purple-600);
+}
+
+.bg-purple-500 {
+  background-color: var(--purple-500);
+}
+
+.border-purple-600 {
+  border-color: var(--purple-600);
 }

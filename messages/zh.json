@@ -61,6 +61,19 @@
     "incorrectFeedback": "答错反馈",
     "save": "保存设置"
   },
+  "landing": {
+    "brand": "LittlePlus",
+    "title": "精彩活动",
+    "subtitle": "从这里开始。",
+    "description": "创建活动页面，邀请朋友并售票。今天就来主办一场难忘的活动吧。",
+    "cta": "创建你的第一个活动",
+    "exploreEvents": "探索活动",
+    "footer": {
+      "support": "使用条款",
+      "privacy": "隐私政策", 
+      "security": "帮助"
+    }
+  },
   "common": {
     "cancel": "取消",
     "confirm": "确认",

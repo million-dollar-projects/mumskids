@@ -61,6 +61,19 @@
     "incorrectFeedback": "Incorrect Answer Feedback",
     "save": "Save Settings"
   },
+  "landing": {
+    "brand": "LittlePlus",
+    "title": "Amazing Events",
+    "subtitle": "Start here.",
+    "description": "Create event pages, invite friends and sell tickets. Host an unforgettable event today.",
+    "cta": "Create Your First Event",
+    "exploreEvents": "Explore Events",
+    "footer": {
+      "support": "Terms of Use",
+      "privacy": "Privacy Policy", 
+      "security": "Help"
+    }
+  },
   "common": {
     "cancel": "Cancel",
     "confirm": "Confirm",

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户头像弹窗预览</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .dropdown-menu {
+            display: none;
+        }
+        .dropdown-menu.show {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-purple-50 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-2xl font-bold mb-8 text-gray-900">用户头像弹窗功能预览</h1>
+        
+        <!-- 模拟的头部导航 -->
+        <div class="bg-purple-50 border-b border-gray-200 mb-8">
+            <div class="flex items-center justify-between h-16 px-6">
+                <div class="flex items-center space-x-8">
+                    <div class="text-lg font-bold">数学练习</div>
+                    <nav class="flex space-x-4">
+                        <a href="#" class="text-gray-600 hover:text-gray-900">练习</a>
+                        <a href="#" class="text-gray-600 hover:text-gray-900">我的练习</a>
+                        <a href="#" class="text-gray-600 hover:text-gray-900">发现</a>
+                    </nav>
+                </div>
+                
+                <!-- 用户头像下拉菜单 -->
+                <div class="relative">
+                    <button id="avatarButton" class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center hover:bg-purple-600 transition-colors">
+                        <span class="text-white text-sm font-medium">G</span>
+                    </button>
+                    
+                    <!-- 下拉菜单 -->
+                    <div id="dropdownMenu" class="dropdown-menu absolute right-0 top-full mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                        <!-- 用户信息头部 -->
+                        <div class="px-4 py-3 border-b border-gray-100">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center">
+                                    <span class="text-white text-base font-medium">G</span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-medium text-gray-900 truncate">George Yang</p>
+                                    <p class="text-xs text-gray-500 truncate">hmput@gmail.com</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 菜单项 -->
+                        <div class="px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer transition-colors">
+                            <div class="flex items-center space-x-3">
+                                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                </svg>
+                                <span>查看个人资料</span>
+                            </div>
+                        </div>
+
+                        <div class="px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer transition-colors">
+                            <div class="flex items-center space-x-3">
+                                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                <span>设置</span>
+                            </div>
+                        </div>
+
+                        <!-- 分隔线 -->
+                        <div class="h-px bg-gray-200 my-1"></div>
+
+                        <div class="px-4 py-3 text-sm text-red-600 hover:bg-red-50 cursor-pointer transition-colors">
+                            <div class="flex items-center space-x-3">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                                </svg>
+                                <span>退出登录</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 说明文档 -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold mb-4">功能说明</h2>
+            <ul class="space-y-2 text-gray-700">
+                <li>• 点击右上角的紫色用户头像可以打开下拉菜单</li>
+                <li>• 菜单显示用户信息（姓名和邮箱）</li>
+                <li>• 包含"查看个人资料"和"设置"选项</li>
+                <li>• 红色的"退出登录"选项在底部</li>
+                <li>• 点击菜单外部区域可以关闭菜单</li>
+                <li>• 头像会在悬停时变色以提供视觉反馈</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const avatarButton = document.getElementById('avatarButton');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+
+        avatarButton.addEventListener('click', function(e) {
+            e.stopPropagation();
+            dropdownMenu.classList.toggle('show');
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!dropdownMenu.contains(e.target) && !avatarButton.contains(e.target)) {
+                dropdownMenu.classList.remove('show');
+            }
+        });
+
+        // 菜单项点击事件
+        const menuItems = dropdownMenu.querySelectorAll('[class*="cursor-pointer"]');
+        menuItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const text = this.textContent.trim();
+                alert(`点击了: ${text}`);
+                dropdownMenu.classList.remove('show');
+            });
+        });
+    </script>
+</body>
+</html>

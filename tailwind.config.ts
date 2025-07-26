@@ -10,6 +10,8 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // 导航链接颜色
+        linkColor: '#1315175c',
         // 儿童主题色彩
         primary: {
           boy: {

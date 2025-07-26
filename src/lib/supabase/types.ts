@@ -58,17 +58,17 @@ export function practiceFormToDbData(form: PracticeFormData, userId: string): Pr
 }
 
 export function dbDataToPracticeForm(practice: Practice): PracticeFormData {
-  const metadata = practice.metadata as PracticeMetadata;
-  const childInfo = practice.child_info as PracticeChildInfo;
+  const metadata = practice.metadata as unknown as PracticeMetadata;
+  const childInfo = practice.child_info as unknown as PracticeChildInfo;
 
   return {
-    title: metadata.title,
-    description: metadata.description,
-    childName: childInfo.name,
-    gender: childInfo.gender,
+    title: metadata?.title || '',
+    description: metadata?.description || '',
+    childName: childInfo?.name || '',
+    gender: childInfo?.gender || 'boy',
     difficulty: practice.difficulty,
     questionCount: practice.question_count,
     isPublic: practice.is_public,
-    rewards: metadata.rewards
+    rewards: metadata?.rewards || []
   };
 } 

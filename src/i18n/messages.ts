@@ -21,6 +21,27 @@ export const messages = {
       "login": "登录",
       "register": "注册"
     },
+    "landing": {
+      "title": "数学练习",
+      "subtitle": "从这里开始。",
+      "description": "创建个性化的数学练习，让孩子在快乐中学习。适合3-12岁儿童的智能练习系统。",
+      "cta": "创建你的第一个练习",
+      "exploreEvents": "浏览练习",
+      "brand": "LittlePlus",
+      "footer": {
+        "support": "使用条款",
+        "privacy": "隐私政策", 
+        "security": "帮助"
+      }
+    },
+    "events": {
+      "title": "活动",
+      "create": "创建活动",
+      "settings": "设置",
+      "noEvents": "暂无即将举办的活动",
+      "noEventsDescription": "你还没有创建任何活动，为什么不来创建一个呢？",
+      "createFirst": "创建活动"
+    },
     "practice": {
       "title": "数学练习",
       "create": "创建练习",
@@ -117,6 +138,27 @@ export const messages = {
       "password": "Password",
       "login": "Login",
       "register": "Register"
+    },
+    "landing": {
+      "title": "Math Practice",
+      "subtitle": "Start here.",
+      "description": "Create personalized math exercises to help children learn joyfully. An intelligent practice system for ages 3-12.",
+      "cta": "Create Your First Practice",
+      "exploreEvents": "Browse Practices",
+      "brand": "LittlePlus",
+      "footer": {
+        "support": "Terms of Use",
+        "privacy": "Privacy Policy",
+        "security": "Help"
+      }
+    },
+    "events": {
+      "title": "Events",
+      "create": "Create Event",
+      "settings": "Settings",
+      "noEvents": "No upcoming events",
+      "noEventsDescription": "You haven't created any events yet, why not create one?",
+      "createFirst": "Create Event"
     },
     "practice": {
       "title": "Math Practice",
