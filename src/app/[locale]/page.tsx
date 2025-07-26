@@ -1,19 +1,13 @@
 'use client'
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
 import Link from 'next/link';
 import { messages } from '@/i18n/messages';
 import { useAuth } from '@/lib/auth/context';
 import { PhoneMockup } from '@/components/ui/phone-mockup';
 import { UserAvatarDropdown } from '@/components/ui/user-avatar-dropdown';
-import { BookOpen, Telescope, Search, Plus, Star, Earth, Bell } from 'lucide-react';
+import { BookOpen, Telescope, Search, Plus, Star, Earth, Bell, X } from 'lucide-react';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -22,6 +16,8 @@ interface PageProps {
 export default function HomePage({ params }: PageProps) {
   const { user, loading } = useAuth();
   const [locale, setLocale] = useState('zh');
+  const [showNotifications, setShowNotifications] = useState(false);
+  const notificationRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const getLocale = async () => {
@@ -30,6 +26,23 @@ export default function HomePage({ params }: PageProps) {
     };
     getLocale();
   }, [params]);
+
+  // 点击外部关闭通知弹窗
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
+        setShowNotifications(false);
+      }
+    };
+
+    if (showNotifications) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showNotifications]);
 
   const t = messages[locale as keyof typeof messages] || messages.zh;
 
@@ -93,33 +106,53 @@ export default function HomePage({ params }: PageProps) {
 
           {/* Right section - positioned absolutely to the right */}
           <div className="absolute right-4 sm:right-6 lg:right-8 top-0 h-16 flex items-center space-x-4">
-            <TooltipProvider>
-              <button className="text-gray-700 hover:text-gray-900 font-medium">创建练习</button>
-              
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button className="text-gray-600 hover:text-gray-900 p-2 rounded-md hover:bg-gray-100 transition-colors">
-                    <Search className="w-5 h-5" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>搜索</p>
-                </TooltipContent>
-              </Tooltip>
-              
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button className="text-gray-600 hover:text-gray-900 p-2 rounded-md hover:bg-gray-100 transition-colors">
-                    <Bell className="w-5 h-5" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>通知</p>
-                </TooltipContent>
-              </Tooltip>
-              
-              <UserAvatarDropdown user={user} />
-            </TooltipProvider>
+            <button className="text-gray-700 hover:text-gray-900 font-medium">创建练习</button>
+
+            <button className="text-gray-600 hover:text-gray-900 p-2 rounded-md hover:bg-gray-100 transition-colors">
+              <Search className="w-5 h-5" />
+            </button>
+
+            <div className="relative" ref={notificationRef}>
+              <button
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="text-gray-600 hover:text-gray-900 p-2 rounded-md hover:bg-gray-100 transition-colors relative"
+              >
+                <Bell className="w-5 h-5" />
+                {/* 未读通知小红点 */}
+                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              </button>
+
+                             {/* 通知弹窗 */}
+               {showNotifications && (
+                 <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                   
+                   {/* 空状态内容 */}
+                   <div className="py-16 px-8 text-center">
+                     {/* 月亮和星星图标 */}
+                     <div className="mb-6 flex justify-center">
+                       <div className="relative">
+                         {/* 月亮 */}
+                         <div className="w-12 h-12 rounded-full bg-gray-300 relative">
+                           <div className="absolute top-1 right-1 w-8 h-8 rounded-full bg-white"></div>
+                         </div>
+                         {/* 星星 */}
+                         <div className="absolute -top-1 -right-1">
+                           <Star className="w-6 h-6 text-gray-400 fill-current" />
+                         </div>
+                       </div>
+                     </div>
+                     
+                     {/* 主要文字 */}
+                     <h3 className="text-xl font-medium text-gray-700 mb-3">这里很安静</h3>
+                     
+                     {/* 副标题 */}
+                     <p className="text-gray-500 text-sm">创建练习并分享给好友。</p>
+                   </div>
+                 </div>
+               )}
+            </div>
+
+            <UserAvatarDropdown user={user} />
           </div>
         </header>
 
