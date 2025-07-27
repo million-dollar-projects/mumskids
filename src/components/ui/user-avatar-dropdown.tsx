@@ -37,7 +37,7 @@ export function UserAvatarDropdown({ user }: UserAvatarDropdownProps) {
   return (
     <DropdownMenu
       trigger={
-        <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center hover:bg-purple-600 transition-colors">
+        <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center hover:bg-purple-600 transition-colors">
           <span className="text-white text-sm font-medium">{getUserInitial()}</span>
         </div>
       }
@@ -45,7 +45,7 @@ export function UserAvatarDropdown({ user }: UserAvatarDropdownProps) {
       {/* 用户信息头部 */}
       <div className="px-4 py-3 border-b border-gray-100">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center">
+          <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
             <span className="text-white text-base font-medium">{getUserInitial()}</span>
           </div>
           <div className="flex-1 min-w-0">
