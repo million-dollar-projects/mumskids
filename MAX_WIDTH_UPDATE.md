@@ -1,7 +1,7 @@
 # 页面最大宽度调整
 
 ## 修改概述
-将页面的最大宽度从 `max-w-7xl` (1280px) 调整为 `max-w-[820px]` (820px)，以提供更紧凑和聚焦的用户体验。
+将页面的最大宽度从 `max-w-7xl` (1280px) 调整为 `max-w-4xl` (820px)，以提供更紧凑和聚焦的用户体验。
 
 ## 修改详情
 
@@ -10,44 +10,44 @@
 
 | 页面状态 | 组件 | 修改前 | 修改后 |
 |---------|------|--------|--------|
-| 加载状态 | 头部容器 | `max-w-7xl` | `max-w-[820px]` |
-| 已登录 | 头部容器 | `max-w-7xl` | `max-w-[820px]` |
-| 已登录 | 主内容容器 | `max-w-7xl` | `max-w-[820px]` |
-| 已登录 | 页脚容器 | `max-w-7xl` | `max-w-[820px]` |
-| 未登录 | 头部容器 | `max-w-7xl` | `max-w-[820px]` |
-| 未登录 | 主内容容器 | `max-w-7xl` | `max-w-[820px]` |
-| 未登录 | 页脚容器 | `max-w-7xl` | `max-w-[820px]` |
+| 加载状态 | 头部容器 | `max-w-7xl` | `max-w-4xl` |
+| 已登录 | 头部容器 | `max-w-7xl` | `max-w-4xl` |
+| 已登录 | 主内容容器 | `max-w-7xl` | `max-w-4xl` |
+| 已登录 | 页脚容器 | `max-w-7xl` | `max-w-4xl` |
+| 未登录 | 头部容器 | `max-w-7xl` | `max-w-4xl` |
+| 未登录 | 主内容容器 | `max-w-7xl` | `max-w-4xl` |
+| 未登录 | 页脚容器 | `max-w-7xl` | `max-w-4xl` |
 
 ### 具体修改位置
 
 #### 1. 加载状态页面
 ```tsx
 // 头部
-<div className="max-w-[820px] mx-auto px-4 sm:px-6 lg:px-8">
+<div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 ```
 
 #### 2. 已登录用户页面
 ```tsx
 // 头部
-<div className="max-w-[820px] mx-auto px-4 sm:px-6 lg:px-8">
+<div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
 // 主内容
-<main className="max-w-[820px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
 // 页脚
-<div className="max-w-[820px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 ```
 
 #### 3. 未登录用户着陆页
 ```tsx
 // 头部
-<div className="max-w-[820px] mx-auto flex justify-between items-center">
+<div className="max-w-4xl mx-auto flex justify-between items-center">
 
 // 主内容
-<div className="max-w-[820px] mx-auto">
+<div className="max-w-4xl mx-auto">
 
 // 页脚
-<div className="max-w-[820px] mx-auto">
+<div className="max-w-4xl mx-auto">
 ```
 
 ## 设计考虑
@@ -72,7 +72,7 @@
 ## 技术实现
 
 ### Tailwind CSS 自定义值
-使用 `max-w-[820px]` 语法来设置精确的像素值：
+使用 `max-w-4xl` 语法来设置精确的像素值：
 - 这是 Tailwind CSS 的任意值语法
 - 直接编译为 `max-width: 820px`
 - 无需额外的 CSS 配置
