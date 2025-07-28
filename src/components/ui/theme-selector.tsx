@@ -24,8 +24,8 @@ export function ThemeSelector({ selectedTheme, onThemeChange }: ThemeSelectorPro
   };
 
   return (
-    <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-sm">
-      <CardContent className="p-2">
+    <Card className="backdrop-blur-sm border-0 shadow-sm rounded cursor-pointer">
+      <CardContent className="px-2 py-1">
         <div className="flex items-center justify-between">
           {/* 左侧：主题图标和信息 */}
           <div className="flex items-center space-x-3">
@@ -43,8 +43,8 @@ export function ThemeSelector({ selectedTheme, onThemeChange }: ThemeSelectorPro
             {/* 选择按钮 */}
             <Sheet open={themeSheetOpen} onOpenChange={setThemeSheetOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="sm" className="p-2 h-8 w-8">
-                  <ChevronsUpDown className="w-4 h-4 text-gray-500" />
+                <Button variant="ghost" size="sm" className="p-0 h-8 w-8 cursor-pointer bg-purple-900/5 hover:bg-purple-900/10">
+                  <ChevronsUpDown className="w-6 h-6 text-gray-500" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="bottom" className="max-h-[75vh] overflow-y-auto">
@@ -83,7 +83,7 @@ export function ThemeSelector({ selectedTheme, onThemeChange }: ThemeSelectorPro
             <Button
               variant="ghost"
               size="sm"
-              className="p-2 h-8 w-8"
+              className="p-2 h-8 w-8 bg-purple-900/5 hover:bg-purple-900/10 opacity-100 cursor-pointer"
               onClick={randomizeTheme}
             >
               <Shuffle className="w-4 h-4 text-gray-500" />

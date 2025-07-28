@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -172,8 +172,8 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
   if (loading) {
     return (
       <div className={`min-h-screen transition-colors duration-500 ${pageBackgroundClass}`}>
-        <Header locale={locale} />
-        <div className="child-container py-8">
+        <Header locale={locale} backgroundClass={pageBackgroundClass} isFixed={true} />
+        <div className="child-container py-8 pt-24">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
             <p className="text-lg text-muted-foreground">{t.common.loading}</p>
@@ -190,9 +190,9 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
 
   return (
     <div className={`min-h-screen transition-colors duration-500 ${pageBackgroundClass}`}>
-      <Header locale={locale} />
+      <Header locale={locale} backgroundClass={pageBackgroundClass} isFixed={true} />
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
         {/* 顶部导航标签 */}
         <div className="flex items-center justify-end mb-0">
           {/* 右上角控制区域 */}
@@ -251,9 +251,18 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
           <div className="lg:col-span-4 space-y-6">
             {/* 练习封面 */}
             <Card className="aspect-square bg-gradient-to-br from-red-500 to-pink-500 border-none shadow-xl flex items-center justify-center relative overflow-hidden">
-              <div className="text-center text-white">
-                <div className="text-6xl font-bold mb-4 transform -rotate-12">
-                  {form.childName ? form.childName.slice(0, 2).toUpperCase() : 'YS'}
+              <div className="text-center text-white px-4">
+                <div className={`font-bold mb-4 transform leading-tight ${form.childName
+                    ? form.childName.length <= 2
+                      ? 'text-6xl'
+                      : form.childName.length <= 4
+                        ? 'text-5xl'
+                        : form.childName.length <= 6
+                          ? 'text-4xl'
+                          : 'text-3xl'
+                    : 'text-6xl'
+                  }`}>
+                  {form.childName ? form.childName.toUpperCase() : '米小圈'}
                 </div>
                 <div className="text-xl font-medium opacity-90">
                   {difficultyOptions.find(option => option.id === form.difficulty)?.label}运算
@@ -301,11 +310,20 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
             <div>
               <Input
                 value={form.childName}
-                onChange={(e) => handleInputChange('childName', e.target.value)}
+                onChange={(e) => {
+                  // 限制昵称长度为8个字符
+                  if (e.target.value.length <= 8) {
+                    handleInputChange('childName', e.target.value);
+                  }
+                }}
                 placeholder="小朋友昵称"
+                maxLength={8}
                 className="w-full border-none shadow-none outline-none px-2 py-2 h-auto focus-visible:ring-0 bg-transparent 
                   placeholder:font-bold placeholder:text-[#1315175c] bg-purple-900/5"
               />
+              <div className="text-xs text-gray-500 mt-1 px-2">
+                {form.childName.length}/8 字符
+              </div>
             </div>
 
             <Separator />
@@ -357,13 +375,13 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
                         <Label
                           key={option.id}
                           htmlFor={`dialog-${option.id}`}
-                          className={`flex items-center space-x-4 p-4 rounded-xl cursor-pointer transition-all duration-200 border-2 ${form.difficulty === option.id
-                            ? 'bg-purple-500 border-purple-500 shadow-lg text-white'
-                            : 'bg-white border-gray-200 hover:bg-purple-50 hover:border-purple-200'
+                          className={`flex items-center text-gray-700 shadow-none space-x-1 py-2 px-4 rounded cursor-pointer transition-all duration-200 border-1 ${form.difficulty === option.id
+                            ? 'bg-purple-900/10 border-purple-900/20 shadow-md text-gray-900'
+                            : 'bg-gray-50 border-gray-200 hover:bg-purple-900/5 hover:border-purple-900/10'
                             }`}
                         >
                           <RadioGroupItem value={option.id} id={`dialog-${option.id}`} className="pointer-events-none" />
-                          <span className={`text-base font-medium flex-1 ${form.difficulty === option.id ? 'text-white' : 'text-gray-700'}`}>
+                          <span className={`text-base font-medium flex-1 ${form.difficulty === option.id ? 'text-gray-800' : 'text-gray-700'}`}>
                             {option.label}
                           </span>
                         </Label>
@@ -416,13 +434,13 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
                         <Label
                           key={option.id}
                           htmlFor={`dialog-${option.id}`}
-                          className={`flex items-center space-x-4 p-4 rounded-xl cursor-pointer transition-all duration-200 border-2 ${form.calculationType === option.id
-                            ? 'bg-purple-500 border-purple-500 shadow-lg text-white'
-                            : 'bg-white border-gray-200 hover:bg-purple-50 hover:border-purple-200'
+                          className={`flex items-center text-gray-700 shadow-none space-x-1 py-2 px-4 rounded cursor-pointer transition-all duration-200 border-1 ${form.calculationType === option.id
+                            ? 'bg-purple-900/10 border-purple-900/20 shadow-md text-gray-900'
+                            : 'bg-gray-50 border-gray-200 hover:bg-purple-900/5 hover:border-purple-900/10'
                             }`}
                         >
                           <RadioGroupItem value={option.id} id={`dialog-${option.id}`} className="pointer-events-none" />
-                          <span className={`text-base font-medium flex-1 ${form.calculationType === option.id ? 'text-white' : 'text-gray-700'}`}>
+                          <span className={`text-base font-medium flex-1 ${form.calculationType === option.id ? 'text-gray-800' : 'text-gray-700'}`}>
                             {option.label}
                           </span>
                         </Label>
@@ -458,9 +476,9 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
               <Dialog open={showTestModeDialog} onOpenChange={setShowTestModeDialog}>
                 <DialogContent className="sm:max-w-[425px] bg-white">
                   <DialogHeader>
-                    <DialogTitle className="text-xl font-bold">选择测试方式</DialogTitle>
+                    <DialogTitle className="text-xl font-bold">选择练习模式</DialogTitle>
                     <DialogDescription className="text-gray-500">
-                      请选择练习题目的测试方式和相关设置
+                      请选择练习题目的练习模式和相关设置
                     </DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-6 py-4">
@@ -475,13 +493,13 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
                         <div key={option.id} className="flex flex-col space-y-3">
                           <Label
                             htmlFor={`dialog-${option.id}`}
-                            className={`flex items-center space-x-4 p-4 rounded-xl cursor-pointer transition-all duration-200 border-2 ${form.testMode === option.id
-                              ? 'bg-purple-500 border-purple-500 shadow-lg text-white'
-                              : 'bg-white border-gray-200 hover:bg-purple-50 hover:border-purple-200'
+                            className={`flex items-center text-gray-700 shadow-none space-x-1 py-2 px-4 rounded cursor-pointer transition-all duration-200 border-1 ${form.testMode === option.id
+                              ? 'bg-purple-900/10 border-purple-900/20 shadow-md text-gray-900'
+                              : 'bg-gray-50 border-gray-200 hover:bg-purple-900/5 hover:border-purple-900/10'
                               }`}
                           >
                             <RadioGroupItem value={option.id} id={`dialog-${option.id}`} className="pointer-events-none" />
-                            <span className={`text-base font-medium flex-1 ${form.testMode === option.id ? 'text-white' : 'text-gray-700'}`}>
+                            <span className={`text-base font-medium flex-1 ${form.testMode === option.id ? 'text-gray-800' : 'text-gray-700'}`}>
                               {option.label}
                             </span>
                           </Label>
@@ -530,9 +548,9 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
                   <DialogFooter>
                     <Button
                       onClick={() => setShowTestModeDialog(false)}
-                      className="w-full"
+                      className="w-full bg-gray-900 hover:bg-gray-800 text-white cursor-pointer"
                     >
-                      确定
+                      确 定
                     </Button>
                   </DialogFooter>
                 </DialogContent>
@@ -587,7 +605,10 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
             <Button
               onClick={handleSave}
               disabled={saving || !form.title.trim() || !form.childName.trim()}
-              className="w-full h-12 text-lg font-medium bg-red-500 hover:bg-red-600 text-white"
+              className={`w-full h-12 text-lg font-medium text-white transition-all duration-300 ${saving || !form.title.trim() || !form.childName.trim()
+                ? 'bg-gray-400 cursor-not-allowed'
+                : `${currentTheme?.gradient || 'bg-gradient-to-br from-pink-300 via-purple-300 to-indigo-400'} hover:opacity-90 hover:scale-[1.02] active:scale-[0.98]`
+                }`}
             >
               {saving ? (
                 <>

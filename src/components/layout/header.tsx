@@ -11,9 +11,11 @@ import { useAuth } from '@/lib/auth/context';
 interface HeaderProps {
   locale: string;
   variant?: 'landing' | 'authenticated';
+  backgroundClass?: string;
+  isFixed?: boolean;
 }
 
-export function Header({ locale, variant = 'authenticated' }: HeaderProps) {
+export function Header({ locale, variant = 'authenticated', backgroundClass = 'bg-purple-50', isFixed = false }: HeaderProps) {
   const { user, loading } = useAuth();
   const [showNotifications, setShowNotifications] = useState(false);
   const notificationRef = useRef<HTMLDivElement>(null);
@@ -82,7 +84,7 @@ export function Header({ locale, variant = 'authenticated' }: HeaderProps) {
   // 加载状态头部
   if (loading) {
     return (
-      <header className="bg-purple-50">
+      <header className={`${backgroundClass} transition-colors duration-500 ${isFixed ? 'fixed top-0 left-0 right-0 z-50' : ''}`}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-8">
@@ -99,7 +101,7 @@ export function Header({ locale, variant = 'authenticated' }: HeaderProps) {
   // 已认证用户头部
   if (user) {
     return (
-      <header className="bg-purple-50 relative">
+      <header className={`${backgroundClass} transition-colors duration-500 ${isFixed ? 'fixed top-0 left-0 right-0 z-50' : 'relative'}`}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center h-16">
             {/* Left section with navigation */}
