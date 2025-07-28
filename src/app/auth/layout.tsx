@@ -5,6 +5,11 @@ import "../globals.css";
 export const metadata: Metadata = {
   title: "认证 - 儿童数学练习",
   description: "用户认证页面",
+  icons: {
+    icon: "/images/plus.png",
+    shortcut: "/images/plus.png",
+    apple: "/images/plus.png",
+  },
 };
 
 interface AuthLayoutProps {
