@@ -125,7 +125,7 @@ export default function HomePage({ params }: PageProps) {
                 <Link href={`/${locale}/auth/login`}>
                   <Button
                     size="lg"
-                    className="btn-primary-black px-4 py-2 text-lg font-medium cursor-pointer"
+                    className="btn-primary-black px-4 py-2 text-base font-medium cursor-pointer"
                   >
                     {t.landing.cta}
                   </Button>
@@ -156,7 +156,7 @@ export default function HomePage({ params }: PageProps) {
         </div>
       </main>
 
-      <Footer locale={locale} variant="landing" />
+      <Footer locale={locale} />
     </div>
   );
 }

@@ -3,7 +3,7 @@ import { AuthProvider } from "@/lib/auth/context";
 import "../globals.css";
 
 export const metadata: Metadata = {
-  title: "儿童数学练习",
+  title: "LittlePlus",
   description: "帮助小朋友进行简单的加减法练习，提升口算/心算能力",
 };
 

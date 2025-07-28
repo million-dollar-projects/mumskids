@@ -10,7 +10,7 @@ export const messages = {
       "logout": "退出"
     },
     "auth": {
-      "title": "儿童数学练习",
+      "title": "LittlePlus",
       "subtitle": "让孩子爱上数学，从简单练习开始",
       "googleLogin": "使用 Google 登录",
       "emailLogin": "邮箱登录",
@@ -24,7 +24,7 @@ export const messages = {
     "landing": {
       "title": "数学练习",
       "subtitle": "从这里开始。",
-      "description": "创建个性化的数学练习，让孩子在快乐中学习。适合3-12岁儿童的智能练习系统。",
+      "description": "创建个性化的数学练习，让孩子在快乐中学习。适合3-12岁儿童的智能练习。",
       "cta": "创建你的第一个练习",
       "exploreEvents": "浏览练习",
       "brand": "LittlePlus",
