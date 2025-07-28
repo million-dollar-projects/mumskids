@@ -30,7 +30,7 @@ export function RewardSelector({
   distributionMode,
   onRewardsChange,
   onDistributionModeChange,
-  maxRewards = 10
+  maxRewards = 5
 }: RewardSelectorProps) {
   const [newRewardText, setNewRewardText] = useState('');
   const [selectedEmoji, setSelectedEmoji] = useState('🎁');
@@ -63,7 +63,7 @@ export function RewardSelector({
     <div>
       <div className="flex items-center gap-3 mb-3">
         <Gift className="w-5 h-5 text-gray-400" />
-        <span className="font-medium">完成奖励</span>
+        <span className="font-medium">完成奖励(可选)</span>
       </div>
 
       <div className="space-y-4">
@@ -128,13 +128,7 @@ export function RewardSelector({
                   className="flex flex-col space-y-2"
                 >
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="all" id="all" />
-                    <Label htmlFor="all" className="text-sm cursor-pointer">
-                      全部获得 - 小朋友将获得所有奖励
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="random" id="random" />
+                    <RadioGroupItem value="random" id="random" checked={distributionMode === 'random'} />
                     <Label htmlFor="random" className="text-sm cursor-pointer flex items-center gap-1">
                       <Shuffle className="w-3 h-3" />
                       随机一个 - 系统随机选择一个奖励
