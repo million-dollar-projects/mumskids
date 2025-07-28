@@ -8,10 +8,14 @@ interface DropdownMenuProps {
   children: React.ReactNode
   align?: 'left' | 'right'
   className?: string
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
-export function DropdownMenu({ trigger, children, align = 'right', className }: DropdownMenuProps) {
-  const [isOpen, setIsOpen] = useState(false)
+export function DropdownMenu({ trigger, children, align = 'right', className, open, onOpenChange }: DropdownMenuProps) {
+  const [internalIsOpen, setInternalIsOpen] = useState(false)
+  const isOpen = open !== undefined ? open : internalIsOpen
+  const setIsOpen = onOpenChange || setInternalIsOpen
   const dropdownRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {

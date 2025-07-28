@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 import { Badge } from '@/components/ui/badge';
@@ -19,8 +18,16 @@ import { ThemeSelector } from '@/components/ui/theme-selector';
 import { messages } from '@/i18n/messages';
 import { useAuth } from '@/lib/auth/context';
 import { themes } from '@/lib/themes';
-import { Plus, X, ChevronDown, Globe, Lock, Pencil } from 'lucide-react';
+import { Plus, X, ChevronDown, Globe, Lock, Pencil, Target, Calculator, Timer, Gift } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import {
+  difficultyOptions,
+  calculationTypeOptions,
+  testModeOptions,
+  questionCountOptions,
+  timeLimitOptions,
+  getVisibilityOptions
+} from '@/lib/practice-config';
 
 interface CreatePracticeProps {
   params: Promise<{ locale: string }>;
@@ -52,6 +59,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
   const [showCalculationDialog, setShowCalculationDialog] = useState(false);
   const [showDifficultyDialog, setShowDifficultyDialog] = useState(false);
   const [showTestModeDialog, setShowTestModeDialog] = useState(false);
+  const [visibilityDropdownOpen, setVisibilityDropdownOpen] = useState(false);
 
   const [form, setForm] = useState<PracticeForm>({
     title: '练习名称',
@@ -61,7 +69,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
     difficulty: 'within10',
     testMode: 'normal',
     questionCount: 10,
-    timeLimit: 0,
+    timeLimit: 5,
     isPublic: false,
     rewards: [],
     selectedTheme: 'rainbow',
@@ -77,6 +85,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
   }, [params]);
 
   const t = messages[locale as keyof typeof messages] || messages.zh;
+  const visibilityOptions = getVisibilityOptions(locale);
 
   const currentTheme = themes.find(t => t.id === form.selectedTheme);
   const pageBackgroundClass = currentTheme?.bgClass || 'bg-purple-50';
@@ -185,12 +194,14 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* 顶部导航标签 */}
-        <div className="flex items-center justify-end mb-8">
+        <div className="flex items-center justify-end mb-0">
           {/* 右上角控制区域 */}
-          <div className="flex items-center space-x-4 bg-purple-100 rounded p-0 pointer-events-auto">
+          <div className="flex items-center space-x-4 bg-purple-900/5 rounded p-0 pointer-events-auto cursor-pointer">
             <DropdownMenu
+              open={visibilityDropdownOpen}
+              onOpenChange={setVisibilityDropdownOpen}
               trigger={
-                <Button variant="ghost" className="flex items-center space-x-2 transition-all duration-200 hover:bg-purple-200/50 hover:scale-105">
+                <Button variant="ghost" className="flex items-center space-x-2 transition-all duration-200 hover:bg-purple-900/5 cursor-pointer">
                   <div className="transition-transform duration-300">
                     {form.isPublic ? (
                       <Globe className="w-4 h-4 animate-in fade-in-0 zoom-in-95 duration-200" />
@@ -199,26 +210,37 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
                     )}
                   </div>
                   <span className="transition-all duration-200">
-                    {form.isPublic ? '公开' : '私密'}
+                    {visibilityOptions.find(option =>
+                      (option.id === 'public' && form.isPublic) ||
+                      (option.id === 'private' && !form.isPublic)
+                    )?.label}
                   </span>
-                  <ChevronDown className="w-4 h-4 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                  <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${visibilityDropdownOpen ? 'rotate-180' : ''}`} />
                 </Button>
               }
             >
-              <DropdownMenuItem
-                onClick={() => handleInputChange('isPublic', false)}
-                className="transition-all duration-200 hover:bg-purple-50 hover:scale-[1.02] cursor-pointer"
-              >
-                <Lock className="w-4 h-4 mr-2 transition-transform duration-200 hover:scale-110" />
-                <span className="transition-colors duration-200">私密</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => handleInputChange('isPublic', true)}
-                className="transition-all duration-200 hover:bg-purple-50 hover:scale-[1.02] cursor-pointer"
-              >
-                <Globe className="w-4 h-4 mr-2 transition-transform duration-200 hover:scale-110" />
-                <span className="transition-colors duration-200">公开</span>
-              </DropdownMenuItem>
+              {visibilityOptions.map((option) => (
+                <DropdownMenuItem
+                  key={option.id}
+                  onClick={() => {
+                    handleInputChange('isPublic', option.id === 'public');
+                    setVisibilityDropdownOpen(false);
+                  }}
+                  className="transition-all duration-200 hover:bg-purple-900/5 cursor-pointer"
+                >
+                  <div className="flex flex-col w-full">
+                    <div className="flex items-center">
+                      {option.icon === 'Lock' ? (
+                        <Lock className="w-4 h-4 mr-2 transition-transform duration-200" />
+                      ) : (
+                        <Globe className="w-4 h-4 mr-2 transition-transform duration-200" />
+                      )}
+                      <span className="transition-colors duration-200">{option.label}</span>
+                    </div>
+                    <span className="text-xs text-gray-500 ml-6">{option.description}</span>
+                  </div>
+                </DropdownMenuItem>
+              ))}
             </DropdownMenu>
           </div>
         </div>
@@ -234,17 +256,14 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
                   {form.childName ? form.childName.slice(0, 2).toUpperCase() : 'YS'}
                 </div>
                 <div className="text-xl font-medium opacity-90">
-                  {form.difficulty === 'within10' && '10以内运算'}
-                  {form.difficulty === 'within20' && '20以内运算'}
-                  {form.difficulty === 'within50' && '50以内运算'}
-                  {form.difficulty === 'within100' && '100以内运算'}
+                  {difficultyOptions.find(option => option.id === form.difficulty)?.label}运算
                 </div>
               </div>
               {/* 装饰元素 */}
               <div className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20"></div>
               <div className="absolute bottom-6 left-6 w-4 h-4 rounded-full bg-white/30"></div>
               <div className="absolute bottom-4 right-4 w-12 h-12 rounded-full border-4 border-white/20 flex items-center justify-center bg-black/20">
-                <span className="text-white text-2xl">🎯</span>
+                <Target className="text-white w-6 h-6" />
               </div>
             </Card>
 
@@ -296,21 +315,19 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
               <h3 className="text-lg font-medium">其他设置</h3>
 
               {/* 难度选择 */}
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between bg-purple-900/5 py-1 px-2 rounded">
                 <div className="flex items-center gap-3">
-                  <span className="text-lg">🎯</span>
+                  <Target className="w-5 h-5 text-gray-400" />
                   <span className="font-medium">难度</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-gray-600">
-                    {form.difficulty === 'within10' && '10以内'}
-                    {form.difficulty === 'within20' && '20以内'}
-                    {form.difficulty === 'within50' && '50以内'}
-                    {form.difficulty === 'within100' && '100以内'}
+                    {difficultyOptions.find(option => option.id === form.difficulty)?.label}
                   </span>
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     size="sm"
+                    className='cursor-pointer'
                     onClick={() => setShowDifficultyDialog(true)}
                   >
                     <Pencil className="w-4 h-4" />
@@ -327,51 +344,49 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
                       请选择练习题目的难度范围
                     </DialogDescription>
                   </DialogHeader>
-                  <div className="grid gap-4 py-4">
+                  <div className="grid gap-4 py-2">
                     <RadioGroup
                       value={form.difficulty}
                       onValueChange={(value: 'within10' | 'within20' | 'within50' | 'within100') => {
                         handleInputChange('difficulty', value);
                         setShowDifficultyDialog(false);
                       }}
-                      className="flex flex-col space-y-2"
+                      className="flex flex-col space-y-1"
                     >
-                      <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-50 transition-colors">
-                        <RadioGroupItem value="within10" id="dialog-within10" />
-                        <Label htmlFor="dialog-within10" className="cursor-pointer text-base">10以内</Label>
-                      </div>
-                      <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-50 transition-colors">
-                        <RadioGroupItem value="within20" id="dialog-within20" />
-                        <Label htmlFor="dialog-within20" className="cursor-pointer text-base">20以内</Label>
-                      </div>
-                      <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-50 transition-colors">
-                        <RadioGroupItem value="within50" id="dialog-within50" />
-                        <Label htmlFor="dialog-within50" className="cursor-pointer text-base">50以内</Label>
-                      </div>
-                      <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-50 transition-colors">
-                        <RadioGroupItem value="within100" id="dialog-within100" />
-                        <Label htmlFor="dialog-within100" className="cursor-pointer text-base">100以内</Label>
-                      </div>
+                      {difficultyOptions.map((option) => (
+                        <Label
+                          key={option.id}
+                          htmlFor={`dialog-${option.id}`}
+                          className={`flex items-center space-x-4 p-4 rounded-xl cursor-pointer transition-all duration-200 border-2 ${form.difficulty === option.id
+                            ? 'bg-purple-500 border-purple-500 shadow-lg text-white'
+                            : 'bg-white border-gray-200 hover:bg-purple-50 hover:border-purple-200'
+                            }`}
+                        >
+                          <RadioGroupItem value={option.id} id={`dialog-${option.id}`} className="pointer-events-none" />
+                          <span className={`text-base font-medium flex-1 ${form.difficulty === option.id ? 'text-white' : 'text-gray-700'}`}>
+                            {option.label}
+                          </span>
+                        </Label>
+                      ))}
                     </RadioGroup>
                   </div>
                 </DialogContent>
               </Dialog>
 
               {/* 计算方式 */}
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between bg-purple-900/5 py-1 px-2 rounded">
                 <div className="flex items-center gap-3">
-                  <span className="text-lg">🧮</span>
+                  <Calculator className="w-5 h-5 text-gray-400" />
                   <span className="font-medium">计算方式</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-gray-600">
-                    {form.calculationType === 'add' && '加法'}
-                    {form.calculationType === 'sub' && '减法'}
-                    {form.calculationType === 'addsub' && '加减混合'}
+                    {calculationTypeOptions.find(option => option.id === form.calculationType)?.label}
                   </span>
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     size="sm"
+                    className='cursor-pointer'
                     onClick={() => setShowCalculationDialog(true)}
                   >
                     <Pencil className="w-4 h-4" />
@@ -395,41 +410,43 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
                         handleInputChange('calculationType', value);
                         setShowCalculationDialog(false);
                       }}
-                      className="flex flex-col space-y-2"
+                      className="flex flex-col space-y-1"
                     >
-                      <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-50 transition-colors">
-                        <RadioGroupItem value="add" id="dialog-add" />
-                        <Label htmlFor="dialog-add" className="cursor-pointer text-base">加法</Label>
-                      </div>
-                      <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-50 transition-colors">
-                        <RadioGroupItem value="sub" id="dialog-sub" />
-                        <Label htmlFor="dialog-sub" className="cursor-pointer text-base">减法</Label>
-                      </div>
-                      <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-50 transition-colors">
-                        <RadioGroupItem value="addsub" id="dialog-addsub" />
-                        <Label htmlFor="dialog-addsub" className="cursor-pointer text-base">加减混合</Label>
-                      </div>
+                      {calculationTypeOptions.map((option) => (
+                        <Label
+                          key={option.id}
+                          htmlFor={`dialog-${option.id}`}
+                          className={`flex items-center space-x-4 p-4 rounded-xl cursor-pointer transition-all duration-200 border-2 ${form.calculationType === option.id
+                            ? 'bg-purple-500 border-purple-500 shadow-lg text-white'
+                            : 'bg-white border-gray-200 hover:bg-purple-50 hover:border-purple-200'
+                            }`}
+                        >
+                          <RadioGroupItem value={option.id} id={`dialog-${option.id}`} className="pointer-events-none" />
+                          <span className={`text-base font-medium flex-1 ${form.calculationType === option.id ? 'text-white' : 'text-gray-700'}`}>
+                            {option.label}
+                          </span>
+                        </Label>
+                      ))}
                     </RadioGroup>
                   </div>
                 </DialogContent>
               </Dialog>
 
-              <Separator />
-
               {/* 测试方式 */}
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between bg-purple-900/5 py-1 px-2 rounded">
                 <div className="flex items-center gap-3">
-                  <span className="text-lg">⏱️</span>
+                  <Timer className="w-5 h-5 text-gray-400" />
                   <span className="font-medium">测试方式</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-gray-600">
-                    {form.testMode === 'normal' && `普通模式 (${form.questionCount}题)`}
-                    {form.testMode === 'timed' && `计时模式 (${form.timeLimit}分钟)`}
+                    {form.testMode === 'normal' && `${testModeOptions.find(option => option.id === 'normal')?.label} (${form.questionCount}题)`}
+                    {form.testMode === 'timed' && `${testModeOptions.find(option => option.id === 'timed')?.label} (${form.timeLimit}分钟)`}
                   </span>
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     size="sm"
+                    className='cursor-pointer'
                     onClick={() => setShowTestModeDialog(true)}
                   >
                     <Pencil className="w-4 h-4" />
@@ -452,63 +469,66 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
                       onValueChange={(value: 'normal' | 'timed') => {
                         handleInputChange('testMode', value);
                       }}
-                      className="flex flex-col space-y-2"
+                      className="flex flex-col space-y-1"
                     >
-                      <div className="flex flex-col space-y-4">
-                        <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-50 transition-colors">
-                          <RadioGroupItem value="normal" id="dialog-normal" />
-                          <Label htmlFor="dialog-normal" className="cursor-pointer text-base">普通模式</Label>
+                      {testModeOptions.map((option) => (
+                        <div key={option.id} className="flex flex-col space-y-3">
+                          <Label
+                            htmlFor={`dialog-${option.id}`}
+                            className={`flex items-center space-x-4 p-4 rounded-xl cursor-pointer transition-all duration-200 border-2 ${form.testMode === option.id
+                              ? 'bg-purple-500 border-purple-500 shadow-lg text-white'
+                              : 'bg-white border-gray-200 hover:bg-purple-50 hover:border-purple-200'
+                              }`}
+                          >
+                            <RadioGroupItem value={option.id} id={`dialog-${option.id}`} className="pointer-events-none" />
+                            <span className={`text-base font-medium flex-1 ${form.testMode === option.id ? 'text-white' : 'text-gray-700'}`}>
+                              {option.label}
+                            </span>
+                          </Label>
+                          {form.testMode === option.id && option.id === 'normal' && (
+                            <div>
+                              <Select
+                                value={form.questionCount.toString()}
+                                onValueChange={(value) => handleInputChange('questionCount', parseInt(value))}
+                              >
+                                <SelectTrigger className="w-full">
+                                  <SelectValue placeholder="选择题目数量" />
+                                </SelectTrigger>
+                                <SelectContent className="bg-white border shadow-lg">
+                                  {questionCountOptions.map((count) => (
+                                    <SelectItem key={count} value={count.toString()}>
+                                      {count} 题
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          )}
+                          {form.testMode === option.id && option.id === 'timed' && (
+                            <div>
+                              <Select
+                                value={form.timeLimit.toString()}
+                                onValueChange={(value) => handleInputChange('timeLimit', parseInt(value))}
+                              >
+                                <SelectTrigger className="w-full">
+                                  <SelectValue placeholder="选择时间" />
+                                </SelectTrigger>
+                                <SelectContent className="bg-white border shadow-lg">
+                                  {timeLimitOptions.map((minutes) => (
+                                    <SelectItem key={minutes} value={minutes.toString()}>
+                                      {minutes} 分钟
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          )}
                         </div>
-                        {form.testMode === 'normal' && (
-                          <div className="ml-8">
-                            <Select
-                              value={form.questionCount.toString()}
-                              onValueChange={(value) => handleInputChange('questionCount', parseInt(value))}
-                            >
-                              <SelectTrigger className="w-32">
-                                <SelectValue placeholder="选择题目数量" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {[5, 10, 15, 20, 25, 30].map((count) => (
-                                  <SelectItem key={count} value={count.toString()}>
-                                    {count} 题
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="flex flex-col space-y-4">
-                        <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-50 transition-colors">
-                          <RadioGroupItem value="timed" id="dialog-timed" />
-                          <Label htmlFor="dialog-timed" className="cursor-pointer text-base">计时模式</Label>
-                        </div>
-                        {form.testMode === 'timed' && (
-                          <div className="ml-8">
-                            <Select
-                              value={form.timeLimit.toString()}
-                              onValueChange={(value) => handleInputChange('timeLimit', parseInt(value))}
-                            >
-                              <SelectTrigger className="w-32">
-                                <SelectValue placeholder="选择时间" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {[1, 2, 3, 5, 10, 15].map((minutes) => (
-                                  <SelectItem key={minutes} value={minutes.toString()}>
-                                    {minutes} 分钟
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        )}
-                      </div>
+                      ))}
                     </RadioGroup>
                   </div>
                   <DialogFooter>
-                    <Button 
+                    <Button
                       onClick={() => setShowTestModeDialog(false)}
                       className="w-full"
                     >
@@ -523,7 +543,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
               {/* 完成奖励 */}
               <div>
                 <div className="flex items-center gap-3 mb-3">
-                  <span className="text-lg">🎁</span>
+                  <Gift className="w-5 h-5 text-gray-400" />
                   <span className="font-medium">完成奖励</span>
                 </div>
                 <div className="space-y-3">
