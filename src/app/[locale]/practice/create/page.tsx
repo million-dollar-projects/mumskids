@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-import { Badge } from '@/components/ui/badge';
+
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
 import { DropdownMenu, DropdownMenuItem } from '@/components/ui/dropdown-menu';
@@ -18,8 +18,9 @@ import { ThemeSelector } from '@/components/ui/theme-selector';
 import { messages } from '@/i18n/messages';
 import { useAuth } from '@/lib/auth/context';
 import { themes } from '@/lib/themes';
-import { Plus, X, ChevronDown, Globe, Lock, Pencil, Target, Calculator, Timer, Gift } from 'lucide-react';
+import { ChevronDown, Globe, Lock, Pencil, Target, Calculator, Timer } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { RewardSelector } from '@/components/ui/reward-selector';
 import {
   difficultyOptions,
   calculationTypeOptions,
@@ -33,6 +34,12 @@ interface CreatePracticeProps {
   params: Promise<{ locale: string }>;
 }
 
+interface Reward {
+  id: string;
+  text: string;
+  emoji: string;
+}
+
 interface PracticeForm {
   title: string;
   description: string;
@@ -43,7 +50,8 @@ interface PracticeForm {
   questionCount: number;
   timeLimit: number; // 单位：分钟
   isPublic: boolean;
-  rewards: string[];
+  rewards: Reward[];
+  rewardDistributionMode: 'random' | 'choice' | 'all';
   selectedTheme: string;
   calculationType: 'add' | 'sub' | 'addsub';
 }
@@ -55,7 +63,6 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
   const router = useRouter();
   const [locale, setLocale] = useState('zh');
   const [saving, setSaving] = useState(false);
-  const [newReward, setNewReward] = useState('');
   const [showCalculationDialog, setShowCalculationDialog] = useState(false);
   const [showDifficultyDialog, setShowDifficultyDialog] = useState(false);
   const [showTestModeDialog, setShowTestModeDialog] = useState(false);
@@ -72,6 +79,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
     timeLimit: 5,
     isPublic: false,
     rewards: [],
+    rewardDistributionMode: 'all',
     selectedTheme: 'rainbow',
     calculationType: 'add'
   });
@@ -96,29 +104,14 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
     }
   }, [user, loading, router, locale]);
 
-  const handleInputChange = (field: keyof PracticeForm, value: string | number | boolean | string[]) => {
+  const handleInputChange = (field: keyof PracticeForm, value: string | number | boolean | Reward[] | 'random' | 'choice' | 'all') => {
     setForm(prev => ({
       ...prev,
       [field]: value
     }));
   };
 
-  const addReward = () => {
-    if (newReward.trim() && form.rewards.length < 5) {
-      setForm(prev => ({
-        ...prev,
-        rewards: [...prev.rewards, newReward.trim()]
-      }));
-      setNewReward('');
-    }
-  };
 
-  const removeReward = (index: number) => {
-    setForm(prev => ({
-      ...prev,
-      rewards: prev.rewards.filter((_, i) => i !== index)
-    }));
-  };
 
 
 
@@ -548,7 +541,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
                   <DialogFooter>
                     <Button
                       onClick={() => setShowTestModeDialog(false)}
-                      className="w-full bg-gray-900 hover:bg-gray-800 text-white cursor-pointer"
+                      className="w-full bg-gray-900 hover:bg-gray-800 text-white cursor-pointer h-11"
                     >
                       确 定
                     </Button>
@@ -559,46 +552,13 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
               <Separator />
 
               {/* 完成奖励 */}
-              <div>
-                <div className="flex items-center gap-3 mb-3">
-                  <Gift className="w-5 h-5 text-gray-400" />
-                  <span className="font-medium">完成奖励</span>
-                </div>
-                <div className="space-y-3">
-                  <div className="flex space-x-2">
-                    <Input
-                      value={newReward}
-                      onChange={(e) => setNewReward(e.target.value)}
-                      placeholder="添加完成奖励..."
-                      onKeyDown={(e) => e.key === 'Enter' && addReward()}
-                      disabled={form.rewards.length >= 5}
-                    />
-                    <Button
-                      onClick={addReward}
-                      disabled={!newReward.trim() || form.rewards.length >= 5}
-                      variant="outline"
-                      size="icon"
-                    >
-                      <Plus className="w-4 h-4" />
-                    </Button>
-                  </div>
-                  {form.rewards.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
-                      {form.rewards.map((reward, index) => (
-                        <Badge key={index} variant="secondary" className="gap-2">
-                          {reward}
-                          <button
-                            onClick={() => removeReward(index)}
-                            className="hover:text-red-500"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
+              <RewardSelector
+                rewards={form.rewards}
+                distributionMode={form.rewardDistributionMode}
+                onRewardsChange={(rewards) => handleInputChange('rewards', rewards)}
+                onDistributionModeChange={(mode) => handleInputChange('rewardDistributionMode', mode)}
+                maxRewards={10}
+              />
             </div>
 
             {/* 创建按钮 */}

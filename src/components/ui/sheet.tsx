@@ -52,10 +52,11 @@ const SheetTrigger = React.forwardRef<HTMLButtonElement, SheetTriggerProps>(
     }
 
     if (asChild) {
-      return React.cloneElement(children as React.ReactElement, {
+      const child = children as React.ReactElement
+      return React.cloneElement(child, {
         onClick: handleClick,
         ref,
-      })
+      } as Partial<React.HTMLAttributes<HTMLElement>>)
     }
 
     return (
