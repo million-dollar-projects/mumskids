@@ -75,11 +75,34 @@ export async function POST(request: NextRequest) {
     }
 
     // 验证必填字段
-    const requiredFields = ['title', 'childName', 'difficulty', 'questionCount'];
+    const requiredFields = ['title', 'childName', 'difficulty', 'testMode'];
     const missingFields = requiredFields.filter(field => !body[field]);
+
+    // 根据测试模式验证额外的必填字段
+    if (body.testMode === 'normal' && !body.questionCount) {
+      missingFields.push('questionCount');
+    } else if (body.testMode === 'timed' && !body.timeLimit) {
+      missingFields.push('timeLimit');
+    }
+
     if (missingFields.length > 0) {
       return NextResponse.json(
         { error: 'Missing required fields', fields: missingFields },
+        { status: 400 }
+      );
+    }
+
+    // 验证字段值的合法性
+    if (body.testMode === 'normal' && (body.questionCount < 5 || body.questionCount > 30)) {
+      return NextResponse.json(
+        { error: 'Invalid question count. Must be between 5 and 30.' },
+        { status: 400 }
+      );
+    }
+
+    if (body.testMode === 'timed' && (body.timeLimit < 1 || body.timeLimit > 15)) {
+      return NextResponse.json(
+        { error: 'Invalid time limit. Must be between 1 and 15 minutes.' },
         { status: 400 }
       );
     }
@@ -98,11 +121,14 @@ export async function POST(request: NextRequest) {
       slug: slugData,
       is_public: body.isPublic ?? false,
       difficulty: body.difficulty,
-      question_count: body.questionCount,
+      question_count: body.testMode === 'normal' ? body.questionCount : null,
+      time_limit: body.testMode === 'timed' ? body.timeLimit : null,
+      test_mode: body.testMode,
       metadata: {
         title: body.title,
         description: body.description || '',
-        rewards: body.rewards || []
+        rewards: body.rewards || [],
+        theme: body.selectedTheme || 'rainbow'
       },
       child_info: {
         name: body.childName,
@@ -111,7 +137,9 @@ export async function POST(request: NextRequest) {
       stats: {
         total_attempts: 0,
         completed_attempts: 0,
-        average_score: 0
+        average_score: 0,
+        best_score: 0,
+        best_time: null
       }
     };
 

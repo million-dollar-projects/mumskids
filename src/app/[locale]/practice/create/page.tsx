@@ -3,22 +3,24 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
+
 import { Badge } from '@/components/ui/badge';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
 import { DropdownMenu, DropdownMenuItem } from '@/components/ui/dropdown-menu';
-import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetClose } from '@/components/ui/sheet';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
+import { ThemeSelector } from '@/components/ui/theme-selector';
 import { messages } from '@/i18n/messages';
 import { useAuth } from '@/lib/auth/context';
-import { Plus, X, ChevronDown, Globe, Lock, ChevronsUpDown, Shuffle } from 'lucide-react';
+import { themes } from '@/lib/themes';
+import { Plus, X, ChevronDown, Globe, Lock, Pencil } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 
 interface CreatePracticeProps {
   params: Promise<{ locale: string }>;
@@ -30,22 +32,16 @@ interface PracticeForm {
   childName: string;
   gender: 'boy' | 'girl';
   difficulty: 'within10' | 'within20' | 'within50' | 'within100';
+  testMode: 'normal' | 'timed';
   questionCount: number;
+  timeLimit: number; // 单位：分钟
   isPublic: boolean;
   rewards: string[];
   selectedTheme: string;
+  calculationType: 'add' | 'sub' | 'addsub';
 }
 
-// 主题数据
-const themes = [
-  { id: 'simple', name: '简约', icon: '✨', gradient: 'bg-gradient-to-br from-gray-100 to-gray-200', bgClass: 'bg-gray-50' },
-  { id: 'colorful', name: '彩子', icon: '🎨', gradient: 'bg-gradient-to-br from-blue-400 to-purple-500', bgClass: 'bg-gradient-to-br from-blue-50 to-purple-50' },
-  { id: 'dark', name: '培训', icon: '🎯', gradient: 'bg-gradient-to-br from-gray-800 to-black', bgClass: 'bg-gray-900' },
-  { id: 'nature', name: '表情符号', icon: '😊', gradient: 'bg-gradient-to-br from-pink-300 to-pink-400', bgClass: 'bg-pink-50' },
-  { id: 'ocean', name: '数据', icon: '📊', gradient: 'bg-gradient-to-br from-purple-600 to-purple-800', bgClass: 'bg-purple-50' },
-  { id: 'sunset', name: '图案', icon: '🔷', gradient: 'bg-gradient-to-br from-blue-500 to-blue-700', bgClass: 'bg-blue-50' },
-  { id: 'space', name: '争夺战', icon: '🏁', gradient: 'bg-gradient-to-br from-cyan-400 to-cyan-600', bgClass: 'bg-cyan-50' },
-];
+
 
 export default function CreatePracticePage({ params }: CreatePracticeProps) {
   const { user, loading } = useAuth();
@@ -53,7 +49,9 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
   const [locale, setLocale] = useState('zh');
   const [saving, setSaving] = useState(false);
   const [newReward, setNewReward] = useState('');
-  const [themeSheetOpen, setThemeSheetOpen] = useState(false);
+  const [showCalculationDialog, setShowCalculationDialog] = useState(false);
+  const [showDifficultyDialog, setShowDifficultyDialog] = useState(false);
+  const [showTestModeDialog, setShowTestModeDialog] = useState(false);
 
   const [form, setForm] = useState<PracticeForm>({
     title: '练习名称',
@@ -61,10 +59,13 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
     childName: '',
     gender: 'boy',
     difficulty: 'within10',
+    testMode: 'normal',
     questionCount: 10,
+    timeLimit: 0,
     isPublic: false,
     rewards: [],
-    selectedTheme: 'simple'
+    selectedTheme: 'rainbow',
+    calculationType: 'add'
   });
 
   useEffect(() => {
@@ -110,11 +111,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
     }));
   };
 
-  const randomizeTheme = () => {
-    const availableThemes = themes.filter(theme => theme.id !== form.selectedTheme);
-    const randomTheme = availableThemes[Math.floor(Math.random() * availableThemes.length)];
-    handleInputChange('selectedTheme', randomTheme.id);
-  };
+
 
   const handleSave = async () => {
     if (!form.title.trim() || !form.childName.trim()) {
@@ -193,29 +190,34 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
           <div className="flex items-center space-x-4 bg-purple-100 rounded p-0 pointer-events-auto">
             <DropdownMenu
               trigger={
-                <Button variant="ghost" className="flex items-center space-x-2">
-                  {form.isPublic ? (
-                    <>
-                      <Globe className="w-4 h-4" />
-                      <span>公开</span>
-                    </>
-                  ) : (
-                    <>
-                      <Lock className="w-4 h-4" />
-                      <span>私密</span>
-                    </>
-                  )}
-                  <ChevronDown className="w-4 h-4" />
+                <Button variant="ghost" className="flex items-center space-x-2 transition-all duration-200 hover:bg-purple-200/50 hover:scale-105">
+                  <div className="transition-transform duration-300">
+                    {form.isPublic ? (
+                      <Globe className="w-4 h-4 animate-in fade-in-0 zoom-in-95 duration-200" />
+                    ) : (
+                      <Lock className="w-4 h-4 animate-in fade-in-0 zoom-in-95 duration-200" />
+                    )}
+                  </div>
+                  <span className="transition-all duration-200">
+                    {form.isPublic ? '公开' : '私密'}
+                  </span>
+                  <ChevronDown className="w-4 h-4 transition-transform duration-200 group-data-[state=open]:rotate-180" />
                 </Button>
               }
             >
-              <DropdownMenuItem onClick={() => handleInputChange('isPublic', false)}>
-                <Lock className="w-4 h-4 mr-2" />
-                私密
+              <DropdownMenuItem
+                onClick={() => handleInputChange('isPublic', false)}
+                className="transition-all duration-200 hover:bg-purple-50 hover:scale-[1.02] cursor-pointer"
+              >
+                <Lock className="w-4 h-4 mr-2 transition-transform duration-200 hover:scale-110" />
+                <span className="transition-colors duration-200">私密</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleInputChange('isPublic', true)}>
-                <Globe className="w-4 h-4 mr-2" />
-                公开
+              <DropdownMenuItem
+                onClick={() => handleInputChange('isPublic', true)}
+                className="transition-all duration-200 hover:bg-purple-50 hover:scale-[1.02] cursor-pointer"
+              >
+                <Globe className="w-4 h-4 mr-2 transition-transform duration-200 hover:scale-110" />
+                <span className="transition-colors duration-200">公开</span>
               </DropdownMenuItem>
             </DropdownMenu>
           </div>
@@ -247,214 +249,276 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
             </Card>
 
             {/* 主题选择 */}
-            <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-sm">
-              <CardContent className="p-2">
-                <div className="flex items-center justify-between">
-                  {/* 左侧：主题图标和信息 */}
-                  <div className="flex items-center space-x-3">
-                    <div className={`w-10 h-10 rounded-lg ${currentTheme?.gradient} flex items-center justify-center shadow-sm`}>
-                      <span className="text-lg">{currentTheme?.icon}</span>
-                    </div>
-                    <div>
-                      <div className="text-sm text-gray-600">主题</div>
-                      <div className="font-medium text-gray-900">{currentTheme?.name}</div>
-                    </div>
-                  </div>
-
-                  {/* 右侧：操作按钮 */}
-                  <div className="flex items-center space-x-2">
-                    {/* 选择按钮 */}
-                    <Sheet open={themeSheetOpen} onOpenChange={setThemeSheetOpen}>
-                      <SheetTrigger asChild>
-                        <Button variant="ghost" size="sm" className="p-2 h-8 w-8">
-                          <ChevronsUpDown className="w-4 h-4 text-gray-500" />
-                        </Button>
-                      </SheetTrigger>
-                      <SheetContent side="bottom" className="max-h-[75vh] overflow-y-auto">
-                        <SheetHeader>
-                          <SheetTitle>11</SheetTitle>
-                        </SheetHeader>
-                        <div className="mt-6">
-                          <div className="flex items-center justify-center space-x-4 overflow-x-auto pb-4">
-                            {themes.map((theme) => (
-                              <button
-                                key={theme.id}
-                                onClick={() => {
-                                  handleInputChange('selectedTheme', theme.id);
-                                  setThemeSheetOpen(false);
-                                }}
-                                className={`flex flex-col items-center space-y-2 p-3 rounded-lg transition-all min-w-[80px] ${form.selectedTheme === theme.id
-                                  ? 'bg-blue-50 border-2 border-blue-500'
-                                  : 'hover:bg-gray-50 border-2 border-transparent'
-                                  }`}
-                              >
-                                <div className={`w-16 h-16 rounded-lg ${theme.gradient} flex items-center justify-center shadow-sm`}>
-                                  <span className="text-2xl">{theme.icon}</span>
-                                </div>
-                                <div className="text-center">
-                                  <h3 className="font-medium text-gray-900 text-sm">{theme.name}</h3>
-                                </div>
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      </SheetContent>
-                    </Sheet>
-
-                    {/* 随机按钮 */}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="p-2 h-8 w-8"
-                      onClick={randomizeTheme}
-                    >
-                      <Shuffle className="w-4 h-4 text-gray-500" />
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <ThemeSelector
+              selectedTheme={form.selectedTheme}
+              onThemeChange={(themeId) => handleInputChange('selectedTheme', themeId)}
+            />
           </div>
 
           {/* 右侧 - 表单区域 */}
-          <div className="lg:col-span-8 space-y-6">
+          <div className="lg:col-span-8 space-y-2">
             {/* 练习标题 */}
             <div>
               <Input
                 value={form.title}
                 onChange={(e) => handleInputChange('title', e.target.value)}
-                className="text-3xl font-bold border-none p-0 h-auto focus-visible:ring-0 bg-transparent"
+                className="text-4xl md:text-4xl font-bold text-[#1315175c] shadow-none 
+                border-none outline-none py-4 px-0 h-auto focus-visible:ring-0 bg-transparent 
+                placeholder:text-4xl placeholder:font-bold placeholder:text-[#1315175c]"
                 placeholder="练习名称"
               />
             </div>
-
-            {/* 时间设置 */}
-            <div className="grid grid-cols-2 gap-6">
-              <div>
-                <Label className="text-sm text-gray-500 mb-2 block flex items-center gap-2">
-                  🎯 开始
-                </Label>
-                <Select
-                  value={form.difficulty}
-                  onValueChange={(value) => handleInputChange('difficulty', value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="within10">{t.practice.within10}</SelectItem>
-                    <SelectItem value="within20">{t.practice.within20}</SelectItem>
-                    <SelectItem value="within50">{t.practice.within50}</SelectItem>
-                    <SelectItem value="within100">{t.practice.within100}</SelectItem>
-                  </SelectContent>
-                </Select>
-                <div className="text-xs text-gray-400 mt-1">23:30</div>
-              </div>
-
-              <div>
-                <Label className="text-sm text-gray-500 mb-2 block flex items-center gap-2">
-                  ⏰ 结束
-                </Label>
-                <div className="text-lg font-medium">{form.questionCount}道题结束</div>
-                <div className="text-xs text-gray-400 mt-1">
-                  GMT+09:00<br />东京
-                </div>
-              </div>
-            </div>
-
-            {/* 添加练习地点 */}
+            {/* 描述 */}
             <div>
-              <Label className="text-sm text-gray-500 mb-2 block flex items-center gap-2">
-                📍 添加练习地点
-              </Label>
               <Input
-                value={form.childName}
-                onChange={(e) => handleInputChange('childName', e.target.value)}
-                placeholder="线下地点或线上链接"
-                className="w-full"
-              />
-            </div>
-
-            {/* 添加描述 */}
-            <div>
-              <Label className="text-sm text-gray-500 mb-2 block flex items-center gap-2">
-                📝 添加描述
-              </Label>
-              <Textarea
                 value={form.description}
                 onChange={(e) => handleInputChange('description', e.target.value)}
                 placeholder="简单描述这个练习的目标和内容..."
-                className="min-h-[100px] resize-none"
+                className="w-full border-none shadow-none outline-none px-2 py-2 h-auto focus-visible:ring-0 bg-transparent 
+                 placeholder:font-bold placeholder:text-[#1315175c] bg-purple-900/5"
+              />
+            </div>
+            {/* 小朋友昵称 */}
+            <div>
+              <Input
+                value={form.childName}
+                onChange={(e) => handleInputChange('childName', e.target.value)}
+                placeholder="小朋友昵称"
+                className="w-full border-none shadow-none outline-none px-2 py-2 h-auto focus-visible:ring-0 bg-transparent 
+                  placeholder:font-bold placeholder:text-[#1315175c] bg-purple-900/5"
               />
             </div>
 
             <Separator />
 
-            {/* 练习选项 */}
+            {/* 其他设置 */}
             <div className="space-y-6">
-              <h3 className="text-lg font-medium">练习选项</h3>
+              <h3 className="text-lg font-medium">其他设置</h3>
 
-              {/* 门票 */}
+              {/* 难度选择 */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <span className="text-lg">🎫</span>
-                  <span className="font-medium">门票</span>
+                  <span className="text-lg">🎯</span>
+                  <span className="font-medium">难度</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-green-600 font-medium">免费</span>
-                  <Button variant="ghost" size="sm">
-                    <ChevronDown className="w-4 h-4" />
+                  <span className="text-gray-600">
+                    {form.difficulty === 'within10' && '10以内'}
+                    {form.difficulty === 'within20' && '20以内'}
+                    {form.difficulty === 'within50' && '50以内'}
+                    {form.difficulty === 'within100' && '100以内'}
+                  </span>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => setShowDifficultyDialog(true)}
+                  >
+                    <Pencil className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
 
-              {/* 需要审核 */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span className="text-lg">👤</span>
-                  <span className="font-medium">需要审核</span>
-                </div>
-                <Switch
-                  checked={false}
-                  onCheckedChange={() => { }}
-                />
-              </div>
+              {/* 难度选择弹窗 */}
+              <Dialog open={showDifficultyDialog} onOpenChange={setShowDifficultyDialog}>
+                <DialogContent className="sm:max-w-[425px] bg-white">
+                  <DialogHeader>
+                    <DialogTitle className="text-xl font-bold">选择难度</DialogTitle>
+                    <DialogDescription className="text-gray-500">
+                      请选择练习题目的难度范围
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <RadioGroup
+                      value={form.difficulty}
+                      onValueChange={(value: 'within10' | 'within20' | 'within50' | 'within100') => {
+                        handleInputChange('difficulty', value);
+                        setShowDifficultyDialog(false);
+                      }}
+                      className="flex flex-col space-y-2"
+                    >
+                      <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-50 transition-colors">
+                        <RadioGroupItem value="within10" id="dialog-within10" />
+                        <Label htmlFor="dialog-within10" className="cursor-pointer text-base">10以内</Label>
+                      </div>
+                      <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-50 transition-colors">
+                        <RadioGroupItem value="within20" id="dialog-within20" />
+                        <Label htmlFor="dialog-within20" className="cursor-pointer text-base">20以内</Label>
+                      </div>
+                      <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-50 transition-colors">
+                        <RadioGroupItem value="within50" id="dialog-within50" />
+                        <Label htmlFor="dialog-within50" className="cursor-pointer text-base">50以内</Label>
+                      </div>
+                      <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-50 transition-colors">
+                        <RadioGroupItem value="within100" id="dialog-within100" />
+                        <Label htmlFor="dialog-within100" className="cursor-pointer text-base">100以内</Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+                </DialogContent>
+              </Dialog>
 
-              {/* 人数限制 */}
+              {/* 计算方式 */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <span className="text-lg">👥</span>
-                  <span className="font-medium">人数限制</span>
+                  <span className="text-lg">🧮</span>
+                  <span className="font-medium">计算方式</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-gray-600">无限制</span>
-                  <Button variant="ghost" size="sm">
-                    <ChevronDown className="w-4 h-4" />
+                  <span className="text-gray-600">
+                    {form.calculationType === 'add' && '加法'}
+                    {form.calculationType === 'sub' && '减法'}
+                    {form.calculationType === 'addsub' && '加减混合'}
+                  </span>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => setShowCalculationDialog(true)}
+                  >
+                    <Pencil className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
 
-              {/* 性别选择 */}
+              {/* 计算方式选择弹窗 */}
+              <Dialog open={showCalculationDialog} onOpenChange={setShowCalculationDialog}>
+                <DialogContent className="sm:max-w-[425px] bg-white">
+                  <DialogHeader>
+                    <DialogTitle className="text-xl font-bold">选择计算方式</DialogTitle>
+                    <DialogDescription className="text-gray-500">
+                      请选择练习题目的计算方式
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <RadioGroup
+                      value={form.calculationType}
+                      onValueChange={(value: 'add' | 'sub' | 'addsub') => {
+                        handleInputChange('calculationType', value);
+                        setShowCalculationDialog(false);
+                      }}
+                      className="flex flex-col space-y-2"
+                    >
+                      <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-50 transition-colors">
+                        <RadioGroupItem value="add" id="dialog-add" />
+                        <Label htmlFor="dialog-add" className="cursor-pointer text-base">加法</Label>
+                      </div>
+                      <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-50 transition-colors">
+                        <RadioGroupItem value="sub" id="dialog-sub" />
+                        <Label htmlFor="dialog-sub" className="cursor-pointer text-base">减法</Label>
+                      </div>
+                      <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-50 transition-colors">
+                        <RadioGroupItem value="addsub" id="dialog-addsub" />
+                        <Label htmlFor="dialog-addsub" className="cursor-pointer text-base">加减混合</Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+                </DialogContent>
+              </Dialog>
+
+              <Separator />
+
+              {/* 测试方式 */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <span className="text-lg">🚻</span>
-                  <span className="font-medium">适合性别</span>
+                  <span className="text-lg">⏱️</span>
+                  <span className="font-medium">测试方式</span>
                 </div>
-                <RadioGroup
-                  value={form.gender}
-                  onValueChange={(value) => handleInputChange('gender', value)}
-                  className="flex space-x-4"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="boy" id="boy" />
-                    <Label htmlFor="boy" className="cursor-pointer">👦 男孩</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="girl" id="girl" />
-                    <Label htmlFor="girl" className="cursor-pointer">👧 女孩</Label>
-                  </div>
-                </RadioGroup>
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-600">
+                    {form.testMode === 'normal' && `普通模式 (${form.questionCount}题)`}
+                    {form.testMode === 'timed' && `计时模式 (${form.timeLimit}分钟)`}
+                  </span>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => setShowTestModeDialog(true)}
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </Button>
+                </div>
               </div>
+
+              {/* 测试方式选择弹窗 */}
+              <Dialog open={showTestModeDialog} onOpenChange={setShowTestModeDialog}>
+                <DialogContent className="sm:max-w-[425px] bg-white">
+                  <DialogHeader>
+                    <DialogTitle className="text-xl font-bold">选择测试方式</DialogTitle>
+                    <DialogDescription className="text-gray-500">
+                      请选择练习题目的测试方式和相关设置
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid gap-6 py-4">
+                    <RadioGroup
+                      value={form.testMode}
+                      onValueChange={(value: 'normal' | 'timed') => {
+                        handleInputChange('testMode', value);
+                      }}
+                      className="flex flex-col space-y-2"
+                    >
+                      <div className="flex flex-col space-y-4">
+                        <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-50 transition-colors">
+                          <RadioGroupItem value="normal" id="dialog-normal" />
+                          <Label htmlFor="dialog-normal" className="cursor-pointer text-base">普通模式</Label>
+                        </div>
+                        {form.testMode === 'normal' && (
+                          <div className="ml-8">
+                            <Select
+                              value={form.questionCount.toString()}
+                              onValueChange={(value) => handleInputChange('questionCount', parseInt(value))}
+                            >
+                              <SelectTrigger className="w-32">
+                                <SelectValue placeholder="选择题目数量" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {[5, 10, 15, 20, 25, 30].map((count) => (
+                                  <SelectItem key={count} value={count.toString()}>
+                                    {count} 题
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex flex-col space-y-4">
+                        <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-purple-50 transition-colors">
+                          <RadioGroupItem value="timed" id="dialog-timed" />
+                          <Label htmlFor="dialog-timed" className="cursor-pointer text-base">计时模式</Label>
+                        </div>
+                        {form.testMode === 'timed' && (
+                          <div className="ml-8">
+                            <Select
+                              value={form.timeLimit.toString()}
+                              onValueChange={(value) => handleInputChange('timeLimit', parseInt(value))}
+                            >
+                              <SelectTrigger className="w-32">
+                                <SelectValue placeholder="选择时间" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {[1, 2, 3, 5, 10, 15].map((minutes) => (
+                                  <SelectItem key={minutes} value={minutes.toString()}>
+                                    {minutes} 分钟
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        )}
+                      </div>
+                    </RadioGroup>
+                  </div>
+                  <DialogFooter>
+                    <Button 
+                      onClick={() => setShowTestModeDialog(false)}
+                      className="w-full"
+                    >
+                      确定
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+
+              <Separator />
 
               {/* 完成奖励 */}
               <div>
@@ -468,7 +532,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
                       value={newReward}
                       onChange={(e) => setNewReward(e.target.value)}
                       placeholder="添加完成奖励..."
-                      onKeyPress={(e) => e.key === 'Enter' && addReward()}
+                      onKeyDown={(e) => e.key === 'Enter' && addReward()}
                       disabled={form.rewards.length >= 5}
                     />
                     <Button
