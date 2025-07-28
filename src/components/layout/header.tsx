@@ -51,16 +51,16 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
             {/* 语言切换 */}
             <div className="flex gap-2">
               <Link href="/zh">
-                <Button variant="ghost" size="sm" className="text-tertiary-gray">中文</Button>
+                <Button variant="ghost" size="sm" className="text-tertiary-gray cursor-pointer">中文</Button>
               </Link>
               <Link href="/en">
-                <Button variant="ghost" size="sm" className="text-tertiary-gray">English</Button>
+                <Button variant="ghost" size="sm" className="text-tertiary-gray cursor-pointer">English</Button>
               </Link>
             </div>
 
             {/* 探索活动链接 */}
             <Link href={`/${locale}/events`}>
-              <Button variant="ghost" size="sm" className="text-secondary-gray">
+              <Button variant="ghost" size="sm" className="text-secondary-gray cursor-pointer">
                 {t.landing.exploreEvents}
               </Button>
             </Link>
@@ -70,7 +70,7 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
               <div className="w-8 h-8 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
             ) : (
               <Link href={`/${locale}/auth/login`}>
-                <Button size="sm" className="btn-primary-black">
+                <Button size="sm" className="btn-primary-black cursor-pointer">
                   {t.nav.login}
                 </Button>
               </Link>
@@ -89,7 +89,7 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-8">
               <div className="flex-shrink-0">
-                <Star className="w-6 h-6 text-purple-600" fill="currentColor" />
+               
               </div>
             </div>
           </div>
@@ -106,15 +106,15 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
           <div className="flex items-center h-16">
             {/* Left section with navigation */}
             <nav className="flex space-x-4">
-              <Link href={`/${locale}/practice`} className="flex items-center space-x-2 text-sm/5 text-gray-900 font-bold">
+              <Link href={`/${locale}/practice`} className="flex items-center space-x-2 text-sm/5 text-gray-900 font-bold cursor-pointer">
                 <BookOpen className="w-5 h-5" />
                 <span>练习</span>
               </Link>
-              <a href="#" className="flex items-center space-x-2 text-sm/5 text-[#1315175c] font-bold hover:opacity-80">
+              <a href="#" className="flex items-center space-x-2 text-sm/5 text-[#1315175c] font-bold hover:opacity-80 cursor-pointer">
                 <Telescope className="w-5 h-5" />
                 <span>我的练习</span>
               </a>
-              <a href="#" className="flex items-center space-x-2 text-sm/5 text-[#1315175c] font-bold hover:opacity-80">
+              <a href="#" className="flex items-center space-x-2 text-sm/5 text-[#1315175c] font-bold hover:opacity-80 cursor-pointer">
                 <Globe className="w-5 h-5" />
                 <span>发现</span>
               </a>
@@ -125,21 +125,21 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
         {/* Right section - positioned absolutely to the right */}
         <div className="absolute right-4 sm:right-6 lg:right-8 top-0 h-16 flex items-center space-x-2">
           <Link href={`/${locale}/practice/create`}>
-            <button className="text-gray-700 hover:text-gray-900 font-medium text-sm/5">创建练习</button>
+            <button className="text-gray-700 hover:text-gray-900 font-medium text-sm/5 cursor-pointer">创建练习</button>
           </Link>
 
-          <button className="text-gray-600 hover:text-gray-900 p-2 rounded-md hover:bg-gray-100 transition-colors">
+          <button className="text-gray-600 hover:text-gray-900 p-2 rounded-md hover:bg-gray-100 transition-colors cursor-pointer">
             <Search className="w-5 h-5" />
           </button>
 
           <div className="relative" ref={notificationRef}>
             <button
               onClick={() => setShowNotifications(!showNotifications)}
-              className="text-gray-600 hover:text-gray-900 p-2 rounded-md hover:bg-gray-100 transition-colors relative"
+              className="text-gray-600 hover:text-gray-900 p-2 rounded-md hover:bg-gray-100 transition-colors relative cursor-pointer hover:bg-gray-100"
             >
               <Bell className="w-5 h-5" />
               {/* 未读通知小红点 */}
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full hidden"></span>
             </button>
 
             {/* 通知弹窗 */}

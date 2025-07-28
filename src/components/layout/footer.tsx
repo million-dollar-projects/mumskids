@@ -1,56 +1,11 @@
 'use client'
 
-import Link from 'next/link';
-import { messages } from '@/i18n/messages';
-
 interface FooterProps {
   locale: string;
-  variant?: 'landing' | 'authenticated';
 }
 
-export function Footer({ locale, variant = 'authenticated' }: FooterProps) {
-  const t = messages[locale as keyof typeof messages] || messages.zh;
-
-  // 着陆页页脚
-  if (variant === 'landing') {
-    return (
-      <footer className="py-12 px-6 border-t border-gray-100 mt-20">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
-            <div className="text-xl font-bold text-primary-black">
-              {t.landing.brand}
-            </div>
-            <div className="flex items-center gap-8 text-sm text-gray-500">
-              <Link href="/terms" className="hover:text-gray-700 transition-colors">
-                {t.landing.footer.support}
-              </Link>
-              <Link href="/privacy" className="hover:text-gray-700 transition-colors">
-                {t.landing.footer.privacy}
-              </Link>
-              <Link href="/help" className="hover:text-gray-700 transition-colors">
-                {t.landing.footer.security}
-              </Link>
-              <div className="flex gap-6">
-                <span className="text-gray-400 hover:text-gray-500 cursor-pointer transition-colors">📧</span>
-                <span className="text-gray-400 hover:text-gray-500 cursor-pointer transition-colors">👤</span>
-                <span className="text-gray-400 hover:text-gray-500 cursor-pointer transition-colors">✕</span>
-                <span className="text-gray-400 hover:text-gray-500 cursor-pointer transition-colors">📷</span>
-              </div>
-            </div>
-          </div>
-          {/* Bottom link */}
-          <div className="text-center">
-            <a href="#" className="text-blue-500 hover:text-blue-600 text-sm font-medium transition-colors">
-              使用 Luna 主卡制作问卷 →
-            </a>
-          </div>
-        </div>
-      </footer>
-    );
-  }
-
-  // 已认证用户页脚
-  return (
+export function Footer({ locale }: FooterProps) {
+  return (  
     <footer className="mt-16">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 border-t border-gray-100">
         <div className="flex items-center justify-between mb-8">

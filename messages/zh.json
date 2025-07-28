@@ -8,7 +8,7 @@
     "logout": "退出"
   },
   "auth": {
-    "title": "儿童数学练习系统",
+    "title": "LittlePlus",
     "subtitle": "让孩子爱上数学，从简单练习开始",
     "googleLogin": "使用 Google 登录",
     "emailLogin": "邮箱登录",

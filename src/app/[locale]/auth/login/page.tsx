@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/lib/auth/context';
@@ -68,8 +69,8 @@ export default function LoginPage({ params }: LoginPageProps) {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-2xl text-white">🧮</span>
+          <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Image src="/images/littleplus.png" alt="Little Plus" width={80} height={80} />
           </div>
           <CardTitle className="text-2xl font-bold">{t.auth.title}</CardTitle>
           <CardDescription className="text-base">

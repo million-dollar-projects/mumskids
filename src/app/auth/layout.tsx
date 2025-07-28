@@ -3,7 +3,7 @@ import { AuthProvider } from "@/lib/auth/context";
 import "../globals.css";
 
 export const metadata: Metadata = {
-  title: "认证 - 儿童数学练习系统",
+  title: "认证 - 儿童数学练习",
   description: "用户认证页面",
 };
 

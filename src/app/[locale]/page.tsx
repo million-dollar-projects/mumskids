@@ -26,8 +26,6 @@ export default function HomePage({ params }: PageProps) {
     getLocale();
   }, [params]);
 
-
-
   const t = messages[locale as keyof typeof messages] || messages.zh;
 
   // 如果正在加载认证状态，显示加载页面
@@ -39,7 +37,7 @@ export default function HomePage({ params }: PageProps) {
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
             <div className="w-8 h-8 animate-spin rounded-full border-2 border-purple-600 border-t-transparent mx-auto mb-4"></div>
-            <p className="text-gray-600">加载中...</p>
+            <p className="text-gray-600">{t.common.loading}</p>
           </div>
         </div>
         <Footer locale={locale} />
@@ -127,7 +125,7 @@ export default function HomePage({ params }: PageProps) {
                 <Link href={`/${locale}/auth/login`}>
                   <Button
                     size="lg"
-                    className="btn-primary-black px-8 py-4 text-lg font-medium"
+                    className="btn-primary-black px-4 py-2 text-lg font-medium cursor-pointer"
                   >
                     {t.landing.cta}
                   </Button>

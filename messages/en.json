@@ -8,7 +8,7 @@
     "logout": "Logout"
   },
   "auth": {
-    "title": "Kids Math Practice System",
+    "title": "LittlePlus",
     "subtitle": "Help children fall in love with math through simple practice",
     "googleLogin": "Login with Google",
     "emailLogin": "Email Login",
