@@ -165,7 +165,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
   if (loading) {
     return (
       <div className={`min-h-screen transition-colors duration-500 ${pageBackgroundClass}`}>
-        <Header locale={locale} backgroundClass={pageBackgroundClass} isFixed={true} />
+        <Header locale={locale} backgroundClass="bg-transparent" isFixed={true} />
         <div className="child-container py-8 pt-24">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
@@ -183,7 +183,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
 
   return (
     <div className={`min-h-screen transition-colors duration-500 ${pageBackgroundClass}`}>
-      <Header locale={locale} backgroundClass={pageBackgroundClass} isFixed={true} />
+      <Header locale={locale} backgroundClass="bg-transparent" isFixed={true} />
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
         {/* 顶部导航标签 */}

@@ -162,13 +162,15 @@ export function RewardSelector({
               variant="outline"
               size="icon"
               onClick={() => setShowEmojiDialog(true)}
-              className="shrink-0"
+              className="shrink-0 cursor-pointer bg-purple-900/5 border-none"
             >
               <span className="text-lg">{selectedEmoji}</span>
             </Button>
             <Input
               value={newRewardText}
               onChange={(e) => setNewRewardText(e.target.value)}
+              className='w-full border-none shadow-none outline-none px-2 py-2 h-auto focus-visible:ring-0 bg-transparent 
+                  placeholder:font-bold placeholder:text-[#1315175c] bg-purple-900/5'
               placeholder="添加完成奖励..."
               onKeyDown={(e) => e.key === 'Enter' && addReward()}
               disabled={rewards.length >= maxRewards}
@@ -177,7 +179,7 @@ export function RewardSelector({
               onClick={addReward}
               disabled={!newRewardText.trim() || rewards.length >= maxRewards}
               variant="outline"
-              className="cursor-pointer"
+              className="cursor-pointer bg-purple-900/5 border-none"
               size="icon"
             >
               <Plus className="w-4 h-4" />
