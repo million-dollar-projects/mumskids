@@ -69,7 +69,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
   const [visibilityDropdownOpen, setVisibilityDropdownOpen] = useState(false);
 
   const [form, setForm] = useState<PracticeForm>({
-    title: '练习名称',
+    title: '',
     description: '',
     childName: '',
     gender: 'boy',
@@ -79,7 +79,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
     timeLimit: 5,
     isPublic: false,
     rewards: [],
-    rewardDistributionMode: 'all',
+    rewardDistributionMode: 'random',
     selectedTheme: 'rainbow',
     calculationType: 'add'
   });
@@ -255,10 +255,10 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
                           : 'text-3xl'
                     : 'text-6xl'
                   }`}>
-                  {form.childName ? form.childName.toUpperCase() : '米小圈'}
+                  {form.childName ? form.childName.toUpperCase() : '昵称'}
                 </div>
                 <div className="text-xl font-medium opacity-90">
-                  {difficultyOptions.find(option => option.id === form.difficulty)?.label}运算
+                  {`${difficultyOptions.find(option => option.id === form.difficulty)?.label}${calculationTypeOptions.find(option => option.id === form.calculationType)?.label}运算`}
                 </div>
               </div>
               {/* 装饰元素 */}
@@ -289,8 +289,8 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
                 placeholder="练习名称"
               />
             </div>
-            {/* 描述 */}
-            <div>
+            {/* 描述暂时隐藏 */}
+            <div className='hidden'>
               <Input
                 value={form.description}
                 onChange={(e) => handleInputChange('description', e.target.value)}
