@@ -51,7 +51,7 @@ interface PracticeForm {
   timeLimit: number; // 单位：分钟
   isPublic: boolean;
   rewards: Reward[];
-  rewardDistributionMode: 'random' | 'choice' | 'all';
+  rewardDistributionMode: 'random' | 'choice';
   selectedTheme: string;
   calculationType: 'add' | 'sub' | 'addsub';
 }
@@ -97,6 +97,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
 
   const currentTheme = themes.find(t => t.id === form.selectedTheme);
   const pageBackgroundClass = currentTheme?.bgClass || 'bg-purple-50';
+  const dialogBackgroundClass = 'bg-white border-none shadow-none';
 
   useEffect(() => {
     if (!loading && !user) {
@@ -104,7 +105,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
     }
   }, [user, loading, router, locale]);
 
-  const handleInputChange = (field: keyof PracticeForm, value: string | number | boolean | Reward[] | 'random' | 'choice' | 'all') => {
+  const handleInputChange = (field: keyof PracticeForm, value: string | number | boolean | Reward[] | 'random' | 'choice') => {
     setForm(prev => ({
       ...prev,
       [field]: value
@@ -246,14 +247,14 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
             <Card className="aspect-square bg-gradient-to-br from-red-500 to-pink-500 border-none shadow-xl flex items-center justify-center relative overflow-hidden">
               <div className="text-center text-white px-4">
                 <div className={`font-bold mb-4 transform leading-tight ${form.childName
-                    ? form.childName.length <= 2
-                      ? 'text-6xl'
-                      : form.childName.length <= 4
-                        ? 'text-5xl'
-                        : form.childName.length <= 6
-                          ? 'text-4xl'
-                          : 'text-3xl'
-                    : 'text-6xl'
+                  ? form.childName.length <= 2
+                    ? 'text-6xl'
+                    : form.childName.length <= 4
+                      ? 'text-5xl'
+                      : form.childName.length <= 6
+                        ? 'text-4xl'
+                        : 'text-3xl'
+                  : 'text-6xl'
                   }`}>
                   {form.childName ? form.childName.toUpperCase() : '昵称'}
                 </div>
@@ -348,7 +349,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
 
               {/* 难度选择弹窗 */}
               <Dialog open={showDifficultyDialog} onOpenChange={setShowDifficultyDialog}>
-                <DialogContent className="sm:max-w-[425px] bg-white">
+                <DialogContent className={`sm:max-w-[425px] ${dialogBackgroundClass}`}>
                   <DialogHeader>
                     <DialogTitle className="text-xl font-bold">选择难度</DialogTitle>
                     <DialogDescription className="text-gray-500">
@@ -369,8 +370,8 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
                           key={option.id}
                           htmlFor={`dialog-${option.id}`}
                           className={`flex items-center text-gray-700 shadow-none space-x-1 py-2 px-4 rounded cursor-pointer transition-all duration-200 border-1 ${form.difficulty === option.id
-                            ? 'bg-purple-900/10 border-purple-900/20 shadow-md text-gray-900'
-                            : 'bg-gray-50 border-gray-200 hover:bg-purple-900/5 hover:border-purple-900/10'
+                            ? 'bg-blue-50 border-blue-200 shadow-md text-gray-900'
+                            : 'bg-gray-50 border-gray-200 hover:bg-blue-50/50 hover:border-blue-200/50'
                             }`}
                         >
                           <RadioGroupItem value={option.id} id={`dialog-${option.id}`} className="pointer-events-none" />
@@ -407,7 +408,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
 
               {/* 计算方式选择弹窗 */}
               <Dialog open={showCalculationDialog} onOpenChange={setShowCalculationDialog}>
-                <DialogContent className="sm:max-w-[425px] bg-white">
+                <DialogContent className={`sm:max-w-[425px] ${dialogBackgroundClass}`}>
                   <DialogHeader>
                     <DialogTitle className="text-xl font-bold">选择计算方式</DialogTitle>
                     <DialogDescription className="text-gray-500">
@@ -427,9 +428,9 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
                         <Label
                           key={option.id}
                           htmlFor={`dialog-${option.id}`}
-                          className={`flex items-center text-gray-700 shadow-none space-x-1 py-2 px-4 rounded cursor-pointer transition-all duration-200 border-1 ${form.calculationType === option.id
-                            ? 'bg-purple-900/10 border-purple-900/20 shadow-md text-gray-900'
-                            : 'bg-gray-50 border-gray-200 hover:bg-purple-900/5 hover:border-purple-900/10'
+                          className={`flex items-center text-gray-700 shadow-none space-x-1 py-2 px-4 rounded cursor-pointer transition-all duration-200 border-1 ${form.difficulty === option.id
+                            ? 'bg-blue-50 border-blue-200 shadow-md text-gray-900'
+                            : 'bg-gray-50 border-gray-200 hover:bg-blue-50/50 hover:border-blue-200/50'
                             }`}
                         >
                           <RadioGroupItem value={option.id} id={`dialog-${option.id}`} className="pointer-events-none" />
@@ -467,7 +468,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
 
               {/* 测试方式选择弹窗 */}
               <Dialog open={showTestModeDialog} onOpenChange={setShowTestModeDialog}>
-                <DialogContent className="sm:max-w-[425px] bg-white">
+                <DialogContent className={`sm:max-w-[425px] ${dialogBackgroundClass}`}>
                   <DialogHeader>
                     <DialogTitle className="text-xl font-bold">选择练习模式</DialogTitle>
                     <DialogDescription className="text-gray-500">
@@ -486,9 +487,9 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
                         <div key={option.id} className="flex flex-col space-y-3">
                           <Label
                             htmlFor={`dialog-${option.id}`}
-                            className={`flex items-center text-gray-700 shadow-none space-x-1 py-2 px-4 rounded cursor-pointer transition-all duration-200 border-1 ${form.testMode === option.id
-                              ? 'bg-purple-900/10 border-purple-900/20 shadow-md text-gray-900'
-                              : 'bg-gray-50 border-gray-200 hover:bg-purple-900/5 hover:border-purple-900/10'
+                            className={`flex items-center text-gray-700 shadow-none space-x-1 py-2 px-4 rounded cursor-pointer transition-all duration-200 border-1 ${form.difficulty === option.id
+                              ? 'bg-blue-50 border-blue-200 shadow-md text-gray-900'
+                              : 'bg-gray-50 border-gray-200 hover:bg-blue-50/50 hover:border-blue-200/50'
                               }`}
                           >
                             <RadioGroupItem value={option.id} id={`dialog-${option.id}`} className="pointer-events-none" />
@@ -505,7 +506,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
                                 <SelectTrigger className="w-full">
                                   <SelectValue placeholder="选择题目数量" />
                                 </SelectTrigger>
-                                <SelectContent className="bg-white border shadow-lg">
+                                <SelectContent className={`${dialogBackgroundClass} border shadow-lg`}>
                                   {questionCountOptions.map((count) => (
                                     <SelectItem key={count} value={count.toString()}>
                                       {count} 题
@@ -524,7 +525,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
                                 <SelectTrigger className="w-full">
                                   <SelectValue placeholder="选择时间" />
                                 </SelectTrigger>
-                                <SelectContent className="bg-white border shadow-lg">
+                                <SelectContent className={`${dialogBackgroundClass} border shadow-lg`}>
                                   {timeLimitOptions.map((minutes) => (
                                     <SelectItem key={minutes} value={minutes.toString()}>
                                       {minutes} 分钟

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -38,6 +38,8 @@ export function RewardSelector({
   const [showEmojiDialog, setShowEmojiDialog] = useState(false);
   const [showRecommendations, setShowRecommendations] = useState(false);
   const [showAllRecommendations, setShowAllRecommendations] = useState(false);
+  
+  const recommendationsRef = useRef<HTMLDivElement>(null);
 
   const addReward = () => {
     if (!newRewardText.trim() || rewards.length >= maxRewards) return;
@@ -73,6 +75,24 @@ export function RewardSelector({
 
     onRewardsChange([...rewards, newReward]);
   };
+
+  // 点击外部关闭推荐列表
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (recommendationsRef.current && !recommendationsRef.current.contains(event.target as Node)) {
+        setShowRecommendations(false);
+        setShowAllRecommendations(false);
+      }
+    };
+
+    if (showRecommendations) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showRecommendations]);
 
   return (
     <div>
@@ -205,7 +225,7 @@ export function RewardSelector({
 
           {/* 推荐奖励列表 */}
           {showRecommendations && rewards.length < maxRewards && (
-            <div className="bg-blue-50 p-3 rounded-lg space-y-3">
+            <div ref={recommendationsRef} className="bg-blue-50 p-3 rounded-lg space-y-3">
               <p className="text-sm font-medium text-blue-800 cursor-pointer">推荐奖励 (点击添加)：</p>
               <div className="grid grid-cols-1 gap-2 ">
                 {defaultRewards
