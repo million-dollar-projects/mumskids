@@ -8,11 +8,13 @@ import { Footer } from '@/components/layout/footer';
 import { messages } from '@/i18n/messages';
 import { useAuth } from '@/lib/auth/context';
 import { PhoneMockup } from '@/components/ui/phone-mockup';
-import { Plus } from 'lucide-react';
+import { PracticeDashboard } from '@/components/dashboard/practice-dashboard';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
 }
+
+
 
 export default function HomePage({ params }: PageProps) {
   const { user, loading } = useAuth();
@@ -25,6 +27,8 @@ export default function HomePage({ params }: PageProps) {
     };
     getLocale();
   }, [params]);
+
+
 
   const t = messages[locale as keyof typeof messages] || messages.zh;
 
@@ -45,58 +49,9 @@ export default function HomePage({ params }: PageProps) {
     );
   }
 
-  // 如果用户已登录，显示活动管理页面
+  // 如果用户已登录，显示练习管理页面
   if (user) {
-    return (
-      <div className="bg-purple-50 min-h-screen">
-        <Header locale={locale} />
-
-        {/* Main Content */}
-        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Page Header */}
-          <div className="flex items-center justify-between mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">练习</h1>
-            <div className="flex space-x-4">
-              <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200">我的练习</button>
-              <button className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg font-medium">公开练习</button>
-            </div>
-          </div>
-
-          {/* Empty State */}
-          <div className="py-16">
-            <div className="text-center">
-              {/* Empty State Icon */}
-              <div className="mx-auto w-48 h-48 mb-8 relative">
-                <div className="w-full h-full bg-white border border-gray-200 shadow-lg opacity-50 rounded-2xl flex items-center justify-center relative">
-                  {/* Math symbols */}
-                  <div className="flex items-center justify-center space-x-3">
-                    <span className="text-3xl font-bold text-gray-400">1</span>
-                    <span className="text-3xl text-gray-300">+</span>
-                    <span className="text-3xl font-bold text-gray-400">1</span>
-                    <span className="text-3xl text-gray-300">=</span>
-                    <span className="text-3xl font-bold text-gray-300">?</span>
-                  </div>
-                  {/* Zero indicator */}
-                  <div className="absolute -top-2 -right-2 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center border border-gray-200">
-                    <span className="text-3xl font-bold text-gray-400">0</span>
-                  </div>
-                </div>
-              </div>
-              <h2 className="text-2xl font-semibold text-gray-400 mb-4">还没有数学练习</h2>
-              <p className="text-gray-400 mb-8 max-w-md mx-auto">为孩子创建第一个数学练习，让学习变得更有趣！</p>
-              <Link href={`/${locale}/practice/create`}>
-                <button className="inline-flex items-center px-4  cursor-pointer py-1 bg-gray-200 opacity-70 hover:opacity-100 text-gray-700 font-medium rounded-lg hover:bg-gray-500 hover:text-white transition-colors">
-                  <Plus className="w-5 h-5 mr-2" />
-                  创建练习
-                </button>
-              </Link>
-            </div>
-          </div>
-        </main>
-
-        <Footer locale={locale} />
-      </div>
-    );
+    return <PracticeDashboard locale={locale} t={t} />;
   }
 
   // 未登录用户的着陆页

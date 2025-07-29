@@ -1,0 +1,275 @@
+'use client'
+
+import { useState, useCallback, useEffect } from 'react';
+import Link from 'next/link';
+import { Header } from '@/components/layout/header';
+import { Footer } from '@/components/layout/footer';
+import { Plus, MapPin, Users, Clock, Settings, Target } from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import { PracticeCard } from '@/components/ui/practice-card';
+import { difficultyOptions, calculationTypeOptions } from '@/lib/practice-config';
+import { useAuth } from '@/lib/auth/context';
+
+interface Practice {
+  id: string;
+  slug: string;
+  created_at: string;
+  updated_at: string;
+  created_by: string;
+  title: string;
+  description: string;
+  child_name: string;
+  gender: 'boy' | 'girl';
+  difficulty: 'within10' | 'within20' | 'within50' | 'within100';
+  calculation_type: 'add' | 'sub' | 'addsub';
+  test_mode: 'normal' | 'timed';
+  question_count: number | null;
+  time_limit: number | null;
+  is_public: boolean;
+  selected_theme: string;
+  reward_distribution_mode: 'random' | 'choice';
+  rewards: string[];
+  stats: {
+    total_attempts: number;
+    completed_attempts: number;
+    average_score: number;
+    best_score: number;
+    best_time: number | null;
+  };
+}
+
+interface PracticeDashboardProps {
+  locale: string;
+  t: any;
+}
+
+export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
+  const { user } = useAuth();
+  const [practices, setPractices] = useState<Practice[]>([]);
+  const [practicesLoading, setPracticesLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<'my' | 'public'>('my');
+
+  // 获取练习列表
+  const fetchPractices = useCallback(async (type: 'my' | 'public') => {
+    if (!user && type === 'my') return;
+
+    setPracticesLoading(true);
+    try {
+      const queryParams = new URLSearchParams();
+      if (type === 'my') {
+        queryParams.set('type', 'user');
+        queryParams.set('userId', user!.id);
+      } else {
+        queryParams.set('type', 'public');
+      }
+
+      const response = await fetch(`/api/practices?${queryParams.toString()}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch practices');
+      }
+
+      const data = await response.json();
+      setPractices(data);
+    } catch (error) {
+      console.error('获取练习列表失败:', error);
+      setPractices([]);
+    } finally {
+      setPracticesLoading(false);
+    }
+  }, [user]);
+
+  // 当用户登录状态改变或标签页切换时获取练习
+  useEffect(() => {
+    if (user) {
+      fetchPractices(activeTab);
+    }
+  }, [user, activeTab, fetchPractices]);
+
+  // 获取主题图标
+  const getThemeIcon = (practice: Practice) => {
+    return (
+      <PracticeCard
+        childName={practice.child_name}
+        difficulty={practice.difficulty}
+        calculationType={practice.calculation_type}
+        className="w-32 h-32"
+        size="small"
+      />
+    );
+  };
+
+  // 格式化时间
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('zh-CN', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
+  };
+
+  // 格式化日期
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const today = new Date();
+    const isToday = date.toDateString() === today.toDateString();
+
+    if (isToday) {
+      return '今天';
+    }
+
+    const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+    return weekdays[date.getDay()];
+  };
+
+  return (
+    <div className="bg-purple-50 min-h-screen">
+      <Header locale={locale} />
+
+      {/* Main Content */}
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Page Header */}
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">练习</h1>
+          <div className="flex space-x-4">
+            <button
+              onClick={() => setActiveTab('my')}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${activeTab === 'my'
+                  ? 'bg-gray-100 text-gray-700'
+                  : 'text-gray-600 hover:bg-gray-100'
+                }`}
+            >
+              我的练习
+            </button>
+            <button
+              onClick={() => setActiveTab('public')}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${activeTab === 'public'
+                  ? 'bg-gray-100 text-gray-700'
+                  : 'text-gray-600 hover:bg-gray-100'
+                }`}
+            >
+              公开练习
+            </button>
+          </div>
+        </div>
+
+        {/* Loading State */}
+        {practicesLoading && (
+          <div className="flex items-center justify-center py-16">
+            <div className="text-center">
+              <div className="w-8 h-8 animate-spin rounded-full border-2 border-purple-600 border-t-transparent mx-auto mb-4"></div>
+              <p className="text-gray-600">{t.common.loading}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Practice List */}
+        {!practicesLoading && practices.length > 0 && (
+          <div className="space-y-4">
+            {practices.map((practice) => (
+              <div key={practice.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <div className="flex items-center justify-between">
+                  {/* Left side - Date and Practice Info */}
+                  <div className="flex-1">
+                    {/* Date and Time */}
+                    <div className="text-sm text-gray-500 mb-2">
+                      <span className="font-medium">{formatDate(practice.created_at)}</span>
+                      <span className="ml-4">{formatTime(practice.created_at)}</span>
+                    </div>
+
+                    {/* Practice Title */}
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                      {practice.title}
+                    </h3>
+
+                    {/* Status Indicators */}
+                    <div className="flex items-center space-x-4 text-sm text-gray-500 mb-4">
+                      <div className="flex items-center">
+                        <MapPin className="w-4 h-4 mr-1 text-orange-500" />
+                        <span>难度: {t.practice[practice.difficulty]}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <Users className="w-4 h-4 mr-1 text-gray-400" />
+                        <span>完成次数: {practice.stats.completed_attempts}</span>
+                      </div>
+                      {practice.test_mode === 'timed' && practice.time_limit && (
+                        <div className="flex items-center">
+                          <Clock className="w-4 h-4 mr-1 text-blue-500" />
+                          <span>{practice.time_limit}分钟限时</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex items-center space-x-3">
+                      <Link href={`/${locale}/practice/${practice.slug}`}>
+                        <button className="px-4 py-2 bg-gray-800 text-white rounded-lg font-medium hover:bg-gray-700 transition-colors">
+                          开始练习
+                        </button>
+                      </Link>
+                      <Link href={`/${locale}/practice/${practice.slug}/edit`}>
+                        <button className="flex items-center px-3 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors">
+                          <Settings className="w-4 h-4 mr-1" />
+                          管理
+                        </button>
+                      </Link>
+                    </div>
+                  </div>
+
+                  {/* Right side - Theme Icon */}
+                  <div className="ml-6">
+                    {getThemeIcon(practice)}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!practicesLoading && practices.length === 0 && (
+          <div className="py-16">
+            <div className="text-center">
+              {/* Empty State Icon */}
+              <div className="mx-auto w-48 h-48 mb-8 relative">
+                <div className="w-full h-full bg-white border border-gray-200 shadow-lg opacity-50 rounded-2xl flex items-center justify-center relative">
+                  {/* Math symbols */}
+                  <div className="flex items-center justify-center space-x-3">
+                    <span className="text-3xl font-bold text-gray-400">1</span>
+                    <span className="text-3xl text-gray-300">+</span>
+                    <span className="text-3xl font-bold text-gray-400">1</span>
+                    <span className="text-3xl text-gray-300">=</span>
+                    <span className="text-3xl font-bold text-gray-300">?</span>
+                  </div>
+                  {/* Zero indicator */}
+                  <div className="absolute -top-2 -right-2 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center border border-gray-200">
+                    <span className="text-3xl font-bold text-gray-400">0</span>
+                  </div>
+                </div>
+              </div>
+              <h2 className="text-2xl font-semibold text-gray-400 mb-4">
+                {activeTab === 'my' ? '还没有数学练习' : '暂无公开练习'}
+              </h2>
+              <p className="text-gray-400 mb-8 max-w-md mx-auto">
+                {activeTab === 'my'
+                  ? '为孩子创建第一个数学练习，让学习变得更有趣！'
+                  : '目前还没有公开的练习，快去创建一个分享给大家吧！'
+                }
+              </p>
+              {activeTab === 'my' && (
+                <Link href={`/${locale}/practice/create`}>
+                  <button className="inline-flex items-center px-4 cursor-pointer py-2 bg-gray-200 opacity-70 hover:opacity-100 text-gray-700 font-medium rounded-lg hover:bg-gray-500 hover:text-white transition-colors">
+                    <Plus className="w-5 h-5 mr-2" />
+                    创建练习
+                  </button>
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
+      </main>
+
+      <Footer locale={locale} />
+    </div>
+  );
+}

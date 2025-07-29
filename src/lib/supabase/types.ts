@@ -1,4 +1,4 @@
-import { Database } from '@/types/supabase';
+import { Database, Json } from '@/types/supabase';
 
 export type Practice = Database['public']['Tables']['practices']['Row'];
 export type PracticeInsert = Database['public']['Tables']['practices']['Insert'];
@@ -57,7 +57,7 @@ export function practiceFormToDbData(form: PracticeFormData, userId: string): Pr
     is_public: form.isPublic,
     selected_theme: form.selectedTheme,
     reward_distribution_mode: form.rewardDistributionMode,
-    rewards: form.rewards as any,
+    rewards: form.rewards as unknown as Json,
     stats: {
       total_attempts: 0,
       completed_attempts: 0,

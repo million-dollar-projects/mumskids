@@ -19,6 +19,7 @@ import { messages } from '@/i18n/messages';
 import { useAuth } from '@/lib/auth/context';
 import { themes } from '@/lib/themes';
 import { ChevronDown, Globe, Lock, Pencil, Target, Calculator, Timer } from 'lucide-react';
+import { PracticeCard } from '@/components/ui/practice-card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { RewardSelector } from '@/components/ui/reward-selector';
 import {
@@ -255,31 +256,11 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
           {/* 左侧 - 练习封面和设置 */}
           <div className="lg:col-span-4 space-y-6">
             {/* 练习封面 */}
-            <Card className="aspect-square bg-gradient-to-br from-red-500 to-pink-500 border-none shadow-xl flex items-center justify-center relative overflow-hidden">
-              <div className="text-center text-white px-4">
-                <div className={`font-bold mb-4 transform leading-tight ${form.childName
-                  ? form.childName.length <= 2
-                    ? 'text-6xl'
-                    : form.childName.length <= 4
-                      ? 'text-5xl'
-                      : form.childName.length <= 6
-                        ? 'text-4xl'
-                        : 'text-3xl'
-                  : 'text-6xl'
-                  }`}>
-                  {form.childName ? form.childName.toUpperCase() : '昵称'}
-                </div>
-                <div className="text-xl font-medium opacity-90">
-                  {`${difficultyOptions.find(option => option.id === form.difficulty)?.label}${calculationTypeOptions.find(option => option.id === form.calculationType)?.label}运算`}
-                </div>
-              </div>
-              {/* 装饰元素 */}
-              <div className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/20"></div>
-              <div className="absolute bottom-6 left-6 w-4 h-4 rounded-full bg-white/30"></div>
-              <div className="absolute bottom-4 right-4 w-12 h-12 rounded-full border-4 border-white/20 flex items-center justify-center bg-black/20">
-                <Target className="text-white w-6 h-6" />
-              </div>
-            </Card>
+            <PracticeCard
+              childName={form.childName}
+              difficulty={form.difficulty}
+              calculationType={form.calculationType}
+            />
 
             {/* 主题选择 */}
             <ThemeSelector
