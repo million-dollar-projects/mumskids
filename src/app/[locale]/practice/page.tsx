@@ -65,7 +65,9 @@ export default function PracticePage({ params }: PracticePageProps) {
         interface RawPractice {
           id: string;
           slug: string;
-          metadata: { title: string; description: string; rewards: string[] };
+          title: string;
+          description: string;
+          rewards: string[];
           difficulty: 'within10' | 'within20' | 'within50' | 'within100';
           question_count: number;
           is_public: boolean;
@@ -89,18 +91,17 @@ export default function PracticePage({ params }: PracticePageProps) {
         });
 
         const formattedPractices = Array.from(practiceMap.values()).map(practice => {
-          const metadata = practice.metadata as { title: string; description: string; rewards: string[] };
           return {
             id: practice.id,
             slug: practice.slug,
-            title: metadata.title,
-            description: metadata.description,
+            title: practice.title,
+            description: practice.description,
             difficulty: practice.difficulty,
             questionCount: practice.question_count,
             isPublic: practice.is_public,
             createdBy: user?.id === practice.created_by ? (user?.user_metadata?.full_name || '我') : '其他用户',
             createdAt: new Date(practice.created_at).toLocaleDateString(),
-            rewards: metadata.rewards
+            rewards: practice.rewards || []
           };
         });
 

@@ -93,16 +93,16 @@ export async function POST(request: NextRequest) {
     }
 
     // 验证字段值的合法性
-    if (body.testMode === 'normal' && (body.questionCount < 5 || body.questionCount > 30)) {
+    if (body.testMode === 'normal' && (body.questionCount < 5 || body.questionCount > 50)) {
       return NextResponse.json(
-        { error: 'Invalid question count. Must be between 5 and 30.' },
+        { error: 'Invalid question count. Must be between 5 and 50.' },
         { status: 400 }
       );
     }
 
-    if (body.testMode === 'timed' && (body.timeLimit < 1 || body.timeLimit > 15)) {
+    if (body.testMode === 'timed' && (body.timeLimit < 1 || body.timeLimit > 30)) {
       return NextResponse.json(
-        { error: 'Invalid time limit. Must be between 1 and 15 minutes.' },
+        { error: 'Invalid time limit. Must be between 1 and 30 minutes.' },
         { status: 400 }
       );
     }
@@ -119,21 +119,19 @@ export async function POST(request: NextRequest) {
     const dbData = {
       created_by: user.id,
       slug: slugData,
-      is_public: body.isPublic ?? false,
+      title: body.title,
+      description: body.description || '',
+      child_name: body.childName,
+      gender: body.gender || 'boy',
       difficulty: body.difficulty,
+      calculation_type: body.calculationType || 'add',
+      test_mode: body.testMode,
       question_count: body.testMode === 'normal' ? body.questionCount : null,
       time_limit: body.testMode === 'timed' ? body.timeLimit : null,
-      test_mode: body.testMode,
-      metadata: {
-        title: body.title,
-        description: body.description || '',
-        rewards: body.rewards || [],
-        theme: body.selectedTheme || 'rainbow'
-      },
-      child_info: {
-        name: body.childName,
-        gender: body.gender || 'boy'
-      },
+      is_public: body.isPublic ?? false,
+      selected_theme: body.selectedTheme || 'default',
+      reward_distribution_mode: body.rewardDistributionMode || 'random',
+      rewards: body.rewards || [],
       stats: {
         total_attempts: 0,
         completed_attempts: 0,

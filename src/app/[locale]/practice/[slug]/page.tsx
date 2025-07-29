@@ -68,23 +68,21 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
           const dbPractice = await response.json();
           console.log('Received practice:', dbPractice); // 添加日志
 
-          const metadata = dbPractice.metadata as { title: string; description: string; rewards: string[] };
-          const childInfo = dbPractice.child_info as { name: string; gender: 'boy' | 'girl' };
           const stats = dbPractice.stats as { total_attempts: number; completed_attempts: number; average_score: number };
 
           setPractice({
             id: dbPractice.id,
             slug: dbPractice.slug,
-            title: metadata.title,
-            description: metadata.description,
+            title: dbPractice.title,
+            description: dbPractice.description,
             difficulty: dbPractice.difficulty,
             questionCount: dbPractice.question_count,
             isPublic: dbPractice.is_public,
             createdBy: user?.id === dbPractice.created_by ? (user?.user_metadata?.full_name || '我') : '其他用户',
             createdAt: new Date(dbPractice.created_at).toLocaleDateString(),
-            rewards: metadata.rewards,
-            childName: childInfo.name,
-            gender: childInfo.gender
+            rewards: dbPractice.rewards || [],
+            childName: dbPractice.child_name,
+            gender: dbPractice.gender
           });
         } catch (error) {
           console.error('加载练习失败:', error);

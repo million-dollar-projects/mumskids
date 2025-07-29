@@ -16,11 +16,19 @@ export interface Database {
           created_at: string
           updated_at: string
           created_by: string
-          is_public: boolean
+          title: string
+          description: string
+          child_name: string
+          gender: 'boy' | 'girl'
           difficulty: 'within10' | 'within20' | 'within50' | 'within100'
-          question_count: number
-          metadata: Json
-          child_info: Json
+          calculation_type: 'add' | 'sub' | 'addsub'
+          test_mode: 'normal' | 'timed'
+          question_count: number | null
+          time_limit: number | null
+          is_public: boolean
+          selected_theme: string
+          reward_distribution_mode: 'random' | 'choice'
+          rewards: Json
           stats: Json
         }
         Insert: {
@@ -29,12 +37,20 @@ export interface Database {
           created_at?: string
           updated_at?: string
           created_by: string
-          is_public: boolean
+          title: string
+          description?: string
+          child_name: string
+          gender: 'boy' | 'girl'
           difficulty: 'within10' | 'within20' | 'within50' | 'within100'
-          question_count: number
-          metadata: Json
-          child_info: Json
-          stats: Json
+          calculation_type: 'add' | 'sub' | 'addsub'
+          test_mode?: 'normal' | 'timed'
+          question_count?: number | null
+          time_limit?: number | null
+          is_public?: boolean
+          selected_theme?: string
+          reward_distribution_mode?: 'random' | 'choice'
+          rewards?: Json
+          stats?: Json
         }
         Update: {
           id?: string
@@ -42,11 +58,19 @@ export interface Database {
           created_at?: string
           updated_at?: string
           created_by?: string
-          is_public?: boolean
+          title?: string
+          description?: string
+          child_name?: string
+          gender?: 'boy' | 'girl'
           difficulty?: 'within10' | 'within20' | 'within50' | 'within100'
-          question_count?: number
-          metadata?: Json
-          child_info?: Json
+          calculation_type?: 'add' | 'sub' | 'addsub'
+          test_mode?: 'normal' | 'timed'
+          question_count?: number | null
+          time_limit?: number | null
+          is_public?: boolean
+          selected_theme?: string
+          reward_distribution_mode?: 'random' | 'choice'
+          rewards?: Json
           stats?: Json
         }
       }

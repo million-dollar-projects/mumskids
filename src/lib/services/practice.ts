@@ -62,22 +62,25 @@ export async function createPractice(formData: PracticeFormData, userId: string)
   const supabase = createClient();
   const dbData = {
     created_by: userId,
-    is_public: formData.isPublic,
+    title: formData.title,
+    description: formData.description || '',
+    child_name: formData.childName,
+    gender: formData.gender,
     difficulty: formData.difficulty,
-    question_count: formData.questionCount,
-    metadata: {
-      title: formData.title,
-      description: formData.description,
-      rewards: formData.rewards
-    },
-    child_info: {
-      name: formData.childName,
-      gender: formData.gender
-    },
+    calculation_type: formData.calculationType || 'add',
+    test_mode: formData.testMode,
+    question_count: formData.testMode === 'normal' ? formData.questionCount : null,
+    time_limit: formData.testMode === 'timed' ? formData.timeLimit : null,
+    is_public: formData.isPublic,
+    selected_theme: formData.selectedTheme || 'default',
+    reward_distribution_mode: formData.rewardDistributionMode || 'random',
+    rewards: formData.rewards || [],
     stats: {
       total_attempts: 0,
       completed_attempts: 0,
-      average_score: 0
+      average_score: 0,
+      best_score: 0,
+      best_time: null
     }
   };
 
