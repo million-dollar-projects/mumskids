@@ -165,7 +165,6 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
         throw new Error(result.details || '保存失败，请重试');
       }
 
-      alert(t.practice.practiceCreated);
       router.push(`/${locale}`);
     } catch (error) {
       console.error('保存失败:', error);

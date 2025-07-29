@@ -4,7 +4,7 @@ import { useRef, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { UserAvatarDropdown } from '@/components/ui/user-avatar-dropdown';
-import { BookOpen, Telescope, Search, Star, Bell, Globe } from 'lucide-react';
+import { Search, Star, Bell, Plus } from 'lucide-react';
 import { messages } from '@/i18n/messages';
 import { useAuth } from '@/lib/auth/context';
 
@@ -100,17 +100,9 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
             {/* Left section with navigation */}
             <nav className="flex space-x-4">
               <Link href={`/${locale}/practice`} className="flex items-center space-x-2 text-sm/5 text-gray-900 font-bold cursor-pointer">
-                <BookOpen className="w-5 h-5" />
-                <span>练习</span>
+                <Plus className="w-5 h-5" />
+                <span>LittlePlus</span>
               </Link>
-              <a href="#" className="flex items-center space-x-2 text-sm/5 text-[#1315175c] font-bold hover:opacity-80 cursor-pointer">
-                <Telescope className="w-5 h-5" />
-                <span>我的练习</span>
-              </a>
-              <a href="#" className="flex items-center space-x-2 text-sm/5 text-[#1315175c] font-bold hover:opacity-80 cursor-pointer">
-                <Globe className="w-5 h-5" />
-                <span>发现</span>
-              </a>
             </nav>
           </div>
         </div>
@@ -120,10 +112,6 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
           <Link href={`/${locale}/practice/create`}>
             <button className="text-gray-700 hover:text-gray-900 font-medium text-sm/5 cursor-pointer">创建练习</button>
           </Link>
-
-          <button className="text-gray-600 hover:text-gray-900 p-2 rounded-md hover:bg-gray-100 transition-colors cursor-pointer">
-            <Search className="w-5 h-5" />
-          </button>
 
           <div className="relative" ref={notificationRef}>
             <button

@@ -219,7 +219,7 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
                 }
               }}
               disabled={isTabChanging}
-              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${activeTab === 'my'
+              className={`px-4 py-1 cursor-pointer rounded-lg font-medium transition-all duration-200 ${activeTab === 'my'
                 ? 'bg-gray-100 text-gray-700'
                 : 'text-gray-600 hover:bg-gray-100'
                 } ${isTabChanging ? 'opacity-50 cursor-not-allowed' : ''}`}
@@ -234,7 +234,7 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
                 }
               }}
               disabled={isTabChanging}
-              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${activeTab === 'public'
+              className={`px-4 py-1 cursor-pointer rounded-lg font-medium transition-all duration-200 ${activeTab === 'public'
                 ? 'bg-gray-100 text-gray-700'
                 : 'text-gray-600 hover:bg-gray-100'
                 } ${isTabChanging ? 'opacity-50 cursor-not-allowed' : ''}`}
