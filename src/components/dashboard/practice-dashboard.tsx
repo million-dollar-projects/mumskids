@@ -1,13 +1,11 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
-import { Plus, MapPin, Users, Clock, Settings, Target } from 'lucide-react';
-import { Card } from '@/components/ui/card';
+import { Plus, MapPin, Users, Clock, Settings } from 'lucide-react';
 import { PracticeCard } from '@/components/ui/practice-card';
-import { difficultyOptions, calculationTypeOptions } from '@/lib/practice-config';
 import { useAuth } from '@/lib/auth/context';
 
 interface Practice {
@@ -48,6 +46,7 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
   const [practices, setPractices] = useState<Practice[]>([]);
   const [practicesLoading, setPracticesLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'my' | 'public'>('my');
+  const lastFetchRef = useRef<{ userId: string | undefined, tab: string } | null>(null);
 
   // 获取练习列表
   const fetchPractices = useCallback(async (type: 'my' | 'public') => {
@@ -76,14 +75,21 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
     } finally {
       setPracticesLoading(false);
     }
-  }, [user]);
+  }, [user?.id]); // 只依赖 user.id 而不是整个 user 对象
 
   // 当用户登录状态改变或标签页切换时获取练习
   useEffect(() => {
-    if (user) {
-      fetchPractices(activeTab);
+    if (user?.id) {
+      // 检查是否需要重新获取数据
+      const currentFetch = { userId: user.id, tab: activeTab };
+      const lastFetch = lastFetchRef.current;
+      
+      if (!lastFetch || lastFetch.userId !== currentFetch.userId || lastFetch.tab !== currentFetch.tab) {
+        lastFetchRef.current = currentFetch;
+        fetchPractices(activeTab);
+      }
     }
-  }, [user, activeTab, fetchPractices]);
+  }, [user?.id, activeTab, fetchPractices]);
 
   // 获取主题图标
   const getThemeIcon = (practice: Practice) => {
