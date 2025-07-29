@@ -1,16 +1,19 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
+import { PAGINATION_CONFIG } from '@/lib/pagination-config';
 
 export async function GET(request: NextRequest) {
   const supabase = await createClient();
   const searchParams = request.nextUrl.searchParams;
   const type = searchParams.get('type');
   const userId = searchParams.get('userId');
+  const page = parseInt(searchParams.get('page') || '1');
+  const limit = parseInt(searchParams.get('limit') || PAGINATION_CONFIG.PRACTICES_PER_PAGE.toString());
 
-  console.log('API /practices called with:', { type, userId });
+  console.log('API /practices called with:', { type, userId, page, limit });
 
   try {
-    let query = supabase.from('practices').select();
+    let query = supabase.from('practices').select('*', { count: 'exact' });
 
     if (type === 'public') {
       console.log('Fetching public practices...');
@@ -23,32 +26,38 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid request parameters' }, { status: 400 });
     }
 
-    const { data, error } = await query.order('created_at', { ascending: false });
+    // 计算分页参数
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+
+    const { data, error, count } = await query
+      .order('created_at', { ascending: false })
+      .range(from, to);
 
     if (error) {
       console.error('Database query failed:', error);
       throw error;
     }
 
-    console.log(`Found ${data?.length || 0} practices for type: ${type}`);
+    console.log(`Found ${data?.length || 0} practices for type: ${type}, page: ${page}`);
     
-    // 如果没有数据，检查数据库中是否有任何练习
-    if (!data || data.length === 0) {
-      const { data: allPractices, error: countError } = await supabase
-        .from('practices')
-        .select('id, is_public, created_by', { count: 'exact' });
-      
-      console.log('Total practices in database:', allPractices?.length || 0);
-      if (allPractices) {
-        console.log('Practice details:', allPractices.map(p => ({ 
-          id: p.id, 
-          is_public: p.is_public, 
-          created_by: p.created_by 
-        })));
-      }
-    }
+    // 计算分页信息
+    const totalCount = count || 0;
+    const totalPages = Math.ceil(totalCount / limit);
+    const hasMore = page < totalPages;
 
-    return NextResponse.json(data || []);
+    const response = {
+      data: data || [],
+      pagination: {
+        page,
+        limit,
+        totalCount,
+        totalPages,
+        hasMore
+      }
+    };
+
+    return NextResponse.json(response);
   } catch (error) {
     console.error('获取练习列表失败:', error);
     return NextResponse.json({ 

@@ -58,13 +58,6 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
               </Link>
             </div>
 
-            {/* 探索活动链接 */}
-            <Link href={`/${locale}/events`}>
-              <Button variant="ghost" size="sm" className="text-secondary-gray cursor-pointer">
-                {t.landing.exploreEvents}
-              </Button>
-            </Link>
-
             {/* 登录按钮 */}
             {loading ? (
               <div className="w-8 h-8 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>

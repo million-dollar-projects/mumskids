@@ -4,12 +4,13 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
-import { Plus, MapPin, Users, Clock, Settings, Target, Calculator, Timer, Globe, Lock } from 'lucide-react';
+import { Plus, MapPin, Users, Clock, Settings, Target, Calculator, Timer, Globe, Lock, ChevronDown } from 'lucide-react';
 import { PracticeCard } from '@/components/ui/practice-card';
 import { useAuth } from '@/lib/auth/context';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { PAGINATION_CONFIG } from '@/lib/pagination-config';
 
 interface Practice {
   id: string;
@@ -48,19 +49,29 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
   const { user } = useAuth();
   const [practices, setPractices] = useState<Practice[]>([]);
   const [practicesLoading, setPracticesLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [activeTab, setActiveTab] = useState<'my' | 'public'>('my');
   const [selectedPractice, setSelectedPractice] = useState<Practice | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
   const lastFetchRef = useRef<{ userId: string | undefined, tab: string } | null>(null);
   const [isTabChanging, setIsTabChanging] = useState(false);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    hasMore: false,
+    totalCount: 0
+  });
 
   // 获取练习列表
-  const fetchPractices = useCallback(async (type: 'my' | 'public') => {
+  const fetchPractices = useCallback(async (type: 'my' | 'public', page: number = 1, append: boolean = false) => {
     if (!user && type === 'my') return;
 
-    setPracticesLoading(true);
-    setIsTabChanging(false);
-    
+    if (page === 1) {
+      setPracticesLoading(true);
+      setIsTabChanging(false);
+    } else {
+      setLoadingMore(true);
+    }
+
     try {
       const queryParams = new URLSearchParams();
       if (type === 'my') {
@@ -69,21 +80,45 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
       } else {
         queryParams.set('type', 'public');
       }
+      queryParams.set('page', page.toString());
+      queryParams.set('limit', PAGINATION_CONFIG.PRACTICES_PER_PAGE.toString());
 
       const response = await fetch(`/api/practices?${queryParams.toString()}`);
       if (!response.ok) {
         throw new Error('Failed to fetch practices');
       }
 
-      const data = await response.json();
-      setPractices(data);
+      const result = await response.json();
+
+      if (append && page > 1) {
+        setPractices(prev => [...prev, ...result.data]);
+      } else {
+        setPractices(result.data);
+      }
+
+      setPagination({
+        page: result.pagination.page,
+        hasMore: result.pagination.hasMore,
+        totalCount: result.pagination.totalCount
+      });
     } catch (error) {
       console.error('获取练习列表失败:', error);
-      setPractices([]);
+      if (!append) {
+        setPractices([]);
+        setPagination({ page: 1, hasMore: false, totalCount: 0 });
+      }
     } finally {
       setPracticesLoading(false);
+      setLoadingMore(false);
     }
   }, [user?.id]); // 只依赖 user.id 而不是整个 user 对象
+
+  // 加载更多
+  const loadMore = useCallback(() => {
+    if (!loadingMore && pagination.hasMore) {
+      fetchPractices(activeTab, pagination.page + 1, true);
+    }
+  }, [fetchPractices, activeTab, pagination.page, pagination.hasMore, loadingMore]);
 
   // 当用户登录状态改变或标签页切换时获取练习
   useEffect(() => {
@@ -91,10 +126,12 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
       // 检查是否需要重新获取数据
       const currentFetch = { userId: user.id, tab: activeTab };
       const lastFetch = lastFetchRef.current;
-      
+
       if (!lastFetch || lastFetch.userId !== currentFetch.userId || lastFetch.tab !== currentFetch.tab) {
         lastFetchRef.current = currentFetch;
-        fetchPractices(activeTab);
+        // 重置分页状态
+        setPagination({ page: 1, hasMore: false, totalCount: 0 });
+        fetchPractices(activeTab, 1, false);
       }
     }
   }, [user?.id, activeTab, fetchPractices]);
@@ -147,7 +184,7 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
   const getDifficultyLabel = (difficulty: string) => {
     const labels = {
       'within10': '10以内',
-      'within20': '20以内', 
+      'within20': '20以内',
       'within50': '50以内',
       'within100': '100以内'
     };
@@ -183,8 +220,8 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
               }}
               disabled={isTabChanging}
               className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${activeTab === 'my'
-                  ? 'bg-gray-100 text-gray-700'
-                  : 'text-gray-600 hover:bg-gray-100'
+                ? 'bg-gray-100 text-gray-700'
+                : 'text-gray-600 hover:bg-gray-100'
                 } ${isTabChanging ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               我的练习
@@ -198,8 +235,8 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
               }}
               disabled={isTabChanging}
               className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${activeTab === 'public'
-                  ? 'bg-gray-100 text-gray-700'
-                  : 'text-gray-600 hover:bg-gray-100'
+                ? 'bg-gray-100 text-gray-700'
+                : 'text-gray-600 hover:bg-gray-100'
                 } ${isTabChanging ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               公开练习
@@ -238,68 +275,101 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
 
           {/* Practice List */}
           {!practicesLoading && practices.length > 0 && (
-            <div className="space-y-4 animate-in fade-in-0 duration-300">
-              {practices.map((practice) => (
-                <div 
-                  key={practice.id} 
-                  className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 cursor-pointer hover:shadow-md transition-shadow"
-                  onClick={() => handlePracticeClick(practice)}
-                >
-                  <div className="flex items-center justify-between">
-                    {/* Left side - Date and Practice Info */}
-                    <div className="flex-1">
-                      {/* Date and Time */}
-                      <div className="text-sm text-gray-500 mb-2">
-                        <span className="font-medium">{formatDate(practice.created_at)}</span>
-                        <span className="ml-4">{formatTime(practice.created_at)}</span>
-                      </div>
-
-                      {/* Practice Title */}
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                        {practice.title}
-                      </h3>
-
-                      {/* Status Indicators */}
-                      <div className="flex items-center space-x-4 text-sm text-gray-500 mb-4">
-                        <div className="flex items-center">
-                          <MapPin className="w-4 h-4 mr-1 text-orange-500" />
-                          <span>难度: {getDifficultyLabel(practice.difficulty)}</span>
+            <div className="animate-in fade-in-0 duration-300">
+              <div className="space-y-4">
+                {practices.map((practice) => (
+                  <div
+                    key={practice.id}
+                    className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 cursor-pointer hover:shadow-md transition-shadow"
+                    onClick={() => handlePracticeClick(practice)}
+                  >
+                    <div className="flex items-center justify-between">
+                      {/* Left side - Date and Practice Info */}
+                      <div className="flex-1">
+                        {/* Date and Time */}
+                        <div className="text-sm text-gray-500 mb-2">
+                          <span className="font-medium">{formatDate(practice.created_at)}</span>
+                          <span className="ml-4">{formatTime(practice.created_at)}</span>
                         </div>
-                        <div className="flex items-center">
-                          <Users className="w-4 h-4 mr-1 text-gray-400" />
-                          <span>完成次数: {practice.stats.completed_attempts}</span>
-                        </div>
-                        {practice.test_mode === 'timed' && practice.time_limit && (
+
+                        {/* Practice Title */}
+                        <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                          {practice.title}
+                        </h3>
+
+                        {/* Status Indicators */}
+                        <div className="flex items-center space-x-4 text-sm text-gray-500 mb-4">
                           <div className="flex items-center">
-                            <Clock className="w-4 h-4 mr-1 text-blue-500" />
-                            <span>{practice.time_limit}分钟限时</span>
+                            <MapPin className="w-4 h-4 mr-1 text-orange-500" />
+                            <span>难度: {getDifficultyLabel(practice.difficulty)}</span>
                           </div>
-                        )}
+                          <div className="flex items-center">
+                            <Users className="w-4 h-4 mr-1 text-gray-400" />
+                            <span>完成次数: {practice.stats.completed_attempts}</span>
+                          </div>
+                          {practice.test_mode === 'timed' && practice.time_limit && (
+                            <div className="flex items-center">
+                              <Clock className="w-4 h-4 mr-1 text-blue-500" />
+                              <span>{practice.time_limit}分钟限时</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex items-center space-x-3" onClick={(e) => e.stopPropagation()}>
+                          <Link href={`/${locale}/practice/${practice.slug}`}>
+                            <button className="px-4 py-2 bg-gray-800 text-white rounded-lg font-medium hover:bg-gray-700 transition-colors">
+                              开始练习
+                            </button>
+                          </Link>
+                          <Link href={`/${locale}/practice/${practice.slug}/edit`}>
+                            <button className="flex items-center px-3 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors">
+                              <Settings className="w-4 h-4 mr-1" />
+                              管理
+                            </button>
+                          </Link>
+                        </div>
                       </div>
 
-                      {/* Action Buttons */}
-                      <div className="flex items-center space-x-3" onClick={(e) => e.stopPropagation()}>
-                        <Link href={`/${locale}/practice/${practice.slug}`}>
-                          <button className="px-4 py-2 bg-gray-800 text-white rounded-lg font-medium hover:bg-gray-700 transition-colors">
-                            开始练习
-                          </button>
-                        </Link>
-                        <Link href={`/${locale}/practice/${practice.slug}/edit`}>
-                          <button className="flex items-center px-3 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors">
-                            <Settings className="w-4 h-4 mr-1" />
-                            管理
-                          </button>
-                        </Link>
+                      {/* Right side - Theme Icon */}
+                      <div className="ml-6">
+                        {getThemeIcon(practice)}
                       </div>
-                    </div>
-
-                    {/* Right side - Theme Icon */}
-                    <div className="ml-6">
-                      {getThemeIcon(practice)}
                     </div>
                   </div>
+                ))}
+              </div>
+
+              {/* Load More Button */}
+              {pagination.hasMore && (
+                <div className="flex justify-center mt-8">
+                  <Button
+                    onClick={loadMore}
+                    disabled={loadingMore}
+                    variant="outline"
+                    className="px-6 py-3 text-gray-600 border-gray-300 hover:bg-gray-50 transition-all duration-200"
+                  >
+                    {loadingMore ? (
+                      <>
+                        <div className="w-4 h-4 animate-spin rounded-full border-2 border-gray-400 border-t-transparent mr-2"></div>
+                        加载中...
+                      </>
+                    ) : (
+                      <>
+                        <ChevronDown className="w-4 h-4 mr-2" />
+                        加载更多 ({pagination.totalCount - practices.length} 个剩余)
+                      </>
+                    )}
+                  </Button>
                 </div>
-              ))}
+              )}
+
+              {/* Total Count Info */}
+              {pagination.totalCount > 0 && (
+                <div className="text-center mt-4 text-sm text-gray-500">
+                  显示 {practices.length} / {pagination.totalCount} 个练习
+                </div>
+              )}
             </div>
           )}
 
@@ -409,7 +479,7 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
                       <span className="font-medium text-gray-700">练习方式</span>
                     </div>
                     <span className="text-gray-900 font-medium">
-                      {selectedPractice.test_mode === 'normal' 
+                      {selectedPractice.test_mode === 'normal'
                         ? `普通模式 (${selectedPractice.question_count}题)`
                         : `计时模式 (${selectedPractice.time_limit}分钟)`
                       }

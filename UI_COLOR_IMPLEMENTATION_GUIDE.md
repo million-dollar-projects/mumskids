@@ -84,13 +84,6 @@
         </Link>
       </div>
 
-      {/* 探索活动链接 */}
-      <Link href={`/${locale}/events`}>
-        <Button variant="ghost" size="sm" className="text-secondary-gray">
-          {t.landing.exploreEvents}
-        </Button>
-      </Link>
-
       {/* 登录按钮 */}
       <Link href={`/${locale}/auth/login`}>
         <Button size="sm" className="btn-primary-black">

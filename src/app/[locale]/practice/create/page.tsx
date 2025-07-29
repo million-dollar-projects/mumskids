@@ -260,6 +260,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
               childName={form.childName}
               difficulty={form.difficulty}
               calculationType={form.calculationType}
+              theme={form.selectedTheme}
             />
 
             {/* 主题选择 */}
