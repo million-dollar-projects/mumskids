@@ -34,10 +34,21 @@ interface CreatePracticeProps {
   params: Promise<{ locale: string }>;
 }
 
+interface RewardCondition {
+  mode: 'normal' | 'timed';
+  // 一般模式
+  targetCorrect?: number; // 目标正确题数
+  maxTime?: number; // 最大时间限制（分钟）
+  // 计时模式（时间限制来自练习设置）
+  minCorrect?: number; // 最少正确题数
+  maxErrorRate?: number; // 最大错误率（百分比）
+}
+
 interface Reward {
   id: string;
   text: string;
   emoji: string;
+  condition?: RewardCondition;
 }
 
 interface PracticeForm {
@@ -186,7 +197,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
     <div className={`min-h-screen transition-colors duration-500 ${pageBackgroundClass}`}>
       <Header locale={locale} backgroundClass="bg-transparent" isFixed={true} />
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20">
         {/* 顶部导航标签 */}
         <div className="flex items-center justify-end mb-0">
           {/* 右上角控制区域 */}
@@ -324,13 +335,11 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
 
             {/* 其他设置 */}
             <div className="space-y-6">
-              <h3 className="text-lg font-medium">其他设置</h3>
-
               {/* 难度选择 */}
               <div className="flex items-center justify-between bg-purple-900/5 py-1 px-2 rounded">
                 <div className="flex items-center gap-3">
                   <Target className="w-5 h-5 text-gray-400" />
-                  <span className="font-medium">难度</span>
+                  <span className="font-medium">计算难度</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-gray-600">
@@ -428,7 +437,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
                         <Label
                           key={option.id}
                           htmlFor={`dialog-${option.id}`}
-                          className={`flex items-center text-gray-700 shadow-none space-x-1 py-2 px-4 rounded cursor-pointer transition-all duration-200 border-1 ${form.difficulty === option.id
+                          className={`flex items-center text-gray-700 shadow-none space-x-1 py-2 px-4 rounded cursor-pointer transition-all duration-200 border-1 ${form.calculationType === option.id
                             ? 'bg-blue-50 border-blue-200 shadow-md text-gray-900'
                             : 'bg-gray-50 border-gray-200 hover:bg-blue-50/50 hover:border-blue-200/50'
                             }`}
@@ -448,7 +457,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
               <div className="flex items-center justify-between bg-purple-900/5 py-1 px-2 rounded">
                 <div className="flex items-center gap-3">
                   <Timer className="w-5 h-5 text-gray-400" />
-                  <span className="font-medium">测试方式</span>
+                  <span className="font-medium">练习方式</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-gray-600">
@@ -487,7 +496,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
                         <div key={option.id} className="flex flex-col space-y-3">
                           <Label
                             htmlFor={`dialog-${option.id}`}
-                            className={`flex items-center text-gray-700 shadow-none space-x-1 py-2 px-4 rounded cursor-pointer transition-all duration-200 border-1 ${form.difficulty === option.id
+                            className={`flex items-center text-gray-700 shadow-none space-x-1 py-2 px-4 rounded cursor-pointer transition-all duration-200 border-1 ${form.testMode === option.id
                               ? 'bg-blue-50 border-blue-200 shadow-md text-gray-900'
                               : 'bg-gray-50 border-gray-200 hover:bg-blue-50/50 hover:border-blue-200/50'
                               }`}
@@ -559,6 +568,9 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
                 onRewardsChange={(rewards) => handleInputChange('rewards', rewards)}
                 onDistributionModeChange={(mode) => handleInputChange('rewardDistributionMode', mode)}
                 maxRewards={10}
+                testMode={form.testMode}
+                questionCount={form.questionCount}
+                timeLimit={form.timeLimit}
               />
             </div>
 

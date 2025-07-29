@@ -1,21 +1,32 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Plus, X, Gift, Shuffle, UserCheck, Lightbulb } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Plus, X, Gift, Shuffle, UserCheck, Lightbulb, Settings } from 'lucide-react';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { defaultRewards } from '@/config/default-rewards';
+
+interface RewardCondition {
+  mode: 'normal' | 'timed';
+  // 一般模式
+  targetCorrect?: number; // 目标正确题数
+  maxTime?: number; // 最大时间限制（分钟）
+  // 计时模式（时间限制来自练习设置）
+  minCorrect?: number; // 最少正确题数
+  maxErrorRate?: number; // 最大错误率（百分比）
+}
 
 interface Reward {
   id: string;
   text: string;
   emoji: string;
+  condition?: RewardCondition;
 }
 
 export interface RewardSelectorProps {
@@ -24,6 +35,9 @@ export interface RewardSelectorProps {
   onRewardsChange: (rewards: Reward[]) => void;
   onDistributionModeChange: (mode: 'random' | 'choice') => void;
   maxRewards?: number;
+  testMode: 'normal' | 'timed';
+  questionCount?: number;
+  timeLimit?: number;
 }
 
 export function RewardSelector({
@@ -31,15 +45,43 @@ export function RewardSelector({
   distributionMode,
   onRewardsChange,
   onDistributionModeChange,
-  maxRewards = 5
+  maxRewards = 5,
+  testMode,
+  questionCount = 10,
+  timeLimit = 5
 }: RewardSelectorProps) {
   const [newRewardText, setNewRewardText] = useState('');
   const [selectedEmoji, setSelectedEmoji] = useState('🎁');
   const [showEmojiDialog, setShowEmojiDialog] = useState(false);
   const [showRecommendations, setShowRecommendations] = useState(false);
   const [showAllRecommendations, setShowAllRecommendations] = useState(false);
+  const [pendingRewards, setPendingRewards] = useState<(typeof defaultRewards[0])[]>([]);
+  const [showConditionDialog, setShowConditionDialog] = useState(false);
   
-  const recommendationsRef = useRef<HTMLDivElement>(null);
+  // 根据练习方式设置默认条件
+  const getDefaultCondition = (): RewardCondition => {
+    if (testMode === 'timed') {
+      return {
+        mode: 'timed',
+        minCorrect: Math.ceil(questionCount * 0.8), // 80% 正确率
+        maxErrorRate: 20 // 20% 错误率
+      };
+    } else {
+      return {
+        mode: 'normal',
+        targetCorrect: Math.ceil(questionCount * 0.8), // 80% 正确率
+        maxTime: Math.ceil(timeLimit * 1.5) // 比时间限制多50%
+      };
+    }
+  };
+
+  const [rewardCondition, setRewardCondition] = useState<RewardCondition>(getDefaultCondition());
+
+  // 当练习方式改变时，更新默认条件
+  useEffect(() => {
+    const newCondition = getDefaultCondition();
+    setRewardCondition(newCondition);
+  }, [testMode, questionCount, timeLimit]);
 
   const addReward = () => {
     if (!newRewardText.trim() || rewards.length >= maxRewards) return;
@@ -47,7 +89,8 @@ export function RewardSelector({
     const newReward: Reward = {
       id: Date.now().toString(),
       text: newRewardText.trim(),
-      emoji: selectedEmoji
+      emoji: selectedEmoji,
+      condition: { ...rewardCondition }
     };
 
     onRewardsChange([...rewards, newReward]);
@@ -64,35 +107,40 @@ export function RewardSelector({
     setShowEmojiDialog(false);
   };
 
-  const addRecommendedReward = (recommendedReward: typeof defaultRewards[0]) => {
-    if (rewards.length >= maxRewards) return;
 
-    const newReward: Reward = {
-      id: Date.now().toString(),
-      text: recommendedReward.text,
-      emoji: recommendedReward.emoji
-    };
 
-    onRewardsChange([...rewards, newReward]);
+  const togglePendingReward = (recommendedReward: typeof defaultRewards[0]) => {
+    const isAlreadyPending = pendingRewards.some(reward => reward.text === recommendedReward.text);
+    if (isAlreadyPending) {
+      setPendingRewards(prev => prev.filter(reward => reward.text !== recommendedReward.text));
+    } else {
+      if (rewards.length + pendingRewards.length < maxRewards) {
+        setPendingRewards(prev => [...prev, recommendedReward]);
+      }
+    }
   };
 
-  // 点击外部关闭推荐列表
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (recommendationsRef.current && !recommendationsRef.current.contains(event.target as Node)) {
-        setShowRecommendations(false);
-        setShowAllRecommendations(false);
-      }
-    };
+    const confirmPendingRewards = () => {
+    const newRewards = pendingRewards.map(reward => ({
+      id: Date.now().toString() + Math.random(),
+      text: reward.text,
+      emoji: reward.emoji,
+      condition: { ...rewardCondition }
+    }));
+    
+    onRewardsChange([...rewards, ...newRewards]);
+    setPendingRewards([]);
+    setShowRecommendations(false);
+    setShowAllRecommendations(false);
+  };
 
-    if (showRecommendations) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
+  const cancelPendingRewards = () => {
+    setPendingRewards([]);
+    setShowRecommendations(false);
+    setShowAllRecommendations(false);
+  };
 
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [showRecommendations]);
+
 
   return (
     <div>
@@ -190,7 +238,7 @@ export function RewardSelector({
               value={newRewardText}
               onChange={(e) => setNewRewardText(e.target.value)}
               className='w-full border-none shadow-none outline-none px-2 py-2 h-auto focus-visible:ring-0 bg-transparent 
-                  placeholder:font-bold placeholder:text-[#1315175c] bg-purple-900/5'
+                  placeholder:font-bold placeholder:text-[#1315175c] bg-purple-900/5 cursor-pointer'
               placeholder="添加完成奖励..."
               onKeyDown={(e) => e.key === 'Enter' && addReward()}
               disabled={rewards.length >= maxRewards}
@@ -199,68 +247,254 @@ export function RewardSelector({
               onClick={addReward}
               disabled={!newRewardText.trim() || rewards.length >= maxRewards}
               variant="outline"
-              className="cursor-pointer bg-purple-900/5 border-none"
+              className="cursor-pointer bg-purple-900/5 border-none cursor-pointer"
               size="icon"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-4 h-4 cursor-pointer" />
             </Button>
+            {rewards.length < maxRewards && (
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setShowRecommendations(true)}
+                className="cursor-pointer bg-purple-900/5 border-none text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+              >
+                <Lightbulb className="w-4 h-4" />
+              </Button>
+            )}
+            {rewards.length > 0 && (
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setShowConditionDialog(true)}
+                className="cursor-pointer bg-purple-900/5 border-none text-gray-600 hover:text-gray-700 hover:bg-gray-50"
+                title="设置奖励条件"
+              >
+                <Settings className="w-4 h-4" />
+              </Button>
+            )}
           </div>
 
           {rewards.length >= maxRewards && (
             <p className="text-xs text-gray-500">最多可以添加 {maxRewards} 个奖励</p>
           )}
 
-          {/* 推荐奖励按钮 */}
-          {rewards.length < maxRewards && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowRecommendations(!showRecommendations)}
-              className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 p-2 h-auto cursor-pointer"
-            >
-              <Lightbulb className="w-4 h-4 mr-1" />
-              {showRecommendations ? '收起推荐' : '查看推荐奖励'}
-            </Button>
-          )}
+          {/* 推荐奖励 Dialog */}
+          <Dialog open={showRecommendations} onOpenChange={cancelPendingRewards}>
+            <DialogContent className="max-w-[500px] bg-white">
+              <DialogHeader>
+                <DialogTitle className="text-xl font-bold">推荐奖励</DialogTitle>
+                {/* 预选择的奖励显示 */}
+                {pendingRewards.length > 0 && (
+                  <div className="mt-3 p-3 bg-blue-50 rounded-lg">
+                    <p className="text-sm text-gray-600 mb-2">已选择的奖励：</p>
+                    <div className="flex flex-wrap gap-2">
+                      {pendingRewards.map((reward, index) => (
+                        <Badge key={index} variant="secondary" className="gap-2 text-sm bg-blue-100 text-blue-800">
+                          <span>{reward.emoji}</span>
+                          <span>{reward.text}</span>
+                          <button
+                            onClick={() => togglePendingReward(reward)}
+                            className="hover:text-red-500 transition-colors cursor-pointer ml-1"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </DialogHeader>
+              <div className="space-y-4">
+                <p className="text-sm text-gray-600">点击选择奖励{pendingRewards.length > 0 ? '（可多选）' : ''}：</p>
+                <div className="grid grid-cols-1 gap-2 max-h-80 overflow-y-auto">
+                  {defaultRewards
+                    .filter(rec => !rewards.some(reward => reward.text === rec.text))
+                    .slice(0, showAllRecommendations ? undefined : 12)
+                    .map((recommendedReward, index) => {
+                      const isSelected = pendingRewards.some(reward => reward.text === recommendedReward.text);
+                      const isDisabled = !isSelected && (rewards.length + pendingRewards.length >= maxRewards);
 
-          {/* 推荐奖励列表 */}
-          {showRecommendations && rewards.length < maxRewards && (
-            <div ref={recommendationsRef} className="bg-blue-50 p-3 rounded-lg space-y-3">
-              <p className="text-sm font-medium text-blue-800 cursor-pointer">推荐奖励 (点击添加)：</p>
-              <div className="grid grid-cols-1 gap-2 ">
-                {defaultRewards
-                  .filter(rec => !rewards.some(reward => reward.text === rec.text))
-                  .slice(0, showAllRecommendations ? undefined : 8)
-                  .map((recommendedReward, index) => (
-                    <button
-                      key={index}
-                      onClick={() => addRecommendedReward(recommendedReward)}
-                      className="flex items-center cursor-pointer gap-2 p-2 text-left hover:bg-blue-100 rounded transition-colors text-sm"
-                      disabled={rewards.length >= maxRewards}
-                    >
-                      <span className="text-base">{recommendedReward.emoji}</span>
-                      <span className="text-blue-700">{recommendedReward.text}</span>
-                    </button>
-                  ))}
+                      return (
+                        <button
+                          key={index}
+                          onClick={() => togglePendingReward(recommendedReward)}
+                          className={`flex items-center cursor-pointer gap-3 p-3 text-left rounded-lg transition-colors text-sm border ${isSelected
+                            ? 'bg-blue-50 border-blue-200 text-blue-800'
+                            : isDisabled
+                              ? 'bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed'
+                              : 'border-gray-100 hover:bg-blue-50 hover:border-blue-200'
+                            }`}
+                          disabled={isDisabled}
+                        >
+                          <span className="text-xl">{recommendedReward.emoji}</span>
+                          <span className="font-medium flex-1">{recommendedReward.text}</span>
+                          {isSelected && <span className="text-blue-600 text-xs">✓ 已选择</span>}
+                        </button>
+                      );
+                    })}
+                </div>
+                {!showAllRecommendations && defaultRewards.filter(rec => !rewards.some(reward => reward.text === rec.text)).length > 12 && (
+                  <button
+                    onClick={() => setShowAllRecommendations(true)}
+                    className="text-sm text-gray-600 hover:text-gray-700 cursor-pointer hover:underline w-full text-center py-2"
+                  >
+                    更多推荐
+                  </button>
+                )}
+                {showAllRecommendations && defaultRewards.filter(rec => !rewards.some(reward => reward.text === rec.text)).length > 12 && (
+                  <button
+                    onClick={() => setShowAllRecommendations(false)}
+                    className="text-sm text-gray-600 hover:text-gray-700 cursor-pointer hover:underline w-full text-center py-2"
+                  >
+                    收起
+                  </button>
+                )}
               </div>
-              {!showAllRecommendations && defaultRewards.filter(rec => !rewards.some(reward => reward.text === rec.text)).length > 8 && (
-                <button
-                  onClick={() => setShowAllRecommendations(true)}
-                  className="text-xs text-blue-600 hover:text-blue-700 cursor-pointer hover:underline"
+              <DialogFooter className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={cancelPendingRewards}
+                  className="cursor-pointer flex-1"
                 >
-                  还有更多推荐...
-                </button>
-              )}
-              {showAllRecommendations && defaultRewards.filter(rec => !rewards.some(reward => reward.text === rec.text)).length > 8 && (
-                <button
-                  onClick={() => setShowAllRecommendations(false)}
-                  className="text-xs text-blue-600 hover:text-blue-700 cursor-pointer hover:underline"
+                  取消
+                </Button>
+                <Button
+                  onClick={confirmPendingRewards}
+                  disabled={pendingRewards.length === 0}
+                  className="cursor-pointer bg-gray-900 hover:bg-gray-700 text-white flex-1"
                 >
-                  收起
-                </button>
-              )}
-            </div>
-          )}
+                  确认添加 {pendingRewards.length > 0 && `(${pendingRewards.length})`}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
+          {/* 奖励条件设置 Dialog */}
+          <Dialog open={showConditionDialog} onOpenChange={setShowConditionDialog}>
+            <DialogContent className="max-w-[500px] bg-white">
+              <DialogHeader>
+                <DialogTitle className="text-xl font-bold">设置奖励条件</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-6">
+                {/* 当前练习模式显示 */}
+                <div className="p-4 bg-gray-50 rounded-lg">
+                  <Label className="text-base font-medium mb-2 block">当前练习模式</Label>
+                  <div className="flex items-center space-x-3">
+                    <div className={`px-3 py-2 rounded-md text-sm font-medium ${
+                      testMode === 'normal' 
+                        ? 'bg-blue-100 text-blue-800' 
+                        : 'bg-green-100 text-green-800'
+                    }`}>
+                      {testMode === 'normal' ? '普通模式' : '计时模式'}
+                    </div>
+                    <span className="text-gray-600 text-sm">
+                      {testMode === 'normal' 
+                        ? `${questionCount} 题` 
+                        : `${timeLimit} 分钟`
+                      }
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2">
+                    奖励条件将根据当前练习模式自动调整
+                  </p>
+                </div>
+
+                {/* 一般模式设置 */}
+                {testMode === 'normal' && (
+                  <div className="space-y-4 p-4 bg-blue-50 rounded-lg">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-sm text-gray-600">目标正确题数</Label>
+                        <Input
+                          type="number"
+                          value={rewardCondition.targetCorrect || 8}
+                          onChange={(e) => setRewardCondition(prev => ({ 
+                            ...prev, 
+                            targetCorrect: parseInt(e.target.value) || 8 
+                          }))}
+                          className="mt-1 focus-visible:ring-0 focus-visible:ring-offset-0"
+                          min="1"
+                          max={questionCount}
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-sm text-gray-600">超时时间(分钟)</Label>
+                        <Input
+                          type="number"
+                          value={rewardCondition.maxTime || 3}
+                          onChange={(e) => setRewardCondition(prev => ({ 
+                            ...prev, 
+                            maxTime: parseInt(e.target.value) || 3 
+                          }))}
+                          className="mt-1 focus-visible:ring-0 focus-visible:ring-offset-0"
+                          min="1"
+                          max="60"
+                        />
+                      </div>
+                    </div>
+                    <p className="text-xs text-blue-600">
+                      需要答对 {rewardCondition.targetCorrect || 8} 题且在 {rewardCondition.maxTime || 3} 分钟内完成
+                    </p>
+                  </div>
+                )}
+
+                 {/* 计时模式设置 */}
+                 {testMode === 'timed' && (
+                   <div className="space-y-4 p-4 bg-green-50 rounded-lg">
+                     <div className="grid grid-cols-2 gap-4">
+                       <div>
+                         <Label className="text-sm text-gray-600">最少正确题数</Label>
+                         <Input
+                           type="number"
+                           value={rewardCondition.minCorrect || 10}
+                           onChange={(e) => setRewardCondition(prev => ({ 
+                             ...prev, 
+                             minCorrect: parseInt(e.target.value) || 10 
+                           }))}
+                           className="mt-1 focus-visible:ring-0 focus-visible:ring-offset-0"
+                           min="1"
+                           max="100"
+                         />
+                       </div>
+                       <div>
+                         <Label className="text-sm text-gray-600">最大错误率（%）</Label>
+                         <Input
+                           type="number"
+                           value={rewardCondition.maxErrorRate || 5}
+                           onChange={(e) => setRewardCondition(prev => ({ 
+                             ...prev, 
+                             maxErrorRate: parseInt(e.target.value) || 5 
+                           }))}
+                           className="mt-1 focus-visible:ring-0 focus-visible:ring-offset-0"
+                           min="0"
+                           max="50"
+                         />
+                       </div>
+                     </div>
+                     <p className="text-xs text-green-600">
+                       需要在 {timeLimit} 分钟内答对至少 {rewardCondition.minCorrect || 10} 题，错误率不超过 {rewardCondition.maxErrorRate || 5}%
+                     </p>
+                   </div>
+                 )}
+              </div>
+              <DialogFooter className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowConditionDialog(false)}
+                  className="cursor-pointer flex-1"
+                >
+                  取消
+                </Button>
+                <Button
+                  onClick={() => setShowConditionDialog(false)}
+                  className="cursor-pointer bg-gray-900 hover:bg-gray-700 text-white flex-1"
+                >
+                  确定
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
 
       </div>
