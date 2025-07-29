@@ -395,9 +395,6 @@ export function RewardSelector({
                       }
                     </span>
                   </div>
-                  <p className="text-xs text-gray-500 mt-2">
-                    奖励条件将根据当前练习模式自动调整
-                  </p>
                 </div>
 
                 {/* 一般模式设置 */}

@@ -379,7 +379,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
                           key={option.id}
                           htmlFor={`dialog-${option.id}`}
                           className={`flex items-center text-gray-700 shadow-none space-x-1 py-2 px-4 rounded cursor-pointer transition-all duration-200 border-1 ${form.difficulty === option.id
-                            ? 'bg-blue-50 border-blue-200 shadow-md text-gray-900'
+                            ? 'bg-blue-50 border-blue-200 text-gray-900'
                             : 'bg-gray-50 border-gray-200 hover:bg-blue-50/50 hover:border-blue-200/50'
                             }`}
                         >
@@ -438,7 +438,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
                           key={option.id}
                           htmlFor={`dialog-${option.id}`}
                           className={`flex items-center text-gray-700 shadow-none space-x-1 py-2 px-4 rounded cursor-pointer transition-all duration-200 border-1 ${form.calculationType === option.id
-                            ? 'bg-blue-50 border-blue-200 shadow-md text-gray-900'
+                            ? 'bg-blue-50 border-blue-200 text-gray-900'
                             : 'bg-gray-50 border-gray-200 hover:bg-blue-50/50 hover:border-blue-200/50'
                             }`}
                         >
@@ -497,7 +497,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
                           <Label
                             htmlFor={`dialog-${option.id}`}
                             className={`flex items-center text-gray-700 shadow-none space-x-1 py-2 px-4 rounded cursor-pointer transition-all duration-200 border-1 ${form.testMode === option.id
-                              ? 'bg-blue-50 border-blue-200 shadow-md text-gray-900'
+                              ? 'bg-blue-50 border-blue-200 text-gray-900'
                               : 'bg-gray-50 border-gray-200 hover:bg-blue-50/50 hover:border-blue-200/50'
                               }`}
                           >
