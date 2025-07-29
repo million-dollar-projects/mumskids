@@ -108,7 +108,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
   const visibilityOptions = getVisibilityOptions(locale);
 
   const currentTheme = themes.find(t => t.id === form.selectedTheme);
-  const pageBackgroundClass = currentTheme?.bgClass || 'bg-purple-50';
+  const pageBackgroundClass = currentTheme?.bgClass || 'bg-transparent';
   const dialogBackgroundClass = 'bg-white border-none shadow-none';
 
   useEffect(() => {
@@ -166,7 +166,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
       }
 
       alert(t.practice.practiceCreated);
-      router.push(`/${locale}/practice`);
+      router.push(`/${locale}`);
     } catch (error) {
       console.error('保存失败:', error);
       alert('保存失败，请重试');

@@ -1,6 +1,7 @@
 import { Card } from '@/components/ui/card';
 import { Target } from 'lucide-react';
 import { difficultyOptions, calculationTypeOptions } from '@/lib/practice-config';
+import { getThemeById, getDefaultTheme } from '@/lib/themes';
 
 interface PracticeCardProps {
   childName?: string;
@@ -8,6 +9,7 @@ interface PracticeCardProps {
   calculationType: 'add' | 'sub' | 'addsub';
   className?: string;
   size?: 'small' | 'large';
+  theme?: string;
 }
 
 export function PracticeCard({
@@ -15,7 +17,8 @@ export function PracticeCard({
   difficulty,
   calculationType,
   className = "",
-  size = 'large'
+  size = 'large',
+  theme
 }: PracticeCardProps) {
   // 根据昵称长度和卡片大小动态调整字体大小
   const getNameFontSize = (name?: string) => {
@@ -73,9 +76,13 @@ export function PracticeCard({
   const difficultyLabel = difficultyOptions.find(option => option.id === difficulty)?.label || '';
   const calculationLabel = calculationTypeOptions.find(option => option.id === calculationType)?.label || '';
   const decorations = getDecorationSizes();
+  
+  // 获取主题配置
+  const currentTheme = theme ? getThemeById(theme) : getDefaultTheme();
+  const themeGradient = currentTheme?.gradient || 'bg-gradient-to-br from-red-500 to-pink-500';
 
   return (
-    <Card className={`aspect-square bg-gradient-to-br from-red-500 to-pink-500 border-none shadow-xl flex items-center justify-center relative overflow-hidden ${className}`}>
+    <Card className={`aspect-square ${themeGradient} border-none shadow-xl flex items-center justify-center relative overflow-hidden ${className}`}>
       <div className={`text-center text-white ${getPadding()}`}>
         <div className={`font-bold ${getMarginBottom()} transform leading-tight ${getNameFontSize(childName)}`}>
           {childName ? childName.toUpperCase() : '昵称'}

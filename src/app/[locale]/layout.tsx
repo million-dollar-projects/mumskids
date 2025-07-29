@@ -27,7 +27,7 @@ export default async function RootLayout({
     <html lang={locale}>
       <body className="antialiased">
         <AuthProvider>
-          <div className="min-h-screen bg-background">
+          <div className="min-h-screen">
             {children}
           </div>
         </AuthProvider>

@@ -35,7 +35,7 @@ export default function HomePage({ params }: PageProps) {
   // 如果正在加载认证状态，显示加载页面
   if (loading) {
     return (
-      <div className="min-h-screen bg-purple-50">
+      <div className="min-h-screen">
         <Header locale={locale} />
         {/* 加载状态 */}
         <div className="flex items-center justify-center min-h-[60vh]">

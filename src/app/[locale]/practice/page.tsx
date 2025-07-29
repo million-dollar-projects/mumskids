@@ -140,7 +140,7 @@ export default function PracticePage({ params }: PracticePageProps) {
 
   if (loading) {
     return (
-      <div className="bg-purple-50 min-h-screen">
+      <div className="min-h-screen">
         <Header locale={locale} />
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
@@ -154,7 +154,7 @@ export default function PracticePage({ params }: PracticePageProps) {
   }
 
   return (
-    <div className="bg-purple-50 min-h-screen">
+    <div className="min-h-screen">
       <Header locale={locale} />
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* 页面标题 */}

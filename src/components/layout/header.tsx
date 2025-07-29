@@ -15,7 +15,7 @@ interface HeaderProps {
   isFixed?: boolean;
 }
 
-export function Header({ locale, variant = 'authenticated', backgroundClass = 'bg-purple-50', isFixed = false }: HeaderProps) {
+export function Header({ locale, variant = 'authenticated', backgroundClass = 'bg-transparent', isFixed = false }: HeaderProps) {
   const { user, loading } = useAuth();
   const [showNotifications, setShowNotifications] = useState(false);
   const notificationRef = useRef<HTMLDivElement>(null);
