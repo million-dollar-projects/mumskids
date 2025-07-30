@@ -58,38 +58,64 @@ export function RewardSelector({
   const [showAllRecommendations, setShowAllRecommendations] = useState(false);
   const [pendingRewards, setPendingRewards] = useState<(typeof defaultRewards[0])[]>([]);
   const [showConditionDialog, setShowConditionDialog] = useState(false);
-  
+
   const [rewardCondition, setRewardCondition] = useState<RewardCondition>(() => {
     if (testMode === 'timed') {
+      // 计时模式：基于时间限制计算合理的最少题数
+      // 假设每题20秒，时间限制内应该能完成的题数的70%作为最少要求
+      const expectedQuestions = Math.floor(timeLimit * 3); // 每分钟3题
+      const minQuestions = Math.max(5, Math.ceil(expectedQuestions * 0.7)); // 至少5题，70%完成率
       return {
         mode: 'timed',
-        minCorrect: Math.ceil(questionCount * 0.9), // 90% 正确率
-        maxErrorRate: 10 // 10% 错误率
+        minCorrect: minQuestions,
+        maxErrorRate: 20 // 20%错误率
       };
     } else {
+      // 普通模式：每道题预估20秒，总时间向上取整到分钟
+      const estimatedMinutes = Math.max(1, Math.ceil(questionCount * 0.33)); // 每题20秒
       return {
         mode: 'normal',
-        targetCorrect: Math.ceil(questionCount * 0.9), // 90% 正确率
-        maxTime: Math.ceil(timeLimit * 1.2) // 比时间限制多20%
+        targetCorrect: Math.max(1, Math.ceil(questionCount * 0.8)), // 至少1题，80%正确率
+        maxTime: estimatedMinutes
       };
     }
   });
 
+  // 初始化时设置默认奖励条件
+  useEffect(() => {
+    const initialCondition = testMode === 'timed'
+      ? {
+        mode: 'timed' as const,
+        minCorrect: Math.max(5, Math.ceil(timeLimit * 3 * 0.7)), // 基于时间限制计算，至少5题
+        maxErrorRate: 20 // 20%错误率
+      }
+      : {
+        mode: 'normal' as const,
+        targetCorrect: Math.max(1, Math.ceil(questionCount * 0.8)), // 至少1题，80%正确率
+        maxTime: Math.max(1, Math.ceil(questionCount * 0.33)) // 每题20秒，向上取整到分钟
+      };
+    onRewardConditionChange?.(initialCondition);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // 只在组件挂载时执行一次
+
   // 当练习方式改变时，更新默认条件
   useEffect(() => {
-    const newCondition = testMode === 'timed' 
+    const newCondition = testMode === 'timed'
       ? {
-          mode: 'timed' as const,
-          minCorrect: Math.ceil(questionCount * 0.9),
-          maxErrorRate: 10
-        }
+        mode: 'timed' as const,
+        minCorrect: Math.max(5, Math.ceil(timeLimit * 3 * 0.7)), // 基于时间限制计算，至少5题
+        maxErrorRate: 20 // 20%错误率
+      }
       : {
-          mode: 'normal' as const,
-          targetCorrect: Math.ceil(questionCount * 0.9),
-          maxTime: Math.ceil(timeLimit * 1.2)
-        };
+        mode: 'normal' as const,
+        targetCorrect: Math.max(1, Math.ceil(questionCount * 0.8)), // 至少1题，80%正确率
+        maxTime: Math.max(1, Math.ceil(questionCount * 0.33)) // 每题20秒，向上取整到分钟
+      };
     setRewardCondition(newCondition);
-  }, [testMode, questionCount, timeLimit]);
+    // 自动调用回调函数，确保父组件获得默认值
+    onRewardConditionChange?.(newCondition);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [testMode, questionCount, timeLimit]); // 移除 onRewardConditionChange 避免无限循环
 
   const addReward = () => {
     if (!newRewardText.trim() || rewards.length >= maxRewards) return;
@@ -125,13 +151,13 @@ export function RewardSelector({
     }
   };
 
-    const confirmPendingRewards = () => {
+  const confirmPendingRewards = () => {
     const newRewards = pendingRewards.map(reward => ({
       id: Date.now().toString() + Math.random(),
       text: reward.text,
       emoji: reward.emoji
     }));
-    
+
     onRewardsChange([...rewards, ...newRewards]);
     setPendingRewards([]);
     setShowRecommendations(false);
@@ -230,10 +256,9 @@ export function RewardSelector({
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <p className="text-xs text-gray-600">
-                                          {testMode === 'normal' 
-                        ? `答对 ${rewardCondition.targetCorrect || Math.ceil(questionCount * 0.9)} 题且在 ${rewardCondition.maxTime || Math.ceil(timeLimit * 1.2)} 分钟内完成`
-                        : `在 ${timeLimit} 分钟内完成至少 ${rewardCondition.minCorrect || Math.ceil(questionCount * 0.9)} 题，错误率不超过 ${rewardCondition.maxErrorRate || 0}%`
-      
+                    {testMode === 'normal'
+                      ? `答对 ${rewardCondition.targetCorrect || Math.max(1, Math.ceil(questionCount * 0.8))} 题且在 ${rewardCondition.maxTime || Math.max(1, Math.ceil(questionCount * 0.5))} 分钟内完成`
+                      : `在 ${timeLimit} 分钟内完成至少 ${rewardCondition.minCorrect || Math.max(5, Math.ceil(timeLimit * 3 * 0.7))} 题，错误率不超过 ${rewardCondition.maxErrorRate !== undefined ? rewardCondition.maxErrorRate : 20}%`
                     }
                     可获得奖励
                   </p>
@@ -399,16 +424,15 @@ export function RewardSelector({
                 <div className="p-4 bg-gray-50 rounded-lg">
                   <Label className="text-base font-medium mb-2 block">当前练习模式</Label>
                   <div className="flex items-center space-x-3">
-                    <div className={`px-3 py-2 rounded-md text-sm font-medium ${
-                      testMode === 'normal' 
-                        ? 'bg-blue-100 text-blue-800' 
-                        : 'bg-green-100 text-green-800'
-                    }`}>
+                    <div className={`px-3 py-2 rounded-md text-sm font-medium ${testMode === 'normal'
+                      ? 'bg-blue-100 text-blue-800'
+                      : 'bg-green-100 text-green-800'
+                      }`}>
                       {testMode === 'normal' ? '普通模式' : '计时模式'}
                     </div>
                     <span className="text-gray-600 text-sm">
-                      {testMode === 'normal' 
-                        ? `${questionCount} 题` 
+                      {testMode === 'normal'
+                        ? `${questionCount} 题`
                         : `${timeLimit} 分钟`
                       }
                     </span>
@@ -424,9 +448,9 @@ export function RewardSelector({
                         <Input
                           type="number"
                           value={rewardCondition.targetCorrect || 8}
-                          onChange={(e) => setRewardCondition(prev => ({ 
-                            ...prev, 
-                            targetCorrect: parseInt(e.target.value) || 8 
+                          onChange={(e) => setRewardCondition(prev => ({
+                            ...prev,
+                            targetCorrect: parseInt(e.target.value) || 8
                           }))}
                           className="mt-1 focus-visible:ring-0 focus-visible:ring-offset-0"
                           min="1"
@@ -438,9 +462,9 @@ export function RewardSelector({
                         <Input
                           type="number"
                           value={rewardCondition.maxTime || 3}
-                          onChange={(e) => setRewardCondition(prev => ({ 
-                            ...prev, 
-                            maxTime: parseInt(e.target.value) || 3 
+                          onChange={(e) => setRewardCondition(prev => ({
+                            ...prev,
+                            maxTime: parseInt(e.target.value) || 3
                           }))}
                           className="mt-1 focus-visible:ring-0 focus-visible:ring-offset-0"
                           min="1"
@@ -454,44 +478,47 @@ export function RewardSelector({
                   </div>
                 )}
 
-                 {/* 计时模式设置 */}
-                 {testMode === 'timed' && (
-                   <div className="space-y-4 p-4 bg-green-50 rounded-lg">
-                     <div className="grid grid-cols-2 gap-4">
-                       <div>
-                         <Label className="text-sm text-gray-600">最少完成题数</Label>
-                         <Input
-                           type="number"
-                           value={rewardCondition.minCorrect || 10}
-                           onChange={(e) => setRewardCondition(prev => ({ 
-                             ...prev, 
-                             minCorrect: parseInt(e.target.value) || 10 
-                           }))}
-                           className="mt-1 focus-visible:ring-0 focus-visible:ring-offset-0"
-                           min="1"
-                           max="100"
-                         />
-                       </div>
-                       <div>
-                         <Label className="text-sm text-gray-600">最大错误率（%）</Label>
-                         <Input
-                           type="number"
-                           value={rewardCondition.maxErrorRate}
-                           onChange={(e) => setRewardCondition(prev => ({ 
-                             ...prev, 
-                             maxErrorRate: parseInt(e.target.value)
-                           }))}
-                           className="mt-1 focus-visible:ring-0 focus-visible:ring-offset-0"
-                           min="0"
-                           max="100"
-                         />
-                       </div>
-                     </div>
-                     <p className="text-xs text-green-600">
-                       需要在 {timeLimit} 分钟内完成至少 {rewardCondition.minCorrect || 10} 题，错误率不超过 {rewardCondition.maxErrorRate || 0}%
-                     </p>
-                   </div>
-                 )}
+                {/* 计时模式设置 */}
+                {testMode === 'timed' && (
+                  <div className="space-y-4 p-4 bg-green-50 rounded-lg">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-sm text-gray-600">最少完成题数</Label>
+                        <Input
+                          type="number"
+                          value={rewardCondition.minCorrect || 10}
+                          onChange={(e) => setRewardCondition(prev => ({
+                            ...prev,
+                            minCorrect: parseInt(e.target.value) || 10
+                          }))}
+                          className="mt-1 focus-visible:ring-0 focus-visible:ring-offset-0"
+                          min="1"
+                          max="100"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-sm text-gray-600">最大错误率（%）</Label>
+                        <Input
+                          type="number"
+                          value={rewardCondition.maxErrorRate !== undefined ? rewardCondition.maxErrorRate : 20}
+                          onChange={(e) => {
+                            const value = e.target.value === '' ? 20 : parseInt(e.target.value);
+                            setRewardCondition(prev => ({
+                              ...prev,
+                              maxErrorRate: isNaN(value) ? 20 : value
+                            }));
+                          }}
+                          className="mt-1 focus-visible:ring-0 focus-visible:ring-offset-0"
+                          min="0"
+                          max="100"
+                        />
+                      </div>
+                    </div>
+                    <p className="text-xs text-green-600">
+                      需要在 {timeLimit} 分钟内完成至少 {rewardCondition.minCorrect || 10} 题，错误率不超过 {rewardCondition.maxErrorRate !== undefined ? rewardCondition.maxErrorRate : 20}%
+                    </p>
+                  </div>
+                )}
               </div>
               <DialogFooter className="flex gap-2">
                 <Button

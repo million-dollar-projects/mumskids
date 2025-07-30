@@ -56,7 +56,8 @@ interface Practice {
 
 interface PracticeDashboardProps {
   locale: string;
-  t: Record<string, string>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  t: Record<string, any>; // 使用 Record<string, any> 来处理嵌套对象
 }
 
 export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
