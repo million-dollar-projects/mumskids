@@ -141,6 +141,7 @@ export async function POST(request: NextRequest) {
       selected_theme: body.selectedTheme || 'default',
       reward_distribution_mode: body.rewardDistributionMode || 'random',
       rewards: body.rewards || [],
+      reward_condition: body.rewardCondition || null,
       stats: {
         total_attempts: 0,
         completed_attempts: 0,

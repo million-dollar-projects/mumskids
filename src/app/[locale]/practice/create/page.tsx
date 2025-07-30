@@ -49,7 +49,6 @@ interface Reward {
   id: string;
   text: string;
   emoji: string;
-  condition?: RewardCondition;
 }
 
 interface PracticeForm {
@@ -64,6 +63,7 @@ interface PracticeForm {
   isPublic: boolean;
   rewards: Reward[];
   rewardDistributionMode: 'random' | 'choice';
+  rewardCondition: RewardCondition | null;
   selectedTheme: string;
   calculationType: 'add' | 'sub' | 'addsub';
 }
@@ -92,6 +92,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
     isPublic: false,
     rewards: [],
     rewardDistributionMode: 'random',
+    rewardCondition: null,
     selectedTheme: 'rainbow',
     calculationType: 'add'
   });
@@ -117,7 +118,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
     }
   }, [user, loading, router, locale]);
 
-  const handleInputChange = (field: keyof PracticeForm, value: string | number | boolean | Reward[] | 'random' | 'choice') => {
+  const handleInputChange = (field: keyof PracticeForm, value: string | number | boolean | Reward[] | 'random' | 'choice' | RewardCondition | null) => {
     setForm(prev => ({
       ...prev,
       [field]: value
@@ -548,6 +549,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
                 distributionMode={form.rewardDistributionMode}
                 onRewardsChange={(rewards) => handleInputChange('rewards', rewards)}
                 onDistributionModeChange={(mode) => handleInputChange('rewardDistributionMode', mode)}
+                onRewardConditionChange={(condition) => handleInputChange('rewardCondition', condition)}
                 maxRewards={10}
                 testMode={form.testMode}
                 questionCount={form.questionCount}

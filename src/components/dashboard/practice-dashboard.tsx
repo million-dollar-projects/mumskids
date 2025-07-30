@@ -4,13 +4,18 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
-import { Plus, MapPin, Users, Clock, Settings, Target, Calculator, Timer, Globe, Lock, ChevronDown } from 'lucide-react';
+import { Plus, MapPin, Users, Clock, Settings, ChevronDown } from 'lucide-react';
 import { PracticeCard } from '@/components/ui/practice-card';
 import { useAuth } from '@/lib/auth/context';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { PAGINATION_CONFIG } from '@/lib/pagination-config';
+import { PracticeDetailSheet } from './practice-detail-sheet';
+
+interface Reward {
+  id?: string;
+  text: string;
+  emoji?: string;
+}
 
 interface Practice {
   id: string;
@@ -30,7 +35,8 @@ interface Practice {
   is_public: boolean;
   selected_theme: string;
   reward_distribution_mode: 'random' | 'choice';
-  rewards: string[];
+  rewards: (string | Reward)[];
+  reward_condition?: any;
   stats: {
     total_attempts: number;
     completed_attempts: number;
@@ -191,16 +197,6 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
     return labels[difficulty as keyof typeof labels] || difficulty;
   };
 
-  // 获取计算类型标签
-  const getCalculationTypeLabel = (type: string) => {
-    const labels = {
-      'add': '加法',
-      'sub': '减法',
-      'addsub': '加减法'
-    };
-    return labels[type as keyof typeof labels] || type;
-  };
-
   return (
     <div className="min-h-screen">
       <Header locale={locale} />
@@ -347,7 +343,7 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
                     onClick={loadMore}
                     disabled={loadingMore}
                     variant="outline"
-                    className="px-6 py-3 text-gray-600 border-gray-300 hover:bg-gray-50 transition-all duration-200"
+                    className="px-6 py-3 text-gray-600 border-gray-300 hover:bg-gray-50 transition-all duration-200 cursor-pointer"
                   >
                     {loadingMore ? (
                       <>
@@ -420,142 +416,12 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
       <Footer locale={locale} />
 
       {/* Practice Detail Sheet */}
-      <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-        <SheetContent side="right" className="w-full sm:w-[540px] p-0">
-          {selectedPractice && (
-            <>
-              <SheetHeader className="p-6 pb-4">
-                <div className="flex items-center space-x-3">
-                  {selectedPractice.is_public ? (
-                    <Globe className="w-5 h-5 text-blue-500" />
-                  ) : (
-                    <Lock className="w-5 h-5 text-gray-500" />
-                  )}
-                  <SheetTitle className="text-xl font-bold text-gray-900">
-                    {selectedPractice.title}
-                  </SheetTitle>
-                </div>
-              </SheetHeader>
-
-              <div className="px-6 pb-6 space-y-6">
-                {/* Practice Card */}
-                <div className="flex justify-center">
-                  <div className="w-48">
-                    <PracticeCard
-                      childName={selectedPractice.child_name}
-                      difficulty={selectedPractice.difficulty}
-                      calculationType={selectedPractice.calculation_type}
-                      className="w-full h-48"
-                      theme={selectedPractice.selected_theme}
-                    />
-                  </div>
-                </div>
-
-                {/* Basic Info */}
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between py-3 px-4 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <Target className="w-5 h-5 text-purple-600" />
-                      <span className="font-medium text-gray-700">计算难度</span>
-                    </div>
-                    <span className="text-gray-900 font-medium">
-                      {getDifficultyLabel(selectedPractice.difficulty)}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between bg-blue-50 py-3 px-4 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <Calculator className="w-5 h-5 text-blue-600" />
-                      <span className="font-medium text-gray-700">计算方式</span>
-                    </div>
-                    <span className="text-gray-900 font-medium">
-                      {getCalculationTypeLabel(selectedPractice.calculation_type)}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between bg-green-50 py-3 px-4 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <Timer className="w-5 h-5 text-green-600" />
-                      <span className="font-medium text-gray-700">练习方式</span>
-                    </div>
-                    <span className="text-gray-900 font-medium">
-                      {selectedPractice.test_mode === 'normal'
-                        ? `普通模式 (${selectedPractice.question_count}题)`
-                        : `计时模式 (${selectedPractice.time_limit}分钟)`
-                      }
-                    </span>
-                  </div>
-                </div>
-
-                <Separator />
-
-                {/* Stats */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-900">练习统计</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-gray-50 p-4 rounded-lg text-center">
-                      <div className="text-2xl font-bold text-gray-900">
-                        {selectedPractice.stats.total_attempts}
-                      </div>
-                      <div className="text-sm text-gray-600">总尝试次数</div>
-                    </div>
-                    <div className="bg-gray-50 p-4 rounded-lg text-center">
-                      <div className="text-2xl font-bold text-green-600">
-                        {selectedPractice.stats.completed_attempts}
-                      </div>
-                      <div className="text-sm text-gray-600">完成次数</div>
-                    </div>
-                    <div className="bg-gray-50 p-4 rounded-lg text-center">
-                      <div className="text-2xl font-bold text-blue-600">
-                        {selectedPractice.stats.average_score.toFixed(1)}%
-                      </div>
-                      <div className="text-sm text-gray-600">平均分数</div>
-                    </div>
-                    <div className="bg-gray-50 p-4 rounded-lg text-center">
-                      <div className="text-2xl font-bold text-purple-600">
-                        {selectedPractice.stats.best_score.toFixed(1)}%
-                      </div>
-                      <div className="text-sm text-gray-600">最佳分数</div>
-                    </div>
-                  </div>
-                </div>
-
-                <Separator />
-
-                {/* Description */}
-                {selectedPractice.description && (
-                  <div className="space-y-2">
-                    <h3 className="text-lg font-semibold text-gray-900">练习描述</h3>
-                    <p className="text-gray-600 leading-relaxed">
-                      {selectedPractice.description}
-                    </p>
-                  </div>
-                )}
-
-                {/* Action Buttons */}
-                <div className="space-y-3 pt-4">
-                  <Link href={`/${locale}/practice/${selectedPractice.slug}`} className="block">
-                    <Button className="w-full h-12 bg-gray-900 hover:bg-gray-800 text-white font-medium">
-                      开始练习
-                    </Button>
-                  </Link>
-                  <Link href={`/${locale}/practice/${selectedPractice.slug}/edit`} className="block">
-                    <Button variant="outline" className="w-full h-12 border-gray-300 text-gray-700 hover:bg-gray-50">
-                      <Settings className="w-4 h-4 mr-2" />
-                      管理练习
-                    </Button>
-                  </Link>
-                </div>
-
-                {/* Creation Info */}
-                <div className="text-xs text-gray-500 text-center pt-4 border-t">
-                  创建于 {new Date(selectedPractice.created_at).toLocaleString('zh-CN')}
-                </div>
-              </div>
-            </>
-          )}
-        </SheetContent>
-      </Sheet>
+      <PracticeDetailSheet
+        practice={selectedPractice}
+        isOpen={sheetOpen}
+        onOpenChange={setSheetOpen}
+        locale={locale}
+      />
     </div>
   );
 }

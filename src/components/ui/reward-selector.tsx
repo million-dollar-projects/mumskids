@@ -26,7 +26,6 @@ interface Reward {
   id: string;
   text: string;
   emoji: string;
-  condition?: RewardCondition;
 }
 
 export interface RewardSelectorProps {
@@ -34,6 +33,7 @@ export interface RewardSelectorProps {
   distributionMode: 'random' | 'choice';
   onRewardsChange: (rewards: Reward[]) => void;
   onDistributionModeChange: (mode: 'random' | 'choice') => void;
+  onRewardConditionChange?: (condition: RewardCondition) => void;
   maxRewards?: number;
   testMode: 'normal' | 'timed';
   questionCount?: number;
@@ -45,6 +45,7 @@ export function RewardSelector({
   distributionMode,
   onRewardsChange,
   onDistributionModeChange,
+  onRewardConditionChange,
   maxRewards = 5,
   testMode,
   questionCount = 10,
@@ -89,8 +90,7 @@ export function RewardSelector({
     const newReward: Reward = {
       id: Date.now().toString(),
       text: newRewardText.trim(),
-      emoji: selectedEmoji,
-      condition: { ...rewardCondition }
+      emoji: selectedEmoji
     };
 
     onRewardsChange([...rewards, newReward]);
@@ -124,8 +124,7 @@ export function RewardSelector({
     const newRewards = pendingRewards.map(reward => ({
       id: Date.now().toString() + Math.random(),
       text: reward.text,
-      emoji: reward.emoji,
-      condition: { ...rewardCondition }
+      emoji: reward.emoji
     }));
     
     onRewardsChange([...rewards, ...newRewards]);
@@ -484,7 +483,10 @@ export function RewardSelector({
                   取消
                 </Button>
                 <Button
-                  onClick={() => setShowConditionDialog(false)}
+                  onClick={() => {
+                    onRewardConditionChange?.(rewardCondition);
+                    setShowConditionDialog(false);
+                  }}
                   className="cursor-pointer bg-gray-900 hover:bg-gray-700 text-white flex-1"
                 >
                   确定

@@ -37,8 +37,8 @@ export const themes: Theme[] = [
         id: 'forest',
         name: '森林',
         icon: '🌳',
-        gradient: 'bg-gradient-to-br from-green-300 to-emerald-400',
-        bgClass: 'bg-gradient-to-br from-green-200 to-emerald-200',
+        gradient: 'bg-gradient-to-br from-lime-400 to-green-600',
+        bgClass: 'bg-gradient-to-br from-lime-200 to-green-300',
         description: '自然的森林绿'
     },
     {
@@ -53,24 +53,24 @@ export const themes: Theme[] = [
         id: 'lavender',
         name: '薰衣草',
         icon: '💜',
-        gradient: 'bg-gradient-to-br from-purple-300 to-violet-400',
-        bgClass: 'bg-gradient-to-br from-purple-200 to-violet-200',
+        gradient: 'bg-gradient-to-br from-indigo-300 to-purple-400',
+        bgClass: 'bg-gradient-to-br from-indigo-200 to-purple-200',
         description: '优雅的薰衣草紫'
     },
     {
         id: 'peach',
         name: '蜜桃',
         icon: '🍑',
-        gradient: 'bg-gradient-to-br from-orange-300 to-pink-300',
-        bgClass: 'bg-gradient-to-br from-orange-200 to-pink-200',
+        gradient: 'bg-gradient-to-br from-rose-300 to-pink-400',
+        bgClass: 'bg-gradient-to-br from-rose-200 to-pink-200',
         description: '温柔的蜜桃色'
     },
     {
         id: 'mint',
         name: '薄荷',
         icon: '🌿',
-        gradient: 'bg-gradient-to-br from-teal-300 to-green-300',
-        bgClass: 'bg-gradient-to-br from-teal-200 to-green-200',
+        gradient: 'bg-gradient-to-br from-emerald-300 to-teal-400',
+        bgClass: 'bg-gradient-to-br from-emerald-200 to-teal-200',
         description: '清爽的薄荷绿'
     }
 ];
