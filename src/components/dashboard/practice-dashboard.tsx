@@ -68,7 +68,7 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
   const [selectedPractice, setSelectedPractice] = useState<Practice | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [isTabChanging, setIsTabChanging] = useState(false);
-  const { 
+  const {
     data: practicesData,
     isLoading: practicesLoading,
     isFetchingNextPage: loadingMore,
@@ -138,7 +138,17 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
   const handleDeletePractice = async (practiceId: string) => {
     try {
       // 找到要删除的练习
-      const practiceToDelete = practicesData?.data.find((p: Practice) => p.id === practiceId);
+      let practiceToDelete: Practice | undefined;
+      if (practicesData?.pages) {
+        for (const page of practicesData.pages) {
+          const found = (page as any)?.data?.find((p: Practice) => p.id === practiceId);
+          if (found) {
+            practiceToDelete = found;
+            break;
+          }
+        }
+      }
+      
       if (!practiceToDelete) {
         console.error('Practice not found');
         return;
@@ -273,7 +283,7 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
                         </h3>
 
                         {/* Status Indicators */}
-                        <div className="flex items-center space-x-4 text-sm text-gray-500 mb-4">
+                        <div className="hidden sm:flex items-center space-x-4 text-sm text-gray-500 mb-4">
                           <div className="flex items-center">
                             <MapPin className="w-4 h-4 mr-1 text-orange-500" />
                             <span>难度: {getDifficultyLabel(practice.difficulty)}</span>
