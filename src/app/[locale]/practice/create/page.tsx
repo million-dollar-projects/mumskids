@@ -22,6 +22,7 @@ import { ChevronDown, Globe, Lock, Pencil, Target, Calculator, Timer } from 'luc
 import { PracticeCard } from '@/components/ui/practice-card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { RewardSelector } from '@/components/ui/reward-selector';
+import { toast } from 'sonner';
 import {
   difficultyOptions,
   calculationTypeOptions,
@@ -165,7 +166,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
 
       // 使所有练习相关的查询缓存失效
       await queryClient.invalidateQueries({ queryKey: ['practices'] });
-      
+
       router.push(`/${locale}`);
     } catch (error) {
       console.error('保存失败:', error);
@@ -276,7 +277,15 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
             <div>
               <Input
                 value={form.title}
-                onChange={(e) => handleInputChange('title', e.target.value)}
+                onChange={(e) => {
+                  // 限制练习名称长度为20个字符
+                  if (e.target.value.length <= 20) {
+                    handleInputChange('title', e.target.value);
+                  } else {
+                    // 超出字符限制时显示提示
+                    toast.error('练习名称最多20个字符');
+                  }
+                }}
                 className="text-4xl md:text-4xl font-bold text-[#1315175c] shadow-none 
                 border-none outline-none py-4 px-0 h-auto focus-visible:ring-0 bg-transparent 
                 placeholder:text-4xl placeholder:font-bold placeholder:text-[#1315175c]"

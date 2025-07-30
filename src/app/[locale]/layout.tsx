@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { AuthProvider } from "@/lib/auth/context";
 import { ReactQueryProvider } from "@/lib/react-query/provider";
+import { Toaster } from "@/components/ui/sonner";
 import "../globals.css";
 
 export const metadata: Metadata = {
@@ -32,6 +33,7 @@ export default async function RootLayout({
             <div className="min-h-screen">
               {children}
             </div>
+            <Toaster position="top-center" />
           </ReactQueryProvider>
         </AuthProvider>
       </body>
