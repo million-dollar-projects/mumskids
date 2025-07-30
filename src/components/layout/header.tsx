@@ -4,7 +4,8 @@ import { useRef, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { UserAvatarDropdown } from '@/components/ui/user-avatar-dropdown';
-import { Star, Bell, Plus } from 'lucide-react';
+import { Star, Bell } from 'lucide-react';
+import Image from 'next/image';
 import { messages } from '@/i18n/messages';
 import { useAuth } from '@/lib/auth/context';
 
@@ -82,7 +83,7 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-8">
               <div className="flex-shrink-0">
-               
+
               </div>
             </div>
           </div>
@@ -99,8 +100,14 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
           <div className="flex items-center h-16">
             {/* Left section with navigation */}
             <nav className="flex space-x-4">
-              <Link href={`/${locale}/practice`} className="flex items-center space-x-2 text-sm/5 text-gray-900 font-bold cursor-pointer">
-                <Plus className="w-5 h-5" />
+              <Link href={`/${locale}`} className="flex items-center space-x-2 text-sm/5 text-gray-900 font-bold cursor-pointer">
+                <Image
+                  src="/images/plus.png"
+                  alt="Plus"
+                  width={20}
+                  height={20}
+                  className="w-5 h-5 transition-transform duration-300 hover:rotate-180"
+                />
                 <span>LittlePlus</span>
               </Link>
             </nav>
