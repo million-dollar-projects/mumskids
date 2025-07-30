@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -72,6 +73,7 @@ interface PracticeForm {
 export default function CreatePracticePage({ params }: CreatePracticeProps) {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [locale, setLocale] = useState('zh');
   const [saving, setSaving] = useState(false);
   const [showCalculationDialog, setShowCalculationDialog] = useState(false);
@@ -161,6 +163,9 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
         throw new Error(result.details || '保存失败，请重试');
       }
 
+      // 使所有练习相关的查询缓存失效
+      await queryClient.invalidateQueries({ queryKey: ['practices'] });
+      
       router.push(`/${locale}`);
     } catch (error) {
       console.error('保存失败:', error);

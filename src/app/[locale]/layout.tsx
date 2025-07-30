@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AuthProvider } from "@/lib/auth/context";
+import { ReactQueryProvider } from "@/lib/react-query/provider";
 import "../globals.css";
 
 export const metadata: Metadata = {
@@ -27,9 +28,11 @@ export default async function RootLayout({
     <html lang={locale}>
       <body className="antialiased">
         <AuthProvider>
-          <div className="min-h-screen">
-            {children}
-          </div>
+          <ReactQueryProvider>
+            <div className="min-h-screen">
+              {children}
+            </div>
+          </ReactQueryProvider>
         </AuthProvider>
       </body>
     </html>

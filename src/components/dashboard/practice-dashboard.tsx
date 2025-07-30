@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
@@ -8,8 +8,9 @@ import { Plus, MapPin, Clock, Settings, ChevronDown } from 'lucide-react';
 import { PracticeCard } from '@/components/ui/practice-card';
 import { useAuth } from '@/lib/auth/context';
 import { Button } from '@/components/ui/button';
-import { PAGINATION_CONFIG } from '@/lib/pagination-config';
 import { PracticeDetailSheet } from './practice-detail-sheet';
+import { usePractices } from '@/lib/hooks/usePractices';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface RewardCondition {
   mode?: 'normal' | 'timed';
@@ -62,94 +63,32 @@ interface PracticeDashboardProps {
 
 export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
   const { user } = useAuth();
-  const [practices, setPractices] = useState<Practice[]>([]);
-  const [practicesLoading, setPracticesLoading] = useState(false);
-  const [loadingMore, setLoadingMore] = useState(false);
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<'my' | 'public'>('my');
   const [selectedPractice, setSelectedPractice] = useState<Practice | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
-  const lastFetchRef = useRef<{ userId: string | undefined, tab: string } | null>(null);
   const [isTabChanging, setIsTabChanging] = useState(false);
-  const [pagination, setPagination] = useState({
-    page: 1,
-    hasMore: false,
-    totalCount: 0
-  });
+  const { 
+    data: practicesData,
+    isLoading: practicesLoading,
+    isFetchingNextPage: loadingMore,
+    hasNextPage,
+    fetchNextPage,
+  } = usePractices(activeTab, user?.id);
 
-  // 获取练习列表
-  const fetchPractices = useCallback(async (type: 'my' | 'public', page: number = 1, append: boolean = false) => {
-    if (!user && type === 'my') return;
-
-    if (page === 1) {
-      setPracticesLoading(true);
+  // 当数据加载完成时，重置标签切换状态
+  useEffect(() => {
+    if (!practicesLoading && isTabChanging) {
       setIsTabChanging(false);
-    } else {
-      setLoadingMore(true);
     }
-
-    try {
-      const queryParams = new URLSearchParams();
-      if (type === 'my') {
-        queryParams.set('type', 'user');
-        queryParams.set('userId', user!.id);
-      } else {
-        queryParams.set('type', 'public');
-      }
-      queryParams.set('page', page.toString());
-      queryParams.set('limit', PAGINATION_CONFIG.PRACTICES_PER_PAGE.toString());
-
-      const response = await fetch(`/api/practices?${queryParams.toString()}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch practices');
-      }
-
-      const result = await response.json();
-
-      if (append && page > 1) {
-        setPractices(prev => [...prev, ...result.data]);
-      } else {
-        setPractices(result.data);
-      }
-
-      setPagination({
-        page: result.pagination.page,
-        hasMore: result.pagination.hasMore,
-        totalCount: result.pagination.totalCount
-      });
-    } catch (error) {
-      console.error('获取练习列表失败:', error);
-      if (!append) {
-        setPractices([]);
-        setPagination({ page: 1, hasMore: false, totalCount: 0 });
-      }
-    } finally {
-      setPracticesLoading(false);
-      setLoadingMore(false);
-    }
-  }, [user?.id]); // 只依赖 user.id 而不是整个 user 对象
+  }, [practicesLoading, isTabChanging]);
 
   // 加载更多
-  const loadMore = useCallback(() => {
-    if (!loadingMore && pagination.hasMore) {
-      fetchPractices(activeTab, pagination.page + 1, true);
+  const loadMore = () => {
+    if (!loadingMore && hasNextPage) {
+      fetchNextPage();
     }
-  }, [fetchPractices, activeTab, pagination.page, pagination.hasMore, loadingMore]);
-
-  // 当用户登录状态改变或标签页切换时获取练习
-  useEffect(() => {
-    if (user?.id) {
-      // 检查是否需要重新获取数据
-      const currentFetch = { userId: user.id, tab: activeTab };
-      const lastFetch = lastFetchRef.current;
-
-      if (!lastFetch || lastFetch.userId !== currentFetch.userId || lastFetch.tab !== currentFetch.tab) {
-        lastFetchRef.current = currentFetch;
-        // 重置分页状态
-        setPagination({ page: 1, hasMore: false, totalCount: 0 });
-        fetchPractices(activeTab, 1, false);
-      }
-    }
-  }, [user?.id, activeTab, fetchPractices]);
+  };
 
   // 获取主题图标
   const getThemeIcon = (practice: Practice) => {
@@ -199,7 +138,7 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
   const handleDeletePractice = async (practiceId: string) => {
     try {
       // 找到要删除的练习
-      const practiceToDelete = practices.find(p => p.id === practiceId);
+      const practiceToDelete = practicesData?.data.find((p: Practice) => p.id === practiceId);
       if (!practiceToDelete) {
         console.error('Practice not found');
         return;
@@ -215,14 +154,8 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
         throw new Error(errorData.error || 'Failed to delete practice');
       }
 
-      // 从本地状态中移除已删除的练习
-      setPractices(prev => prev.filter(p => p.id !== practiceId));
-
-      // 更新总数
-      setPagination(prev => ({
-        ...prev,
-        totalCount: prev.totalCount - 1
-      }));
+      // 通知 React Query 重新获取数据
+      queryClient.invalidateQueries({ queryKey: ['practices'] });
 
       console.log('练习删除成功');
     } catch (error) {
@@ -316,10 +249,10 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
           )}
 
           {/* Practice List */}
-          {!practicesLoading && practices.length > 0 && (
+          {!practicesLoading && practicesData?.pages[0].data.length > 0 && (
             <div className="animate-in fade-in-0 duration-300">
               <div className="space-y-4">
-                {practices.map((practice) => (
+                {practicesData.pages.map((page: PaginatedResponse) => page.data.map((practice: Practice) => (
                   <div
                     key={practice.id}
                     className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 cursor-pointer hover:shadow-md transition-shadow"
@@ -382,11 +315,11 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
                       </div>
                     </div>
                   </div>
-                ))}
+                )))}
               </div>
 
               {/* Load More Button */}
-              {pagination.hasMore && (
+              {hasNextPage && (
                 <div className="flex justify-center mt-8">
                   <Button
                     onClick={loadMore}
@@ -402,7 +335,7 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
                     ) : (
                       <>
                         <ChevronDown className="w-4 h-4 mr-2" />
-                        加载更多 ({pagination.totalCount - practices.length} 个剩余)
+                        加载更多 ({practicesData.pages[practicesData.pages.length - 1].pagination.totalCount - practicesData.pages.reduce((total: number, page: PaginatedResponse) => total + page.data.length, 0)} 个剩余)
                       </>
                     )}
                   </Button>
@@ -410,16 +343,16 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
               )}
 
               {/* Total Count Info */}
-              {pagination.totalCount > 0 && (
+              {practicesData.pages[0].pagination.totalCount > 0 && (
                 <div className="text-center mt-4 text-sm text-gray-500">
-                  显示 {practices.length} / {pagination.totalCount} 个练习
+                  显示 {practicesData.pages.reduce((total: number, page: PaginatedResponse) => total + page.data.length, 0)} / {practicesData.pages[0].pagination.totalCount} 个练习
                 </div>
               )}
             </div>
           )}
 
           {/* Empty State */}
-          {!practicesLoading && practices.length === 0 && (
+          {!practicesLoading && practicesData?.pages[0].data.length === 0 && (
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center animate-in fade-in-0 duration-300">
                 {/* Empty State Icon */}
