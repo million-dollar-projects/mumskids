@@ -186,6 +186,43 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
     setSheetOpen(true);
   };
 
+  // 处理删除练习
+  const handleDeletePractice = async (practiceId: string) => {
+    try {
+      // 找到要删除的练习
+      const practiceToDelete = practices.find(p => p.id === practiceId);
+      if (!practiceToDelete) {
+        console.error('Practice not found');
+        return;
+      }
+
+      // 调用删除API
+      const response = await fetch(`/api/practices/${practiceToDelete.slug}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to delete practice');
+      }
+
+      // 从本地状态中移除已删除的练习
+      setPractices(prev => prev.filter(p => p.id !== practiceId));
+      
+      // 更新总数
+      setPagination(prev => ({
+        ...prev,
+        totalCount: prev.totalCount - 1
+      }));
+
+      console.log('练习删除成功');
+    } catch (error) {
+      console.error('删除练习失败:', error);
+      // 这里可以添加错误提示，比如使用 toast 或者其他通知方式
+      alert('删除失败，请稍后重试');
+    }
+  };
+
   // 获取难度标签
   const getDifficultyLabel = (difficulty: string) => {
     const labels = {
@@ -421,6 +458,7 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
         isOpen={sheetOpen}
         onOpenChange={setSheetOpen}
         locale={locale}
+        onDelete={handleDeletePractice}
       />
     </div>
   );

@@ -1,11 +1,22 @@
 'use client'
 
 import Link from 'next/link';
-import { Settings, Target, Calculator, Timer, Globe, Lock, Gift } from 'lucide-react';
+import { useState } from 'react';
+import { Target, Calculator, Timer, Globe, Lock, Gift, Trash2, Copy, Check, Play } from 'lucide-react';
 import { PracticeCard } from '@/components/ui/practice-card';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface RewardCondition {
   mode?: 'normal' | 'timed';
@@ -42,7 +53,7 @@ interface Practice {
   selected_theme: string;
   reward_distribution_mode: 'random' | 'choice';
   rewards: (string | Reward)[];
-  reward_condition: RewardCondition | null;
+  reward_condition?: RewardCondition | null;
   stats: {
     total_attempts: number;
     completed_attempts: number;
@@ -57,14 +68,19 @@ interface PracticeDetailSheetProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   locale: string;
+  onDelete?: (practiceId: string) => Promise<void>;
 }
 
 export function PracticeDetailSheet({
   practice,
   isOpen,
   onOpenChange,
-  locale
+  locale,
+  onDelete
 }: PracticeDetailSheetProps) {
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
   // 获取难度标签
   const getDifficultyLabel = (difficulty: string) => {
     const labels = {
@@ -84,6 +100,50 @@ export function PracticeDetailSheet({
       'addsub': '加减法'
     };
     return labels[type as keyof typeof labels] || type;
+  };
+
+  // 处理删除练习
+  const handleDelete = async () => {
+    if (practice && onDelete && !isDeleting) {
+      setIsDeleting(true);
+      try {
+        await onDelete(practice.id);
+        setShowDeleteDialog(false);
+        onOpenChange(false);
+      } catch (error) {
+        console.error('删除失败:', error);
+        // 保持对话框打开，让用户可以重试
+      } finally {
+        setIsDeleting(false);
+      }
+    }
+  };
+
+  // 处理复制练习链接
+  const handleCopyLink = async () => {
+    if (practice) {
+      const practiceUrl = `${window.location.origin}/${locale}/practice/${practice.slug}`;
+      try {
+        await navigator.clipboard.writeText(practiceUrl);
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2000);
+      } catch (error) {
+        console.error('复制失败:', error);
+        // 降级方案：使用传统的复制方法
+        const textArea = document.createElement('textarea');
+        textArea.value = practiceUrl;
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+          document.execCommand('copy');
+          setIsCopied(true);
+          setTimeout(() => setIsCopied(false), 2000);
+        } catch (fallbackError) {
+          console.error('降级复制也失败:', fallbackError);
+        }
+        document.body.removeChild(textArea);
+      }
+    }
   };
 
   return (
@@ -229,17 +289,64 @@ export function PracticeDetailSheet({
               {/* Action Buttons */}
               <div className="space-y-3 pt-4">
                 <Link href={`/${locale}/practice/${practice.slug}`} className="block">
-                  <Button className="w-full h-12 bg-gray-900 hover:bg-gray-800 text-white font-medium">
+                  <Button className="w-full h-10 bg-gray-900 hover:bg-gray-800 text-white font-medium cursor-pointer">
+                    <Play className="w-4 h-4 mr-2" />
                     开始练习
                   </Button>
                 </Link>
-                <Link href={`/${locale}/practice/${practice.slug}/edit`} className="block">
-                  <Button variant="outline" className="w-full h-12 border-gray-300 text-gray-700 hover:bg-gray-50">
-                    <Settings className="w-4 h-4 mr-2" />
-                    管理练习
+                <div className="flex flex-col gap-2">
+                  <Button
+                    variant="outline"
+                    className="h-10 px-4 border-blue-300 text-white bg-blue-400 hover:bg-blue-500 w-full cursor-pointer"
+                    onClick={handleCopyLink}
+                  >
+                    {isCopied ? (
+                      <Check className="w-4 h-4 mr-2" />
+                    ) : (
+                      <Copy className="w-4 h-4 mr-2" />
+                    )}
+                    复制链接
                   </Button>
-                </Link>
+                  <Button
+                    variant="outline"
+                    className="h-10 px-4 border-red-300 text-white bg-red-600 hover:bg-red-500 w-full cursor-pointer"
+                    onClick={() => setShowDeleteDialog(true)}
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    删除
+                  </Button>
+                </div>
               </div>
+
+
+              {/* Delete Confirmation Dialog */}
+              <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>确认删除练习</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      您确定要删除练习「{practice.title}」吗？此操作无法撤销，所有相关的练习记录也将被删除。
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel disabled={isDeleting}>取消</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleDelete}
+                      disabled={isDeleting}
+                      className="bg-red-600 hover:bg-red-700 text-white disabled:opacity-50"
+                    >
+                      {isDeleting ? (
+                        <>
+                          <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2"></div>
+                          删除中...
+                        </>
+                      ) : (
+                        '确认删除'
+                      )}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
 
               {/* Creation Info */}
               <div className="text-xs text-gray-500 text-center pt-4 border-t">
