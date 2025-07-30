@@ -150,7 +150,7 @@ export function PracticeDetailSheet({
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-full sm:w-[460px] p-0 right-2 top-2">
+      <SheetContent side="right" className="w-full sm:w-[460px] p-0 sm:right-2 sm:top-2">
         {practice && (
           <>
             <SheetHeader className="p-6 pb-4">

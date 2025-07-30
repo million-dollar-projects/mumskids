@@ -293,18 +293,19 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
                         </div>
 
                         {/* Action Buttons */}
-                        <div className="flex items-center space-x-3" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center space-x-2 sm:space-x-3" onClick={(e) => e.stopPropagation()}>
                           <Link target="_blank" href={`/${locale}/practice/${practice.slug}`}>
-                            <button className="px-4 py-1 bg-gray-800 text-white rounded font-medium hover:bg-gray-700 transition-colors cursor-pointer">
+                            <button className="px-2 py-1 sm:px-4 text-sm sm:text-base bg-gray-800 text-white rounded font-medium hover:bg-gray-700 transition-colors cursor-pointer">
                               开始练习
                             </button>
                           </Link>
                           <button
                             onClick={() => handlePracticeClick(practice)}
-                            className="flex items-center px-3 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors cursor-pointer"
+                            className="flex items-center px-2 py-1 sm:px-3 sm:py-2 text-sm sm:text-base text-gray-600 hover:text-gray-800 font-medium transition-colors cursor-pointer"
                           >
-                            <Settings className="w-4 h-4 mr-1" />
-                            查看详细
+                            <Settings className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                            <span className="hidden sm:inline">查看详细</span>
+                            <span className="sm:hidden">详细</span>
                           </button>
                         </div>
                       </div>

@@ -23,7 +23,7 @@ export function PracticeCard({
   // 根据昵称长度和卡片大小动态调整字体大小
   const getNameFontSize = (name?: string) => {
     if (!name) {
-      return size === 'small' ? 'text-lg' : 'text-6xl';
+      return size === 'small' ? 'text-lg' : 'text-3xl sm:text-4xl md:text-5xl lg:text-6xl';
     }
 
     const length = name.length;
@@ -35,15 +35,15 @@ export function PracticeCard({
       return 'text-xs';
     }
 
-    // large size
-    if (length <= 2) return 'text-6xl';
-    if (length <= 4) return 'text-5xl';
-    if (length <= 6) return 'text-4xl';
-    return 'text-3xl';
+    // large size - 响应式字体大小
+    if (length <= 2) return 'text-3xl sm:text-4xl md:text-5xl lg:text-6xl';
+    if (length <= 4) return 'text-2xl sm:text-3xl md:text-4xl lg:text-5xl';
+    if (length <= 6) return 'text-xl sm:text-2xl md:text-3xl lg:text-4xl';
+    return 'text-lg sm:text-xl md:text-2xl lg:text-3xl';
   };
 
   const getDescriptionFontSize = () => {
-    return size === 'small' ? 'text-xs' : 'text-xl';
+    return size === 'small' ? 'text-xs' : 'text-sm sm:text-base md:text-lg lg:text-xl';
   };
 
   const getPadding = () => {
@@ -66,10 +66,10 @@ export function PracticeCard({
     }
 
     return {
-      topRight: 'w-8 h-8 top-4 right-4',
-      bottomLeft: 'w-4 h-4 bottom-6 left-6',
-      bottomRight: 'w-12 h-12 bottom-4 right-4 border-4',
-      targetIcon: 'w-6 h-6'
+      topRight: 'w-4 h-4 sm:w-6 sm:h-6 md:w-8 md:h-8 top-2 right-2 sm:top-3 sm:right-3 md:top-4 md:right-4',
+      bottomLeft: 'w-2 h-2 sm:w-3 sm:h-3 md:w-4 md:h-4 bottom-3 left-3 sm:bottom-4 sm:left-4 md:bottom-6 md:left-6',
+      bottomRight: 'w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 bottom-2 right-2 sm:bottom-3 sm:right-3 md:bottom-4 md:right-4 border-2 sm:border-3 md:border-4',
+      targetIcon: 'w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 lg:w-6 lg:h-6'
     };
   };
 
@@ -82,7 +82,7 @@ export function PracticeCard({
   const themeGradient = currentTheme?.gradient || 'bg-gradient-to-br from-red-500 to-pink-500';
 
   return (
-    <Card className={`aspect-square ${themeGradient} border-none shadow-xl flex items-center justify-center relative overflow-hidden ${className}`}>
+    <Card className={`aspect-square max-w-[200px] sm:max-w-none mx-auto sm:mx-0 ${themeGradient} border-none shadow-xl flex items-center justify-center relative overflow-hidden ${className}`}>
       <div className={`text-center text-white ${getPadding()}`}>
         <div className={`font-bold ${getMarginBottom()} transform leading-tight ${getNameFontSize(childName)}`}>
           {childName ? childName.toUpperCase() : '昵称'}
