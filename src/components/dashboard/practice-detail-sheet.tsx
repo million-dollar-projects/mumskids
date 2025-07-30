@@ -69,6 +69,7 @@ interface PracticeDetailSheetProps {
   onOpenChange: (open: boolean) => void;
   locale: string;
   onDelete?: (practiceId: string) => Promise<void>;
+  currentUserId?: string;
 }
 
 export function PracticeDetailSheet({
@@ -76,7 +77,8 @@ export function PracticeDetailSheet({
   isOpen,
   onOpenChange,
   locale,
-  onDelete
+  onDelete,
+  currentUserId
 }: PracticeDetailSheetProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -148,7 +150,7 @@ export function PracticeDetailSheet({
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-full sm:w-[480px] p-0 right-2 top-2">
+      <SheetContent side="right" className="w-full sm:w-[460px] p-0 right-2 top-2">
         {practice && (
           <>
             <SheetHeader className="p-6 pb-4">
@@ -288,7 +290,7 @@ export function PracticeDetailSheet({
 
               {/* Action Buttons */}
               <div className="space-y-3 pt-4">
-                <Link href={`/${locale}/practice/${practice.slug}`} className="block">
+                <Link target="_blank" href={`/${locale}/practice/${practice.slug}`} className="block">
                   <Button className="w-full h-10 bg-gray-900 hover:bg-gray-800 text-white font-medium cursor-pointer">
                     <Play className="w-4 h-4 mr-2" />
                     开始练习
@@ -307,14 +309,16 @@ export function PracticeDetailSheet({
                     )}
                     复制链接
                   </Button>
-                  <Button
-                    variant="outline"
-                    className="h-10 px-4 border-red-300 text-white bg-red-600 hover:bg-red-500 w-full cursor-pointer"
-                    onClick={() => setShowDeleteDialog(true)}
-                  >
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    删除
-                  </Button>
+                  {currentUserId && practice.created_by === currentUserId && (
+                    <Button
+                      variant="outline"
+                      className="h-10 px-4 border-red-300 text-white bg-red-600 hover:bg-red-500 w-full cursor-pointer"
+                      onClick={() => setShowDeleteDialog(true)}
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      删除
+                    </Button>
+                  )}
                 </div>
               </div>
 

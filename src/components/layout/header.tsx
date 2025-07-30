@@ -4,7 +4,7 @@ import { useRef, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { UserAvatarDropdown } from '@/components/ui/user-avatar-dropdown';
-import { Search, Star, Bell, Plus } from 'lucide-react';
+import { Star, Bell, Plus } from 'lucide-react';
 import { messages } from '@/i18n/messages';
 import { useAuth } from '@/lib/auth/context';
 

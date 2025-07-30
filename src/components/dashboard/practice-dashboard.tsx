@@ -4,12 +4,20 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
-import { Plus, MapPin, Users, Clock, Settings, ChevronDown } from 'lucide-react';
+import { Plus, MapPin, Clock, Settings, ChevronDown } from 'lucide-react';
 import { PracticeCard } from '@/components/ui/practice-card';
 import { useAuth } from '@/lib/auth/context';
 import { Button } from '@/components/ui/button';
 import { PAGINATION_CONFIG } from '@/lib/pagination-config';
 import { PracticeDetailSheet } from './practice-detail-sheet';
+
+interface RewardCondition {
+  mode?: 'normal' | 'timed';
+  minCorrect?: number;
+  maxErrorRate?: number;
+  targetCorrect?: number;
+  maxTime?: number;
+}
 
 interface Reward {
   id?: string;
@@ -36,7 +44,7 @@ interface Practice {
   selected_theme: string;
   reward_distribution_mode: 'random' | 'choice';
   rewards: (string | Reward)[];
-  reward_condition?: any;
+  reward_condition?: RewardCondition | null;
   stats: {
     total_attempts: number;
     completed_attempts: number;
@@ -48,7 +56,7 @@ interface Practice {
 
 interface PracticeDashboardProps {
   locale: string;
-  t: any;
+  t: Record<string, string>;
 }
 
 export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
@@ -208,7 +216,7 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
 
       // 从本地状态中移除已删除的练习
       setPractices(prev => prev.filter(p => p.id !== practiceId));
-      
+
       // 更新总数
       setPagination(prev => ({
         ...prev,
@@ -336,31 +344,34 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
                             <MapPin className="w-4 h-4 mr-1 text-orange-500" />
                             <span>难度: {getDifficultyLabel(practice.difficulty)}</span>
                           </div>
-                          <div className="flex items-center">
-                            <Users className="w-4 h-4 mr-1 text-gray-400" />
-                            <span>完成次数: {practice.stats.completed_attempts}</span>
-                          </div>
                           {practice.test_mode === 'timed' && practice.time_limit && (
                             <div className="flex items-center">
                               <Clock className="w-4 h-4 mr-1 text-blue-500" />
                               <span>{practice.time_limit}分钟限时</span>
                             </div>
                           )}
+                          {practice.test_mode === 'normal' && practice.question_count && (
+                            <div className="flex items-center">
+                              <Clock className="w-4 h-4 mr-1 text-green-500" />
+                              <span>{practice.question_count}道题目</span>
+                            </div>
+                          )}
                         </div>
 
                         {/* Action Buttons */}
                         <div className="flex items-center space-x-3" onClick={(e) => e.stopPropagation()}>
-                          <Link href={`/${locale}/practice/${practice.slug}`}>
-                            <button className="px-4 py-2 bg-gray-800 text-white rounded-lg font-medium hover:bg-gray-700 transition-colors">
+                          <Link target="_blank" href={`/${locale}/practice/${practice.slug}`}>
+                            <button className="px-4 py-1 bg-gray-800 text-white rounded font-medium hover:bg-gray-700 transition-colors cursor-pointer">
                               开始练习
                             </button>
                           </Link>
-                          <Link href={`/${locale}/practice/${practice.slug}/edit`}>
-                            <button className="flex items-center px-3 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors">
-                              <Settings className="w-4 h-4 mr-1" />
-                              管理
-                            </button>
-                          </Link>
+                          <button
+                            onClick={() => handlePracticeClick(practice)}
+                            className="flex items-center px-3 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors cursor-pointer"
+                          >
+                            <Settings className="w-4 h-4 mr-1" />
+                            查看详细
+                          </button>
                         </div>
                       </div>
 
@@ -438,7 +449,7 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
                 </p>
                 {activeTab === 'my' && (
                   <Link href={`/${locale}/practice/create`}>
-                    <button className="inline-flex items-center px-4 cursor-pointer py-2 bg-gray-200 opacity-70 hover:opacity-100 text-gray-700 font-medium rounded-lg hover:bg-gray-500 hover:text-white transition-colors">
+                    <button className="inline-flex items-center px-4 cursor-pointer py-1 bg-gray-200 opacity-70 hover:opacity-100 text-gray-700 font-medium rounded-lg hover:bg-gray-500 hover:text-white transition-colors">
                       <Plus className="w-5 h-5 mr-2" />
                       创建练习
                     </button>
@@ -459,6 +470,7 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
         onOpenChange={setSheetOpen}
         locale={locale}
         onDelete={handleDeletePractice}
+        currentUserId={user?.id}
       />
     </div>
   );

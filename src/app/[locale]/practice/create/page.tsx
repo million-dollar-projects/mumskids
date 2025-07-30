@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -125,10 +124,6 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
     }));
   };
 
-
-
-
-
   const handleSave = async () => {
     if (!form.title.trim() || !form.childName.trim()) {
       alert(t.practice.fillAllFields);
@@ -196,9 +191,9 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
 
   return (
     <div className={`min-h-screen transition-colors duration-500 ${pageBackgroundClass}`}>
-      <Header locale={locale} backgroundClass="bg-transparent" isFixed={true} />
+      <Header locale={locale} backgroundClass="bg-transparent" isFixed={false} />
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-6">
         {/* 顶部导航标签 */}
         <div className="flex items-center justify-end mb-0">
           {/* 右上角控制区域 */}

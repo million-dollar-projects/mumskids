@@ -27,7 +27,7 @@
   --primary-white: #ffffff;
   
   /* 背景渐变 */
-  --bg-gradient-start: #9fd1bd;
+  --bg-gradient-start: #cce5f7;
   --bg-gradient-middle: #ffffff;
   --bg-gradient-end: #ffffff;
   --circle-bg: #fef5f3;
@@ -108,8 +108,8 @@
 }
 
 body {
-  background: -webkit-linear-gradient(180deg, #9fd1bd, #ffffff, #ffffff); /* Chrome 10-25, Safari 5.1-6 */
-  background: linear-gradient(180deg, #9fd1bd, #ffffff, #ffffff); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  background: -webkit-linear-gradient(180deg, #cce5f7, #ffffff, #ffffff); /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(180deg, #cce5f7, #ffffff, #ffffff); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
   background-attachment: fixed;
   min-height: 100vh;
   color: hsl(var(--foreground));
