@@ -49,7 +49,7 @@ export function RewardSelector({
   maxRewards = 5,
   testMode,
   questionCount = 10,
-  timeLimit = 5
+  timeLimit = 2
 }: RewardSelectorProps) {
   const [newRewardText, setNewRewardText] = useState('');
   const [selectedEmoji, setSelectedEmoji] = useState('🎁');
@@ -59,28 +59,35 @@ export function RewardSelector({
   const [pendingRewards, setPendingRewards] = useState<(typeof defaultRewards[0])[]>([]);
   const [showConditionDialog, setShowConditionDialog] = useState(false);
   
-  // 根据练习方式设置默认条件
-  const getDefaultCondition = (): RewardCondition => {
+  const [rewardCondition, setRewardCondition] = useState<RewardCondition>(() => {
     if (testMode === 'timed') {
       return {
         mode: 'timed',
-        minCorrect: Math.ceil(questionCount * 0.8), // 80% 正确率
-        maxErrorRate: 20 // 20% 错误率
+        minCorrect: Math.ceil(questionCount * 0.9), // 90% 正确率
+        maxErrorRate: 10 // 10% 错误率
       };
     } else {
       return {
         mode: 'normal',
-        targetCorrect: Math.ceil(questionCount * 0.8), // 80% 正确率
-        maxTime: Math.ceil(timeLimit * 1.5) // 比时间限制多50%
+        targetCorrect: Math.ceil(questionCount * 0.9), // 90% 正确率
+        maxTime: Math.ceil(timeLimit * 1.2) // 比时间限制多20%
       };
     }
-  };
-
-  const [rewardCondition, setRewardCondition] = useState<RewardCondition>(getDefaultCondition());
+  });
 
   // 当练习方式改变时，更新默认条件
   useEffect(() => {
-    const newCondition = getDefaultCondition();
+    const newCondition = testMode === 'timed' 
+      ? {
+          mode: 'timed' as const,
+          minCorrect: Math.ceil(questionCount * 0.9),
+          maxErrorRate: 10
+        }
+      : {
+          mode: 'normal' as const,
+          targetCorrect: Math.ceil(questionCount * 0.9),
+          maxTime: Math.ceil(timeLimit * 1.2)
+        };
     setRewardCondition(newCondition);
   }, [testMode, questionCount, timeLimit]);
 
@@ -106,8 +113,6 @@ export function RewardSelector({
     setSelectedEmoji(emoji.native);
     setShowEmojiDialog(false);
   };
-
-
 
   const togglePendingReward = (recommendedReward: typeof defaultRewards[0]) => {
     const isAlreadyPending = pendingRewards.some(reward => reward.text === recommendedReward.text);
@@ -219,6 +224,31 @@ export function RewardSelector({
                 </RadioGroup>
               </div>
             )}
+
+            {/* 默认奖励条件显示 */}
+            <div className="bg-purple-900/5 p-2 rounded">
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <p className="text-xs text-gray-600">
+                                          {testMode === 'normal' 
+                        ? `答对 ${rewardCondition.targetCorrect || Math.ceil(questionCount * 0.9)} 题且在 ${rewardCondition.maxTime || Math.ceil(timeLimit * 1.2)} 分钟内完成`
+                        : `在 ${timeLimit} 分钟内完成至少 ${rewardCondition.minCorrect || Math.ceil(questionCount * 0.9)} 题，错误率不超过 ${rewardCondition.maxErrorRate || 0}%`
+      
+                    }
+                    可获得奖励
+                  </p>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowConditionDialog(true)}
+                  className="text-gray-600 hover:text-gray-700 hover:bg-blue-50 p-1 h-auto cursor-pointer"
+                  title="点击修改条件"
+                >
+                  <Settings className="w-4 h-4 text-gray-600" />
+                </Button>
+              </div>
+            </div>
           </div>
         )}
         {/* 添加奖励 */}
@@ -238,7 +268,7 @@ export function RewardSelector({
               onChange={(e) => setNewRewardText(e.target.value)}
               className='w-full border-none shadow-none outline-none px-2 py-2 h-auto focus-visible:ring-0 bg-transparent 
                   placeholder:font-bold placeholder:text-[#1315175c] bg-purple-900/5 cursor-pointer'
-              placeholder="添加完成奖励..."
+              placeholder="自定义添加完成奖励..."
               onKeyDown={(e) => e.key === 'Enter' && addReward()}
               disabled={rewards.length >= maxRewards}
             />
@@ -259,17 +289,6 @@ export function RewardSelector({
                 className="cursor-pointer bg-purple-900/5 border-none text-blue-600 hover:text-blue-700 hover:bg-blue-50"
               >
                 <Lightbulb className="w-4 h-4" />
-              </Button>
-            )}
-            {rewards.length > 0 && (
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setShowConditionDialog(true)}
-                className="cursor-pointer bg-purple-900/5 border-none text-gray-600 hover:text-gray-700 hover:bg-gray-50"
-                title="设置奖励条件"
-              >
-                <Settings className="w-4 h-4" />
               </Button>
             )}
           </div>
@@ -440,7 +459,7 @@ export function RewardSelector({
                    <div className="space-y-4 p-4 bg-green-50 rounded-lg">
                      <div className="grid grid-cols-2 gap-4">
                        <div>
-                         <Label className="text-sm text-gray-600">最少正确题数</Label>
+                         <Label className="text-sm text-gray-600">最少完成题数</Label>
                          <Input
                            type="number"
                            value={rewardCondition.minCorrect || 10}
@@ -457,19 +476,19 @@ export function RewardSelector({
                          <Label className="text-sm text-gray-600">最大错误率（%）</Label>
                          <Input
                            type="number"
-                           value={rewardCondition.maxErrorRate || 5}
+                           value={rewardCondition.maxErrorRate}
                            onChange={(e) => setRewardCondition(prev => ({ 
                              ...prev, 
-                             maxErrorRate: parseInt(e.target.value) || 5 
+                             maxErrorRate: parseInt(e.target.value)
                            }))}
                            className="mt-1 focus-visible:ring-0 focus-visible:ring-offset-0"
                            min="0"
-                           max="50"
+                           max="100"
                          />
                        </div>
                      </div>
                      <p className="text-xs text-green-600">
-                       需要在 {timeLimit} 分钟内答对至少 {rewardCondition.minCorrect || 10} 题，错误率不超过 {rewardCondition.maxErrorRate || 5}%
+                       需要在 {timeLimit} 分钟内完成至少 {rewardCondition.minCorrect || 10} 题，错误率不超过 {rewardCondition.maxErrorRate || 0}%
                      </p>
                    </div>
                  )}

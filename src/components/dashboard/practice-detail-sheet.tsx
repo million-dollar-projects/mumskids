@@ -195,8 +195,10 @@ export function PracticeDetailSheet({
                                 const parts = [];
 
                                 // 处理计时模式的条件
-                                if (condition.minCorrect) parts.push(`最少答对${condition.minCorrect}题`);
-                                if (condition.maxErrorRate) parts.push(`错误率不超过${condition.maxErrorRate}%`);
+                                if (condition.minCorrect) {
+                                  parts.push(`最少完成${condition.minCorrect}题`);
+                                  parts.push(`错误率不超过${condition.maxErrorRate}%`);
+                                };
 
                                 // 处理普通模式的条件
                                 if (condition.targetCorrect) parts.push(`答对${condition.targetCorrect}题`);
