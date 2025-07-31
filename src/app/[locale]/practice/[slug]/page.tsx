@@ -563,7 +563,7 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
               {(gameActive || gameEnded) && (
                 <div className="mb-3 sm:mb-4">
                   <div className="text-sm font-bold text-gray-700 mb-2">练习进度</div>
-                  <div className="w-full h-3 sm:h-4 bg-gray-200 border border-gray-300 sm:border-2 sm:border-gray-800 rounded-lg overflow-hidden">
+                  <div className="w-full h-3 sm:h-4 bg-gray-200 border border-gray-300 sm:border-2 sm:border-gray-800 rounded overflow-hidden">
                     <div
                       className={`h-full transition-all duration-800 ease-out relative ${getThemeColors().progress}`}
                       style={{
@@ -594,7 +594,7 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
                   <h3 className="text-xl font-semibold mb-2 text-gray-700">练习不存在</h3>
                   <p className="text-gray-600 mb-6">{error}</p>
                   <Link href={`/${locale}/practice`}>
-                    <Button className={`${getThemeColors().button} text-white font-bold py-3 px-6 rounded-lg shadow-lg`}>
+                    <Button className={`${getThemeColors().button} text-white font-bold py-3 px-6 rounded shadow`}>
                       <ArrowLeft className="w-4 h-4 mr-2" />
                       返回
                     </Button>
@@ -688,7 +688,7 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
 
                   <Button
                     onClick={startGame}
-                    className={`${getThemeColors().button} text-white font-bold py-3 sm:py-4 px-4 sm:px-6 text-base sm:text-lg rounded-lg shadow-lg transform transition-transform hover:scale-105 sm:relative fixed bottom-4 left-4 right-4 z-50 sm:bottom-auto sm:left-auto sm:right-auto sm:z-auto sm:w-full`}
+                    className={`${getThemeColors().button} text-white font-bold py-3 sm:py-4 px-4 sm:px-6 text-base sm:text-lg rounded shadow transform transition-transform hover:scale-105 sm:relative fixed bottom-4 left-4 right-4 z-50 sm:bottom-auto sm:left-auto sm:right-auto sm:z-auto sm:w-full`}
                   >
                     开始
                     <Play className="w-5 h-5 mr-2" />
@@ -743,20 +743,7 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
                     ))}
                   </div>
 
-                  {/* Feedback - 计时模式下不显示文字反馈 */}
-                  {feedback && practice?.test_mode !== 'timed' && (
-                    <Card className={`mb-3 sm:mb-4 border-0 sm:border-4 ${feedbackType === 'correct'
-                      ? 'bg-green-100 border-green-500'
-                      : 'bg-red-100 border-red-500'
-                      }`}>
-                      <CardContent className="py-4 text-center">
-                        <div className={`text-lg font-bold ${feedbackType === 'correct' ? 'text-green-800' : 'text-red-800'
-                          }`}>
-                          {feedback}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
+                 
                 </>
               )}
 
@@ -869,18 +856,46 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
                   </Dialog>
 
                   {/* Restart Button */}
-                  <div className="text-center">
+                  <div className="text-center sm:block hidden">
                     <Button
                       onClick={restartGame}
-                      className={`${getThemeColors().button} text-white cursor-pointer font-bold py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg`}
+                      className={`${getThemeColors().button} text-white cursor-pointer font-bold py-2.5 sm:py-3 px-4 sm:px-6 rounded`}
                     >
                       再来一次
                     </Button>
                   </div>
                 </>
               )}
+
+              {/* Mobile Fixed Restart Button */}
+              {gameEnded && (
+                <div className="fixed bottom-4 left-4 right-4 z-50 sm:hidden">
+                  <Button
+                    onClick={restartGame}
+                    className={`${getThemeColors().button} w-full text-white cursor-pointer font-bold py-3 px-4 rounded shadow`}
+                  >
+                    再来一次
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
+
+          {/* Feedback - 计时模式下不显示文字反馈 */}
+          {gameActive && currentQuestion && feedback && practice?.test_mode !== 'timed' && (
+            <Card className={`mt-4 mb-3 sm:mb-4 border-0 sm:border-4 ${feedbackType === 'correct'
+              ? 'bg-green-100 border-green-500'
+              : 'bg-red-100 border-red-500'
+              }`}>
+              <CardContent className="py-4 text-center">
+                <div className={`text-lg font-bold ${feedbackType === 'correct' ? 'text-green-800' : 'text-red-800'
+                  }`}>
+                  {feedback}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+          
           {/* Next Button */}
           {showNextButton && (
             <div className="text-center mt-4 w-full">
