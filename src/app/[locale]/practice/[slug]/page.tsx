@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ArrowLeft, Play, Star, BookOpen } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { getEncouragements, getConsolations, getFinalMessage } from '@/config/messages';
 import { defaultRewards, type DefaultReward } from '@/config/default-rewards';
 import { getThemeById, getDefaultTheme, getThemeColors as getThemeColorsById, type Theme } from '@/lib/themes';
@@ -520,13 +521,20 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
         </div>
 
         <div className="relative z-10 max-w-md mx-auto">
+          
+          <div className="flex items-center justify-center gap-2 mb-4 sm:mb-4">
+            <Image src="/images/plus.png" alt="LittlePlus" width={32} height={32} className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />
+            <p className={`text-xl sm:text-2xl md:text-3xl font-bold ${getThemeColors().text} tracking-wide`}>
+              LittlePlus
+            </p>
+          </div>
 
           {/* Game Container */}
           <Card className={`border-0 sm:border-0 ${getThemeColors().border}  sm:shadow-none bg-white relative overflow-hidden rounded sm:rounded`}>
             <div className={`absolute inset-0 bg-gradient-to-br ${getThemeColors().secondary}/30 rounded`}></div>
 
             <CardHeader className="relative z-10 text-center pb-2 sm:pb-4">
-              <CardTitle className={`text-xl sm:text-2xl md:text-3xl font-bold ${getThemeColors().text} mb-2 sm:mb-4 tracking-wide`}>
+              <CardTitle className={`text-xl hidden sm:text-2xl md:text-3xl font-bold ${getThemeColors().text} mb-2 sm:mb-4 tracking-wide`}>
                 {getCurrentTheme().icon} {practice?.child_name || '小朋友'}的数学小天地 {getCurrentTheme().icon}
               </CardTitle>
 
