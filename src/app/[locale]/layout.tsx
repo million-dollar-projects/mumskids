@@ -12,6 +12,12 @@ export const metadata: Metadata = {
     shortcut: "/images/plus.png",
     apple: "/images/plus.png",
   },
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+  },
 };
 
 interface RootLayoutProps {
