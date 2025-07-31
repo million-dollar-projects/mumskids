@@ -905,7 +905,7 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
               : 'bg-red-100 border-red-500'
               }`}>
               <CardContent className="py-4 text-center">
-                <div className={`text-lg font-bold ${feedbackType === 'correct' ? 'text-green-800' : 'text-red-800'
+                <div className={`text-base sm:text-lg font-bold ${feedbackType === 'correct' ? 'text-green-800' : 'text-red-800'
                   }`}>
                   {feedback}
                 </div>
@@ -914,7 +914,7 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
           )}
           
           {/* Next Button */}
-          {showNextButton && (
+          {showNextButton && !gameEnded && (
             <div className="text-center mt-4 w-full">
                 <Button
                  onClick={nextQuestion}
