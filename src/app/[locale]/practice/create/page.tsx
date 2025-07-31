@@ -31,42 +31,10 @@ import {
   timeLimitOptions,
   getVisibilityOptions
 } from '@/lib/practice-config';
+import { PracticeForm, Reward, RewardCondition } from '@/types/practice';
 
 interface CreatePracticeProps {
   params: Promise<{ locale: string }>;
-}
-
-interface RewardCondition {
-  mode: 'normal' | 'timed';
-  // 一般模式
-  targetCorrect?: number; // 目标正确题数
-  maxTime?: number; // 最大时间限制（分钟）
-  // 计时模式（时间限制来自练习设置）
-  minCorrect?: number; // 最少正确题数
-  maxErrorRate?: number; // 最大错误率（百分比）
-}
-
-interface Reward {
-  id: string;
-  text: string;
-  emoji: string;
-}
-
-interface PracticeForm {
-  title: string;
-  description: string;
-  childName: string;
-  gender: 'boy' | 'girl';
-  difficulty: 'within10' | 'within20' | 'within50' | 'within100';
-  testMode: 'normal' | 'timed';
-  questionCount: number;
-  timeLimit: number; // 单位：分钟
-  isPublic: boolean;
-  rewards: Reward[];
-  rewardDistributionMode: 'random' | 'choice';
-  rewardCondition: RewardCondition | null;
-  selectedTheme: string;
-  calculationType: 'add' | 'sub' | 'addsub';
 }
 
 

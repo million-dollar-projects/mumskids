@@ -348,6 +348,8 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
     return practice?.question_count || 10;
   };
 
+
+
   // 格式化时间显示
   const formatTime = (milliseconds: number) => {
     const seconds = Math.floor(milliseconds / 1000);
@@ -620,9 +622,11 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
                           {practice.calculation_type === 'sub' && '减法'}
                           {practice.calculation_type === 'addsub' && '加减混合'}
                         </Badge>
-                        <Badge className={`${getThemeColors().accent} text-white`}>
-                          {getMaxQuestions()} 道题
-                        </Badge>
+                        {practice?.test_mode !== 'timed' && (
+                          <Badge className={`${getThemeColors().accent} text-white`}>
+                            {getMaxQuestions()} 道题
+                          </Badge>
+                        )}
                       </div>
                       <div className={`flex items-center gap-2 text-sm ${getThemeColors().text}`}>
                         <span>为 {practice.child_name} 定制</span>

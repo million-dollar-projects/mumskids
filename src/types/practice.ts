@@ -1,8 +1,8 @@
 export interface Reward {
-  id?: string;
+  id: string;
   text: string;
   name?: string;
-  emoji?: string;
+  emoji: string;
 }
 
 export interface RewardCondition {
@@ -42,4 +42,21 @@ export interface Practice {
     best_score: number;
     best_time: number | null;
   };
+}
+
+export interface PracticeForm {
+  title: string;
+  description: string;
+  childName: string;
+  gender: 'boy' | 'girl';
+  difficulty: 'within10' | 'within20' | 'within50' | 'within100';
+  testMode: 'normal' | 'timed';
+  questionCount: number;
+  timeLimit: number; // 单位：分钟
+  isPublic: boolean;
+  rewards: Reward[];
+  rewardDistributionMode: 'random' | 'choice';
+  rewardCondition: RewardCondition | null;
+  selectedTheme: string;
+  calculationType: 'add' | 'sub' | 'addsub';
 }

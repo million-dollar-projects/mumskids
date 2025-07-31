@@ -11,22 +11,7 @@ import { Plus, X, Gift, Shuffle, UserCheck, Lightbulb, Settings } from 'lucide-r
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { defaultRewards } from '@/config/default-rewards';
-
-interface RewardCondition {
-  mode: 'normal' | 'timed';
-  // 一般模式
-  targetCorrect?: number; // 目标正确题数
-  maxTime?: number; // 最大时间限制（分钟）
-  // 计时模式（时间限制来自练习设置）
-  minCorrect?: number; // 最少正确题数
-  maxErrorRate?: number; // 最大错误率（百分比）
-}
-
-interface Reward {
-  id: string;
-  text: string;
-  emoji: string;
-}
+import { Reward, RewardCondition } from '@/types/practice';
 
 export interface RewardSelectorProps {
   rewards: Reward[];

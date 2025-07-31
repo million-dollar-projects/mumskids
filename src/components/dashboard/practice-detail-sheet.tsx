@@ -17,51 +17,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-
-interface RewardCondition {
-  mode?: 'normal' | 'timed';
-  // 计时模式
-  minCorrect?: number;
-  maxErrorRate?: number;
-  // 普通模式
-  targetCorrect?: number;
-  maxTime?: number;
-}
-
-interface Reward {
-  id?: string;
-  text: string;
-  emoji?: string;
-}
-
-interface Practice {
-  id: string;
-  slug: string;
-  created_at: string;
-  updated_at: string;
-  created_by: string;
-  title: string;
-  description: string;
-  child_name: string;
-  gender: 'boy' | 'girl';
-  difficulty: 'within10' | 'within20' | 'within50' | 'within100';
-  calculation_type: 'add' | 'sub' | 'addsub';
-  test_mode: 'normal' | 'timed';
-  question_count: number | null;
-  time_limit: number | null;
-  is_public: boolean;
-  selected_theme: string;
-  reward_distribution_mode: 'random' | 'choice';
-  rewards: (string | Reward)[];
-  reward_condition?: RewardCondition | null;
-  stats: {
-    total_attempts: number;
-    completed_attempts: number;
-    average_score: number;
-    best_score: number;
-    best_time: number | null;
-  };
-}
+import { Practice, Reward, RewardCondition } from '@/types/practice';
 
 interface PracticeDetailSheetProps {
   practice: Practice | null;

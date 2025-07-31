@@ -222,7 +222,7 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
           {!practicesLoading && (practicesData?.pages[0] as PaginatedResponse<Practice>)?.data.length > 0 && (
             <div className="animate-in fade-in-0 duration-300">
               <div className="space-y-4">
-                {practicesData.pages.map((page: unknown) => (page as PaginatedResponse<Practice>).data.map((practice: Practice) => (
+                {practicesData?.pages.map((page: unknown) => (page as PaginatedResponse<Practice>).data.map((practice: Practice) => (
                   <div
                     key={practice.id}
                     className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 cursor-pointer hover:shadow-md transition-shadow"
@@ -306,7 +306,7 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
                     ) : (
                       <>
                         <ChevronDown className="w-4 h-4 mr-2" />
-                        加载更多 ({(practicesData.pages[practicesData.pages.length - 1] as PaginatedResponse<Practice>).pagination.totalCount - practicesData.pages.reduce((total: number, page: unknown) => total + (page as PaginatedResponse<Practice>).data.length, 0)} 个剩余)
+                        加载更多 ({(practicesData?.pages[practicesData.pages.length - 1] as PaginatedResponse<Practice>)?.pagination.totalCount - practicesData?.pages.reduce((total: number, page: unknown) => total + (page as PaginatedResponse<Practice>).data.length, 0)} 个剩余)
                       </>
                     )}
                   </Button>
@@ -314,9 +314,9 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
               )}
 
               {/* Total Count Info */}
-              {(practicesData.pages[0] as PaginatedResponse<Practice>).pagination.totalCount > 0 && (
+              {(practicesData?.pages[0] as PaginatedResponse<Practice>)?.pagination.totalCount > 0 && (
                 <div className="text-center mt-4 text-sm text-gray-500">
-                  显示 {practicesData.pages.reduce((total: number, page: unknown) => total + (page as PaginatedResponse<Practice>).data.length, 0)} / {(practicesData.pages[0] as PaginatedResponse<Practice>).pagination.totalCount} 个练习
+                  显示 {practicesData?.pages.reduce((total: number, page: unknown) => total + (page as PaginatedResponse<Practice>).data.length, 0)} / {(practicesData?.pages[0] as PaginatedResponse<Practice>)?.pagination.totalCount} 个练习
                 </div>
               )}
             </div>
