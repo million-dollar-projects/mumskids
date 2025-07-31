@@ -641,24 +641,47 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
                       <CardContent className="py-4">
                         <h4 className={`font-bold ${getThemeColors().text} mb-2 flex items-center`}>
                           <Star className="w-4 h-4 mr-2" />
-                          完成奖励
+                          完成可获得奖励
                         </h4>
-                        <div className="flex flex-wrap gap-2">
-                          {practice.rewards.slice(0, 3).map((reward, index) => (
-                            <Badge key={index} className={`${getThemeColors().accent} text-white`}>
-                              {typeof reward === 'string'
-                                ? reward
-                                : (typeof reward === 'object' && reward !== null)
-                                  ? (reward.text || reward.name || '奖励')
-                                  : '奖励'}
-                            </Badge>
-                          ))}
+                         {/* 奖励条件 */}
+                         <div className={`text-sm ${getThemeColors().text} bg-purple-500/2 px-1 py-1 mb-2 rounded ${getThemeColors().border}`}>
+                          <div className="text-xs">
+                            {practice.reward_condition ? (
+                              practice.test_mode === 'normal' ? (
+                                `需要答对 ${practice.reward_condition.targetCorrect || Math.max(1, Math.ceil((practice.question_count || 10) * 0.8))} 题且在 ${practice.reward_condition.maxTime || Math.max(1, Math.ceil((practice.question_count || 10) * 0.5))} 分钟内完成`
+                              ) : (
+                                `需要答对至少 ${practice.reward_condition.minCorrect || Math.max(5, Math.ceil((practice.time_limit || 5) * 3 * 0.7))} 题，错误率不超过 ${practice.reward_condition.maxErrorRate !== undefined ? practice.reward_condition.maxErrorRate : 20}%`
+                              )
+                            ) : (
+                              '需要全部答对才能获得奖励'
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          {practice.rewards.slice(0, 12).map((reward, index) => {
+                            const rewardText = typeof reward === 'string'
+                              ? reward
+                              : (typeof reward === 'object' && reward !== null)
+                                ? (reward.text || reward.name || '奖励')
+                                : '奖励';
+                            const rewardEmoji = typeof reward === 'object' && reward !== null
+                              ? (reward.emoji || '🎁')
+                              : getRewardEmoji(rewardText);
+                            
+                            return (
+                              <Badge key={index} className={`${getThemeColors().accent} text-white flex items-center gap-1`}>
+                                <span>{rewardEmoji}</span>
+                                <span>{rewardText}</span>
+                              </Badge>
+                            );
+                          })}
                           {practice.rewards.length > 3 && (
-                            <Badge className={`bg-gradient-to-r ${getThemeColors().secondary} text-white`}>
+                            <Badge className={`bg-gradient-to-r ${getThemeColors().secondary} hidden text-white`}>
                               +{practice.rewards.length - 3} 更多
                             </Badge>
                           )}
                         </div>
+                    
                       </CardContent>
                     </Card>
                   )}
