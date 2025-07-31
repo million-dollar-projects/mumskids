@@ -1,8 +1,10 @@
 export interface PaginatedResponse<T> {
   data: T[];
-  nextCursor?: string | null;
-  hasMore: boolean;
   pagination: {
+    page: number;
+    limit: number;
     totalCount: number;
+    totalPages: number;
+    hasMore: boolean;
   };
 }

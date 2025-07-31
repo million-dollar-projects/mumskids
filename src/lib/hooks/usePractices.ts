@@ -30,7 +30,7 @@ export function usePractices(type: 'my' | 'public', userId?: string | null) {
     initialPageParam: 1,
     queryFn: ({ pageParam }) => fetchPractices(type, userId || undefined, pageParam),
     getNextPageParam: (lastPage: PaginatedResponse<Practice>, allPages) => {
-      return lastPage.hasMore ? allPages.length + 1 : undefined
+      return lastPage.pagination.hasMore ? allPages.length + 1 : undefined
     },
     // 如果用户ID不存在且类型是'my'，则不执行查询
     enabled: !(type === 'my' && !userId),
