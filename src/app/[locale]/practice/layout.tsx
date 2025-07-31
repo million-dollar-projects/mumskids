@@ -1,8 +1,25 @@
 import { ReactNode } from 'react';
+import type { Metadata } from "next";
 
 interface PracticeLayoutProps {
   children: ReactNode;
 }
+
+export const metadata: Metadata = {
+  title: "LittlePlus11",
+  description: "帮助小朋友进行简单的加减法练习，提升口算/心算能力",
+  icons: {
+    icon: "/images/plus.png",
+    shortcut: "/images/plus.png",
+    apple: "/images/plus.png",
+  },
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+  },
+};
 
 export default function PracticeLayout({ children }: PracticeLayoutProps) {
   return (

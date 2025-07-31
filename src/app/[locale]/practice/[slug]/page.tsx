@@ -386,10 +386,6 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
     }
   };
 
-
-
-
-
   const startGame = () => {
     const now = Date.now();
     setStartTime(now);
@@ -478,15 +474,7 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
   const getAccuracy = () => {
     return totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
   };
-
-  const getFinalEmoji = () => {
-    const accuracy = getAccuracy();
-    if (accuracy === 100) return '👑';
-    if (accuracy >= 90) return '🌟';
-    if (accuracy >= 70) return '👍';
-    return '💪';
-  };
-
+ 
   // 获取当前主题
   const getCurrentTheme = (): Theme => {
     if (!practice?.selected_theme) return getDefaultTheme();
