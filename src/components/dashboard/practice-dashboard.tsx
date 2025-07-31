@@ -12,48 +12,8 @@ import { PracticeDetailSheet } from './practice-detail-sheet';
 import { usePractices } from '@/lib/hooks/usePractices';
 import { useQueryClient } from '@tanstack/react-query';
 
-interface RewardCondition {
-  mode?: 'normal' | 'timed';
-  minCorrect?: number;
-  maxErrorRate?: number;
-  targetCorrect?: number;
-  maxTime?: number;
-}
-
-interface Reward {
-  id?: string;
-  text: string;
-  emoji?: string;
-}
-
-interface Practice {
-  id: string;
-  slug: string;
-  created_at: string;
-  updated_at: string;
-  created_by: string;
-  title: string;
-  description: string;
-  child_name: string;
-  gender: 'boy' | 'girl';
-  difficulty: 'within10' | 'within20' | 'within50' | 'within100';
-  calculation_type: 'add' | 'sub' | 'addsub';
-  test_mode: 'normal' | 'timed';
-  question_count: number | null;
-  time_limit: number | null;
-  is_public: boolean;
-  selected_theme: string;
-  reward_distribution_mode: 'random' | 'choice';
-  rewards: (string | Reward)[];
-  reward_condition?: RewardCondition | null;
-  stats: {
-    total_attempts: number;
-    completed_attempts: number;
-    average_score: number;
-    best_score: number;
-    best_time: number | null;
-  };
-}
+import { Practice, Reward, RewardCondition } from '@/types/practice';
+import { PaginatedResponse } from '@/types/pagination';
 
 interface PracticeDashboardProps {
   locale: string;
@@ -259,10 +219,10 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
           )}
 
           {/* Practice List */}
-          {!practicesLoading && practicesData?.pages[0].data.length > 0 && (
+          {!practicesLoading && (practicesData?.pages[0] as PaginatedResponse<Practice>)?.data.length > 0 && (
             <div className="animate-in fade-in-0 duration-300">
               <div className="space-y-4">
-                {practicesData.pages.map((page: PaginatedResponse) => page.data.map((practice: Practice) => (
+                {practicesData.pages.map((page: unknown) => (page as PaginatedResponse<Practice>).data.map((practice: Practice) => (
                   <div
                     key={practice.id}
                     className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 cursor-pointer hover:shadow-md transition-shadow"
@@ -346,7 +306,7 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
                     ) : (
                       <>
                         <ChevronDown className="w-4 h-4 mr-2" />
-                        加载更多 ({practicesData.pages[practicesData.pages.length - 1].pagination.totalCount - practicesData.pages.reduce((total: number, page: PaginatedResponse) => total + page.data.length, 0)} 个剩余)
+                        加载更多 ({(practicesData.pages[practicesData.pages.length - 1] as PaginatedResponse<Practice>).pagination.totalCount - practicesData.pages.reduce((total: number, page: unknown) => total + (page as PaginatedResponse<Practice>).data.length, 0)} 个剩余)
                       </>
                     )}
                   </Button>
@@ -354,16 +314,16 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
               )}
 
               {/* Total Count Info */}
-              {practicesData.pages[0].pagination.totalCount > 0 && (
+              {(practicesData.pages[0] as PaginatedResponse<Practice>).pagination.totalCount > 0 && (
                 <div className="text-center mt-4 text-sm text-gray-500">
-                  显示 {practicesData.pages.reduce((total: number, page: PaginatedResponse) => total + page.data.length, 0)} / {practicesData.pages[0].pagination.totalCount} 个练习
+                  显示 {practicesData.pages.reduce((total: number, page: unknown) => total + (page as PaginatedResponse<Practice>).data.length, 0)} / {(practicesData.pages[0] as PaginatedResponse<Practice>).pagination.totalCount} 个练习
                 </div>
               )}
             </div>
           )}
 
           {/* Empty State */}
-          {!practicesLoading && practicesData?.pages[0].data.length === 0 && (
+          {!practicesLoading && (practicesData?.pages[0] as PaginatedResponse<Practice>)?.data.length === 0 && (
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center animate-in fade-in-0 duration-300">
                 {/* Empty State Icon */}

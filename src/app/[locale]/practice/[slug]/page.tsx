@@ -15,43 +15,7 @@ interface PracticeDetailProps {
   params: Promise<{ locale: string; slug: string }>;
 }
 
-interface Reward {
-  id?: string;
-  text?: string;
-  name?: string;
-  emoji?: string;
-}
-
-interface RewardCondition {
-  mode: 'normal' | 'timed';
-  // 一般模式
-  targetCorrect?: number; // 目标正确题数
-  maxTime?: number; // 最大时间限制（分钟）
-  // 计时模式（时间限制来自练习设置）
-  minCorrect?: number; // 最少正确题数
-  maxErrorRate?: number; // 最大错误率（百分比）
-}
-
-interface Practice {
-  id: string;
-  slug: string;
-  title: string;
-  description: string;
-  child_name: string;
-  gender: 'boy' | 'girl';
-  difficulty: 'within10' | 'within20' | 'within50' | 'within100';
-  calculation_type: 'add' | 'subtract' | 'multiply' | 'divide' | 'mixed';
-  test_mode: 'normal' | 'timed';
-  question_count: number | null;
-  time_limit: number | null;
-  is_public: boolean;
-  selected_theme: string;
-  reward_distribution_mode: string;
-  rewards: (string | Reward)[];
-  reward_condition: RewardCondition | null;
-  created_by: string;
-  created_at: string;
-}
+import { Practice } from '@/types/practice';
 
 interface Question {
   question: string;
@@ -330,29 +294,14 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
         question = `${num1} + ${num2}`;
         correctAnswer = num1 + num2;
         break;
-      case 'subtract':
+      case 'sub':
         operation = '-';
         const larger = Math.max(num1, num2);
         const smaller = Math.min(num1, num2);
         question = `${larger} - ${smaller}`;
         correctAnswer = larger - smaller;
         break;
-      case 'multiply':
-        operation = '×';
-        const smallNum1 = Math.floor(Math.random() * 10) + 1;
-        const smallNum2 = Math.floor(Math.random() * 10) + 1;
-        question = `${smallNum1} × ${smallNum2}`;
-        correctAnswer = smallNum1 * smallNum2;
-        break;
-      case 'divide':
-        operation = '÷';
-        const divisor = Math.floor(Math.random() * 9) + 2;
-        const quotient = Math.floor(Math.random() * 10) + 1;
-        const dividend = divisor * quotient;
-        question = `${dividend} ÷ ${divisor}`;
-        correctAnswer = quotient;
-        break;
-      case 'mixed':
+      case 'addsub':
       default:
         const operations = ['+', '-'];
         operation = operations[Math.floor(Math.random() * operations.length)];
@@ -523,15 +472,9 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
     }
   };
 
-
-
-
-
   const getAccuracy = () => {
     return totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
   };
-
-
 
   const getFinalEmoji = () => {
     const accuracy = getAccuracy();
@@ -674,10 +617,8 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
                         </Badge>
                         <Badge className={`${getThemeColors().accent} text-white`}>
                           {practice.calculation_type === 'add' && '加法'}
-                          {practice.calculation_type === 'subtract' && '减法'}
-                          {practice.calculation_type === 'multiply' && '乘法'}
-                          {practice.calculation_type === 'divide' && '除法'}
-                          {practice.calculation_type === 'mixed' && '混合运算'}
+                          {practice.calculation_type === 'sub' && '减法'}
+                          {practice.calculation_type === 'addsub' && '加减混合'}
                         </Badge>
                         <Badge className={`${getThemeColors().accent} text-white`}>
                           {getMaxQuestions()} 道题
