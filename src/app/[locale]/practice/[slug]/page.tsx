@@ -522,37 +522,30 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
         <div className="relative z-10 max-w-md mx-auto">
 
           {/* Game Container */}
-          <Card className={`border-4 ${getThemeColors().border} shadow-2xl bg-white relative overflow-hidden rounded-2xl`}>
-            <div className={`absolute inset-0 bg-gradient-to-br ${getThemeColors().secondary}/30 rounded-2xl`}></div>
+          <Card className={`border-0 sm:border-0 ${getThemeColors().border}  sm:shadow-none bg-white relative overflow-hidden rounded sm:rounded`}>
+            <div className={`absolute inset-0 bg-gradient-to-br ${getThemeColors().secondary}/30 rounded`}></div>
 
-            <CardHeader className="relative z-10 text-center pb-4">
-              <CardTitle className={`text-2xl md:text-3xl font-bold ${getThemeColors().text} mb-4 tracking-wide`}>
+            <CardHeader className="relative z-10 text-center pb-2 sm:pb-4">
+              <CardTitle className={`text-xl sm:text-2xl md:text-3xl font-bold ${getThemeColors().text} mb-2 sm:mb-4 tracking-wide`}>
                 {getCurrentTheme().icon} {practice?.child_name || '小朋友'}的数学小天地 {getCurrentTheme().icon}
               </CardTitle>
 
-              {/* Characters */}
-              <div className="flex justify-center gap-4 mb-4">
-                <span className="text-3xl animate-bounce">🦁</span>
-                <span className="text-3xl animate-bounce delay-300">🐸</span>
-                <span className="text-3xl animate-bounce delay-700">🐙</span>
-              </div>
-
               {/* Score Board */}
-              <div className="flex gap-2 mb-4">
-                <Badge className={`flex-1 ${getThemeColors().accent} hover:${getThemeColors().accent} text-white py-2 px-2 text-xs font-bold`}>
+              <div className="flex gap-1 sm:gap-2 mb-3 sm:mb-4">
+                <Badge className={`flex-1 ${getThemeColors().accent} hover:${getThemeColors().accent} text-white py-1.5 sm:py-2 px-1 sm:px-2 text-xs font-bold`}>
                   🏆 答对: {correctAnswers}
                 </Badge>
                 {practice?.test_mode === 'timed' ? (
-                  <Badge className={`flex-1 ${getThemeColors().accent} hover:${getThemeColors().accent} text-white py-2 px-2 text-xs font-bold`}>
+                  <Badge className={`flex-1 ${getThemeColors().accent} hover:${getThemeColors().accent} text-white py-1.5 sm:py-2 px-1 sm:px-2 text-xs font-bold`}>
                     ⏰ 限时: {practice.time_limit}分钟
                   </Badge>
                 ) : (
-                  <Badge className={`flex-1 ${getThemeColors().accent} hover:${getThemeColors().accent} text-white py-2 px-2 text-xs font-bold`}>
+                  <Badge className={`flex-1 ${getThemeColors().accent} hover:${getThemeColors().accent} text-white py-1.5 sm:py-2 px-1 sm:px-2 text-xs font-bold`}>
                     📚 题数: {totalQuestions}/{getMaxQuestions()}
                   </Badge>
                 )}
                 {gameActive && (
-                  <Badge className={`flex-1 ${getTimerDisplay().color} hover:${getTimerDisplay().color} text-white py-2 px-2 text-xs font-bold`}>
+                  <Badge className={`flex-1 ${getTimerDisplay().color} hover:${getTimerDisplay().color} text-white py-1.5 sm:py-2 px-1 sm:px-2 text-xs font-bold`}>
                     ⏱️ {getTimerDisplay().text}
                   </Badge>
                 )}
@@ -560,9 +553,9 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
 
               {/* Progress Bar - 只在开始练习后显示 */}
               {(gameActive || gameEnded) && (
-                <div className="mb-4">
+                <div className="mb-3 sm:mb-4">
                   <div className="text-sm font-bold text-gray-700 mb-2">练习进度</div>
-                  <div className="w-full h-4 bg-gray-200 border-2 border-gray-800 rounded-lg overflow-hidden">
+                  <div className="w-full h-3 sm:h-4 bg-gray-200 border border-gray-300 sm:border-2 sm:border-gray-800 rounded-lg overflow-hidden">
                     <div
                       className={`h-full transition-all duration-800 ease-out relative ${getThemeColors().progress}`}
                       style={{
@@ -579,7 +572,7 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
               )}
             </CardHeader>
 
-            <CardContent className="relative z-10 px-4 pb-6">
+            <CardContent className="relative z-10 px-3 sm:px-4 pb-4 sm:pb-6">
               {loading && (
                 <div className="text-center py-8">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
@@ -664,7 +657,7 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
 
                   <Button
                     onClick={startGame}
-                    className={`w-full ${getThemeColors().button} text-white font-bold py-4 px-6 text-lg rounded-lg shadow-lg transform transition-transform hover:scale-105`}
+                    className={`w-full ${getThemeColors().button} text-white font-bold py-3 sm:py-4 px-4 sm:px-6 text-base sm:text-lg rounded-lg shadow-lg transform transition-transform hover:scale-105`}
                   >
                     开始
                     <Play className="w-5 h-5 mr-2" />
@@ -675,17 +668,17 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
               {gameActive && currentQuestion && (
                 <>
                   {/* Question */}
-                  <Card className={`bg-gradient-to-br ${getThemeColors().secondary} border-4 ${getThemeColors().border} mb-6 relative`}>
+                  <Card className={`bg-gradient-to-br ${getThemeColors().secondary} border-0 sm:border-4 ${getThemeColors().border} mb-4 sm:mb-6 relative`}>
                     <div className="absolute -top-4 -right-2 text-3xl animate-bounce">🤔</div>
                     <CardContent className="py-6 text-center">
-                      <div className="text-3xl md:text-4xl font-bold text-white drop-shadow-lg">
+                      <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-white drop-shadow-lg">
                         {currentQuestion.question} = ?
                       </div>
                     </CardContent>
                   </Card>
 
                   {/* Choices */}
-                  <div className="grid grid-cols-2 gap-3 mb-6">
+                  <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-4 sm:mb-6">
                     {currentQuestion.choices.map((choice, index) => (
                       <div
                         key={index}
@@ -700,7 +693,7 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
                           onClick={() => selectAnswer(index)}
                           disabled={selectedAnswer !== -1}
                           className={`
-                          w-full h-16 text-2xl font-bold border-4 transition-all duration-200 transform
+                          w-full h-12 sm:h-16 text-xl sm:text-2xl font-bold border-2 sm:border-4 transition-all duration-200 transform
                           ${selectedAnswer === -1
                               ? `${getThemeColors().button} ${getThemeColors().border} text-white hover:scale-105 active:scale-95`
                               : selectedAnswer === index
@@ -721,7 +714,7 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
 
                   {/* Feedback - 计时模式下不显示文字反馈 */}
                   {feedback && practice?.test_mode !== 'timed' && (
-                    <Card className={`mb-4 border-4 ${feedbackType === 'correct'
+                    <Card className={`mb-3 sm:mb-4 border-0 sm:border-4 ${feedbackType === 'correct'
                       ? 'bg-green-100 border-green-500'
                       : 'bg-red-100 border-red-500'
                       }`}>
@@ -739,7 +732,7 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
                     <div className="text-center">
                       <Button
                         onClick={nextQuestion}
-                        className={`${getThemeColors().button} text-white font-bold py-3 px-6 rounded-lg`}
+                        className={`${getThemeColors().button} text-white font-bold py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg`}
                       >
                         ➡️ 下一题
                       </Button>
@@ -751,10 +744,10 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
               {gameEnded && (
                 <>
                   {/* Final Score */}
-                  <Card className={`bg-gradient-to-br ${getThemeColors().secondary}/20 border-4 ${getThemeColors().border} mb-4`}>
+                  <Card className={`bg-gradient-to-br ${getThemeColors().secondary}/20 border-0 sm:border-4 ${getThemeColors().border} mb-3 sm:mb-4`}>
                     <CardContent className="py-6 text-center">
-                      <div className="text-5xl mb-4 animate-bounce">{getFinalEmoji()}</div>
-                      <div className={`text-xl font-bold ${getThemeColors().text} mb-2`}>
+                      <div className="text-4xl sm:text-5xl mb-3 sm:mb-4 animate-bounce">{getFinalEmoji()}</div>
+                      <div className={`text-lg sm:text-xl font-bold ${getThemeColors().text} mb-2`}>
                         {getFinalMessage(getAccuracy(), correctAnswers, practice?.child_name || '小朋友')}
                       </div>
                       <div className={`text-lg font-bold ${getThemeColors().text} mb-2`}>
@@ -770,21 +763,18 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
 
                   {/* Reward */}
                   {showReward && (
-                    <Card className={`${getThemeColors().light} border-4 ${getThemeColors().border} mb-4 animate-pulse`}>
+                    <Card className={`${getThemeColors().light} border-0 sm:border-4 ${getThemeColors().border} mb-3 sm:mb-4 animate-pulse`}>
                       <CardHeader>
                         <CardTitle className={`text-center ${getThemeColors().text} text-xl font-bold`}>
-                          🎉 恭喜获得奖励！
+                          恭喜获得奖励
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="text-center">
-                        <div className="text-4xl mb-2 animate-bounce">
+                        <div className="text-3xl sm:text-4xl mb-2 animate-bounce">
                           {selectedReward ? getRewardEmoji(selectedReward) : '🎁'}
                         </div>
-                        <div className={`text-lg font-bold ${getThemeColors().text} mb-2`}>
-                          获得奖励：{selectedReward || '完成练习'}！
-                        </div>
-                        <div className={`text-sm ${getThemeColors().text} opacity-80`}>
-                          你已经满足了奖励条件，真棒！
+                        <div className={`text-base sm:text-lg font-bold ${getThemeColors().text} mb-2`}>
+                          {selectedReward || '完成练习'}！
                         </div>
                       </CardContent>
                     </Card>
@@ -792,7 +782,7 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
 
                   {/* 如果没有获得奖励，显示鼓励信息 */}
                   {!showReward && !showRewardChoice && practice?.rewards && practice.rewards.length > 0 && (
-                    <Card className={`${getThemeColors().light} border-2 ${getThemeColors().border} mb-4`}>
+                    <Card className={`${getThemeColors().light} border-0 sm:border-2 ${getThemeColors().border} mb-3 sm:mb-4`}>
                       <CardContent className="py-4 text-center">
                         <div className="text-2xl mb-2">💪</div>
                         <div className={`text-sm ${getThemeColors().text} mb-2`}>
@@ -815,13 +805,18 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
 
                   {/* 奖励选择对话框 */}
                   <Dialog open={showRewardChoice} onOpenChange={setShowRewardChoice}>
-                    <DialogContent className={`max-w-sm px-4 border-2 ${getThemeColors().border}`}>
+                    <DialogContent className={`max-w-sm mx-4 sm:mx-auto px-3 sm:px-4 border-0 sm:border-2 ${getThemeColors().border}`}>
+                      <DialogHeader>
+                        <DialogTitle className={`text-center ${getThemeColors().text} text-xl font-bold`}>
+                          🎉 恭喜获得奖励！
+                        </DialogTitle>
+                      </DialogHeader>
                       <div className="py-4">
                         <div className="text-center mb-4">
-                          <p className={`text-sm ${getThemeColors().text} mb-2 font-bold text-xl`}>
+                          <p className={`text-base sm:text-lg ${getThemeColors().text} mb-2 font-bold`}>
                             太棒了！
                           </p>
-                          <p className={`text-sm ${getThemeColors().text} mb-4 font-bold`}>
+                          <p className={`text-sm ${getThemeColors().text} mb-3 sm:mb-4 font-bold`}>
                             赶快选择一个你喜欢的奖励吧！
                           </p>
                         </div>
@@ -834,11 +829,11 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
                                 setShowRewardChoice(false);
                                 setShowReward(true);
                               }}
-                              className={`w-full ${getThemeColors().button} text-white font-bold py-4 px-4 rounded text-left transform transition-transform shadow-md`}
+                              className={`w-full ${getThemeColors().button} text-white font-bold py-3 sm:py-4 px-3 sm:px-4 rounded text-left transform transition-transform shadow-md`}
                             >
                               <div className="flex items-center">
-                                <span className="text-base mr-3">{getRewardEmoji(reward)}</span>
-                                <span className="text-lg">{reward}</span>
+                                <span className="text-sm sm:text-base mr-2 sm:mr-3">{getRewardEmoji(reward)}</span>
+                                <span className="text-base sm:text-lg">{reward}</span>
                               </div>
                             </Button>
                           ))}
@@ -851,7 +846,7 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
                   <div className="text-center">
                     <Button
                       onClick={restartGame}
-                      className={`${getThemeColors().button} text-white cursor-pointer font-bold py-3 px-6 rounded-lg`}
+                      className={`${getThemeColors().button} text-white cursor-pointer font-bold py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg`}
                     >
                       再来一次
                     </Button>
