@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ArrowLeft, Play, Star, BookOpen } from 'lucide-react';
+import { ArrowLeft, Play, Star, BookOpen, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getEncouragements, getConsolations, getFinalMessage } from '@/config/messages';
@@ -520,7 +520,7 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
           <div className="absolute top-[30%] right-[30%] text-yellow-400 text-lg animate-pulse delay-2000">✨</div>
         </div>
 
-        <div className="relative z-10 max-w-md mx-auto">
+        <div className="relative z-10 max-w-md mx-auto pb-20 sm:pb-0">
           
           <div className="flex items-center justify-center gap-2 mb-4 sm:mb-4">
             <Image src="/images/plus.png" alt="LittlePlus" width={32} height={32} className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />
@@ -688,7 +688,7 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
 
                   <Button
                     onClick={startGame}
-                    className={`w-full ${getThemeColors().button} text-white font-bold py-3 sm:py-4 px-4 sm:px-6 text-base sm:text-lg rounded-lg shadow-lg transform transition-transform hover:scale-105`}
+                    className={`${getThemeColors().button} text-white font-bold py-3 sm:py-4 px-4 sm:px-6 text-base sm:text-lg rounded-lg shadow-lg transform transition-transform hover:scale-105 sm:relative fixed bottom-4 left-4 right-4 z-50 sm:bottom-auto sm:left-auto sm:right-auto sm:z-auto sm:w-full`}
                   >
                     开始
                     <Play className="w-5 h-5 mr-2" />
@@ -756,18 +756,6 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
                         </div>
                       </CardContent>
                     </Card>
-                  )}
-
-                  {/* Next Button */}
-                  {showNextButton && (
-                    <div className="text-center">
-                      <Button
-                        onClick={nextQuestion}
-                        className={`${getThemeColors().button} text-white font-bold py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg`}
-                      >
-                        ➡️ 下一题
-                      </Button>
-                    </div>
                   )}
                 </>
               )}
@@ -893,6 +881,18 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
               )}
             </CardContent>
           </Card>
+          {/* Next Button */}
+          {showNextButton && (
+            <div className="text-center mt-4 w-full">
+                <Button
+                 onClick={nextQuestion}
+                 className={`${getThemeColors().button} w-full text-white font-bold py-2.5 sm:py-3 px-4 sm:px-6 rounded`}
+               >
+                 下一题
+                 <ChevronRight className="w-4 h-4 ml-0" />
+               </Button>
+            </div>
+          )}
         </div>
       </div>
     </>
