@@ -94,6 +94,15 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
     }
   }, [slug]);
 
+  // 动态设置页面标题
+  useEffect(() => {
+    if (practice) {
+      document.title = `${practice.title} - ${practice.child_name} - LittlePlus`;
+    } else {
+      document.title = 'LittlePlus';
+    }
+  }, [practice]);
+
   // 检查是否满足奖励条件 - 需要在 endGame 之前定义
   const checkRewardCondition = useCallback((correctCount: number, totalCount: number, completionTimeMs: number) => {
     if (!practice?.rewards || practice.rewards.length === 0) {
@@ -489,16 +498,36 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
 
   return (
     <>
-      {/* 添加自定义抖动动画 */}
+      {/* 添加自定义抖动动画和防止双击缩放 */}
       <style jsx global>{`
         @keyframes wiggle {
           0%, 100% { transform: rotate(0deg); }
           25% { transform: rotate(-3deg) translateX(-2px); }
           75% { transform: rotate(3deg) translateX(2px); }
         }
+        
+        /* 防止双击缩放 */
+        * {
+          -webkit-touch-callout: none;
+          -webkit-user-select: none;
+          -khtml-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
+          -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* 允许输入框选择文本 */
+        input, textarea {
+          -webkit-user-select: text;
+          -khtml-user-select: text;
+          -moz-user-select: text;
+          -ms-user-select: text;
+          user-select: text;
+        }
       `}</style>
 
-      <div className={`min-h-screen p-4 relative overflow-hidden bg-gradient-to-br ${getCurrentTheme().bgClass}`}>
+      <div className={`min-h-screen p-4 relative overflow-hidden bg-gradient-to-br ${getCurrentTheme().bgClass} touch-manipulation`}>
         {/* Decorative stars */}
         <div className="fixed inset-0 pointer-events-none z-0">
           <div className="absolute top-[10%] left-[10%] text-yellow-400 text-xl animate-pulse">⭐</div>

@@ -6,7 +6,7 @@ interface PracticeLayoutProps {
 }
 
 export const metadata: Metadata = {
-  title: "LittlePlus11",
+  title: "LittlePlus",
   description: "帮助小朋友进行简单的加减法练习，提升口算/心算能力",
   icons: {
     icon: "/images/plus.png",
