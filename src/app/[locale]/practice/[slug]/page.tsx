@@ -106,13 +106,16 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
   // 检查是否满足奖励条件 - 需要在 endGame 之前定义
   const checkRewardCondition = useCallback((correctCount: number, totalCount: number, completionTimeMs: number) => {
     if (!practice?.rewards || practice.rewards.length === 0) {
+      console.log('没有设置奖励');
       return false; // 没有设置奖励
     }
 
     const rewardCondition = practice.reward_condition;
     if (!rewardCondition) {
       // 没有设置奖励条件，使用默认条件：100%正确率
-      return correctCount === totalCount;
+      const result = correctCount === totalCount;
+      console.log('使用默认条件(100%正确率):', { correctCount, totalCount, result });
+      return result;
     }
 
     const completionTimeMinutes = completionTimeMs / (1000 * 60); // 转换为分钟
@@ -121,17 +124,36 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
       // 普通模式：需要达到目标正确题数且在时间限制内完成
       const targetCorrect = rewardCondition.targetCorrect || Math.max(1, Math.ceil(totalCount * 0.8));
       const maxTime = rewardCondition.maxTime || Math.max(1, Math.ceil(totalCount * 0.5));
-
-      return correctCount >= targetCorrect && completionTimeMinutes <= maxTime;
+      const result = correctCount >= targetCorrect && completionTimeMinutes <= maxTime;
+      
+      console.log('普通模式检查:', {
+        correctCount,
+        targetCorrect,
+        completionTimeMinutes,
+        maxTime,
+        result
+      });
+      
+      return result;
     } else if (rewardCondition.mode === 'timed' || practice.test_mode === 'timed') {
       // 计时模式：需要达到最少正确题数且错误率不超过限制
       const minCorrect = rewardCondition.minCorrect || Math.max(5, Math.ceil((practice.time_limit || 5) * 3 * 0.7));
       const maxErrorRate = rewardCondition.maxErrorRate !== undefined ? rewardCondition.maxErrorRate : 20;
       const errorRate = totalCount > 0 ? ((totalCount - correctCount) / totalCount) * 100 : 0;
-
-      return correctCount >= minCorrect && errorRate <= maxErrorRate;
+      const result = correctCount >= minCorrect && errorRate <= maxErrorRate;
+      
+      console.log('计时模式检查:', {
+        correctCount,
+        minCorrect,
+        errorRate,
+        maxErrorRate,
+        result
+      });
+      
+      return result;
     }
 
+    console.log('未匹配任何模式');
     return false;
   }, [practice]);
 
@@ -208,7 +230,7 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
   };
 
   // 结束游戏函数 - 需要在 useEffect 之前定义
-  const endGame = useCallback(() => {
+  const endGame = useCallback((finalCorrectAnswers?: number, finalTotalQuestions?: number) => {
     setGameActive(false);
     setGameEnded(true);
 
@@ -219,14 +241,33 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
       setTotalTime(finalTime);
     }
 
+    // 使用传入的最终值，如果没有传入则使用当前状态值
+    const finalCorrect = finalCorrectAnswers !== undefined ? finalCorrectAnswers : correctAnswers;
+    const finalTotal = finalTotalQuestions !== undefined ? finalTotalQuestions : totalQuestions;
+
     // 检查是否满足奖励条件
-    const shouldShowReward = checkRewardCondition(correctAnswers, totalQuestions, finalTime);
+    const shouldShowReward = checkRewardCondition(finalCorrect, finalTotal, finalTime);
+    
+    // 调试信息
+    console.log('奖励条件检查:', {
+      correctAnswers: finalCorrect,
+      totalQuestions: finalTotal,
+      finalTime: finalTime / 1000, // 转换为秒
+      shouldShowReward,
+      rewardCondition: practice?.reward_condition,
+      rewards: practice?.rewards,
+      distributionMode: practice?.reward_distribution_mode
+    });
 
     if (shouldShowReward && practice?.reward_distribution_mode === 'choice') {
       // 自选模式：显示奖励选择对话框
       setShowRewardChoice(true);
     } else if (shouldShowReward && practice?.reward_distribution_mode === 'random') {
       // 随机模式：直接显示随机奖励
+      setShowReward(true);
+      setSelectedReward(getRandomReward());
+    } else if (shouldShowReward) {
+      // 如果没有设置分发模式，默认显示随机奖励
       setShowReward(true);
       setSelectedReward(getRandomReward());
     }
@@ -246,7 +287,7 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
         if (practice?.test_mode === 'timed' && practice.time_limit) {
           const timeLimit = practice.time_limit * 60 * 1000; // 转换为毫秒
           if (elapsed >= timeLimit) {
-            endGame();
+            endGame(correctAnswers, totalQuestions);
           }
         }
       }, 100); // 每100ms更新一次，提供更流畅的显示
@@ -413,7 +454,7 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
     if (practice?.test_mode !== 'timed') {
       const maxQuestions = getMaxQuestions();
       if (totalQuestions >= maxQuestions) {
-        endGame();
+        endGame(correctAnswers, totalQuestions);
         return;
       }
     }
@@ -454,7 +495,7 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
           if (totalQuestions + 1 < maxQuestions) {
             nextQuestion();
           } else {
-            endGame();
+            endGame(correctAnswers + 1, totalQuestions + 1);
           }
         }, 2000);
       }
