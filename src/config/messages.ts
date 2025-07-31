@@ -20,12 +20,12 @@ export const getConsolations = (name: string = '小朋友') => [
 
 export const getFinalMessage = (accuracy: number, correctAnswers: number, name: string = '小朋友') => {
   if (accuracy === 100) {
-    return `太棒了${name}！你答对了全部 ${correctAnswers} 道题！`;
+    return { first: `太棒了${name}！`, second: `你答对了全部 ${correctAnswers} 道题！` };
   } else if (accuracy >= 90) {
-    return `真棒${name}！你答对了 ${correctAnswers} 道题！`;
+    return { first: `真棒${name}！`, second: `你答对了 ${correctAnswers} 道题！` };
   } else if (accuracy >= 70) {
-    return `做得不错${name}！你答对了 ${correctAnswers} 道题！`;
+    return { first: `做得不错${name}！`, second: `你答对了 ${correctAnswers} 道题！` };
   } else {
-    return `继续加油${name}！你答对了 ${correctAnswers} 道题！`;
+    return { first: `继续加油${name}！`, second: `你答对了 ${correctAnswers} 道题！` };
   }
 };

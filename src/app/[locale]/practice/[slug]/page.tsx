@@ -746,9 +746,16 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
                   {/* Final Score */}
                   <Card className={`bg-gradient-to-br ${getThemeColors().secondary}/20 border-0 sm:border-4 ${getThemeColors().border} mb-3 sm:mb-4`}>
                     <CardContent className="py-6 text-center">
-                      <div className="text-4xl sm:text-5xl mb-3 sm:mb-4 animate-bounce">{getFinalEmoji()}</div>
                       <div className={`text-lg sm:text-xl font-bold ${getThemeColors().text} mb-2`}>
-                        {getFinalMessage(getAccuracy(), correctAnswers, practice?.child_name || '小朋友')}
+                        {(() => {
+                          const message = getFinalMessage(getAccuracy(), correctAnswers, practice?.child_name || '小朋友');
+                          return (
+                            <>
+                              <div>{message.first}</div>
+                              <div>{message.second}</div>
+                            </>
+                          );
+                        })()}
                       </div>
                       <div className={`text-lg font-bold ${getThemeColors().text} mb-2`}>
                         正确率: {getAccuracy()}%

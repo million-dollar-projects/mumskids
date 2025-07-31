@@ -168,9 +168,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
       <Header locale={locale} backgroundClass="bg-transparent" isFixed={false} />
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-6">
-        {/* 顶部导航标签 */}
-        <div className="flex items-center justify-end mb-0">
-          {/* 右上角控制区域 */}
+        <div className="items-center justify-end mb-0 hidden sm:flex">
           <div className="flex items-center space-x-4 bg-purple-900/5 rounded p-0 pointer-events-auto cursor-pointer">
             <DropdownMenu
               open={visibilityDropdownOpen}
@@ -254,9 +252,9 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
                     toast.error('练习名称最多20个字符');
                   }
                 }}
-                className="text-4xl md:text-4xl font-bold text-[#1315175c] shadow-none 
+                className="text-2xl sm:text-4xl md:text-4xl font-bold text-[#1315175c] shadow-none 
                 border-none outline-none py-4 px-0 h-auto focus-visible:ring-0 bg-transparent 
-                placeholder:text-4xl placeholder:font-bold placeholder:text-[#1315175c]"
+                placeholder:text-2xl sm:placeholder:text-4xl placeholder:font-bold placeholder:text-[#1315175c]"
                 placeholder="练习名称"
               />
             </div>
