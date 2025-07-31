@@ -8,6 +8,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { ArrowLeft, Play, Star, BookOpen } from 'lucide-react';
 import Link from 'next/link';
 import { getEncouragements, getConsolations, getFinalMessage } from '@/config/messages';
+import { defaultRewards, type DefaultReward } from '@/config/default-rewards';
+import { getThemeById, getDefaultTheme, getThemeColors as getThemeColorsById, type Theme } from '@/lib/themes';
 
 interface PracticeDetailProps {
   params: Promise<{ locale: string; slug: string }>;
@@ -173,6 +175,30 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
       }
       return '奖励';
     });
+  }, [practice]);
+
+  // 获取奖励的图标
+  const getRewardEmoji = useCallback((rewardText: string) => {
+    if (!practice?.rewards || practice.rewards.length === 0) {
+      return '🎁'; // 默认图标
+    }
+
+    // 首先尝试从数据库中的奖励对象获取图标
+    for (const reward of practice.rewards) {
+      if (typeof reward === 'object' && reward !== null) {
+        if (reward.text === rewardText || reward.name === rewardText) {
+          return reward.emoji || '🎁';
+        }
+      }
+    }
+
+    // 如果数据库中没有找到，尝试从默认奖励配置中匹配
+    const defaultReward = defaultRewards.find((dr: DefaultReward) => dr.text === rewardText);
+    if (defaultReward) {
+      return defaultReward.emoji;
+    }
+
+    return '🎁'; // 默认图标
   }, [practice]);
 
   // 获取随机奖励
@@ -410,18 +436,7 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
 
 
 
-  // 获取随机奖励
-  const getRandomReward = () => {
-    if (practice?.rewards && practice.rewards.length > 0) {
-      const randomReward = practice.rewards[Math.floor(Math.random() * practice.rewards.length)];
-      if (typeof randomReward === 'string') {
-        return randomReward;
-      } else if (typeof randomReward === 'object' && randomReward !== null) {
-        return randomReward.text || randomReward.name || '完成练习';
-      }
-    }
-    return '完成练习'; // 默认奖励文本
-  };
+
 
   const startGame = () => {
     const now = Date.now();
@@ -437,10 +452,13 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
   };
 
   const nextQuestion = () => {
-    const maxQuestions = getMaxQuestions();
-    if (totalQuestions >= maxQuestions) {
-      endGame();
-      return;
+    // 计时模式下不受题目数量限制，只受时间限制
+    if (practice?.test_mode !== 'timed') {
+      const maxQuestions = getMaxQuestions();
+      if (totalQuestions >= maxQuestions) {
+        endGame();
+        return;
+      }
     }
 
     const newQuestion = generateQuestion();
@@ -459,52 +477,55 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
 
     if (choiceIndex === currentQuestion.correctIndex) {
       setCorrectAnswers(prev => prev + 1);
-      const encouragements = getEncouragements(practice?.child_name || '小朋友');
-      const encouragement = encouragements[Math.floor(Math.random() * encouragements.length)];
-      setFeedback(encouragement);
-      setFeedbackType('correct');
 
-      // Auto advance after correct answer
-      setTimeout(() => {
-        const maxQuestions = getMaxQuestions();
-        if (totalQuestions + 1 < maxQuestions) {
+      // 计时模式：不显示鼓励话语，立即跳转
+      if (practice?.test_mode === 'timed') {
+        setFeedbackType('correct');
+        setTimeout(() => {
           nextQuestion();
-        } else {
-          endGame();
-        }
-      }, 2000);
-    } else {
-      const consolations = getConsolations(practice?.child_name || '小朋友');
-      const consolation = consolations[Math.floor(Math.random() * consolations.length)];
-      setFeedback(`${consolation} 正确答案是 ${currentQuestion.correctAnswer}`);
-      setFeedbackType('incorrect');
+        }, 500); // 缩短延迟时间
+      } else {
+        // 普通模式：显示鼓励话语
+        const encouragements = getEncouragements(practice?.child_name || '小朋友');
+        const encouragement = encouragements[Math.floor(Math.random() * encouragements.length)];
+        setFeedback(encouragement);
+        setFeedbackType('correct');
 
-      // Show next button for incorrect answers
-      setTimeout(() => {
-        setShowNextButton(true);
-      }, 2000);
+        // Auto advance after correct answer
+        setTimeout(() => {
+          const maxQuestions = getMaxQuestions();
+          if (totalQuestions + 1 < maxQuestions) {
+            nextQuestion();
+          } else {
+            endGame();
+          }
+        }, 2000);
+      }
+    } else {
+      // 计时模式：不显示安慰话语，立即跳转
+      if (practice?.test_mode === 'timed') {
+        setFeedbackType('incorrect');
+        setTimeout(() => {
+          nextQuestion();
+        }, 500); // 缩短延迟时间
+      } else {
+        // 普通模式：显示安慰话语和下一题按钮
+        const consolations = getConsolations(practice?.child_name || '小朋友');
+        const consolation = consolations[Math.floor(Math.random() * consolations.length)];
+        setFeedback(`${consolation} 正确答案是 ${currentQuestion.correctAnswer}`);
+        setFeedbackType('incorrect');
+
+        // Show next button for incorrect answers
+        setTimeout(() => {
+          setShowNextButton(true);
+        }, 2000);
+      }
     }
   };
 
 
 
-  const restartGame = () => {
-    setGameActive(false);
-    setGameEnded(false);
-    setShowReward(false);
-    setCurrentQuestion(null);
-    setCorrectAnswers(0);
-    setTotalQuestions(0);
-    setFeedback('');
-    setFeedbackType('');
-    setSelectedAnswer(-1);
-    setShowNextButton(false);
 
-    // 重置计时器
-    setStartTime(null);
-    setElapsedTime(0);
-    setTotalTime(0);
-  };
 
   const getAccuracy = () => {
     return totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
@@ -520,350 +541,384 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
     return '💪';
   };
 
+  // 获取当前主题
+  const getCurrentTheme = (): Theme => {
+    if (!practice?.selected_theme) return getDefaultTheme();
+    return getThemeById(practice.selected_theme) || getDefaultTheme();
+  };
+
+  // 根据主题生成配色方案
+  const getThemeColors = () => {
+    const theme = getCurrentTheme();
+    return getThemeColorsById(theme.id);
+  };
+
   return (
-    <div className="min-h-screen p-4 relative overflow-hidden">
-      {/* Decorative stars */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute top-[10%] left-[10%] text-yellow-400 text-xl animate-pulse">⭐</div>
-        <div className="absolute top-[20%] right-[20%] text-yellow-300 text-lg animate-bounce">✨</div>
-        <div className="absolute bottom-[30%] left-[15%] text-yellow-400 text-xl animate-pulse delay-1000">🌟</div>
-        <div className="absolute bottom-[20%] right-[15%] text-yellow-300 text-lg animate-bounce delay-500">⭐</div>
-        <div className="absolute top-[30%] right-[30%] text-yellow-400 text-lg animate-pulse delay-2000">✨</div>
-      </div>
+    <>
+      {/* 添加自定义抖动动画 */}
+      <style jsx global>{`
+        @keyframes wiggle {
+          0%, 100% { transform: rotate(0deg); }
+          25% { transform: rotate(-3deg) translateX(-2px); }
+          75% { transform: rotate(3deg) translateX(2px); }
+        }
+      `}</style>
 
-      <div className="relative z-10 max-w-md mx-auto">
+      <div className={`min-h-screen p-4 relative overflow-hidden bg-gradient-to-br ${getCurrentTheme().bgClass}`}>
+        {/* Decorative stars */}
+        <div className="fixed inset-0 pointer-events-none z-0">
+          <div className="absolute top-[10%] left-[10%] text-yellow-400 text-xl animate-pulse">⭐</div>
+          <div className="absolute top-[20%] right-[20%] text-yellow-300 text-lg animate-bounce">✨</div>
+          <div className="absolute bottom-[30%] left-[15%] text-yellow-400 text-xl animate-pulse delay-1000">🌟</div>
+          <div className="absolute bottom-[20%] right-[15%] text-yellow-300 text-lg animate-bounce delay-500">⭐</div>
+          <div className="absolute top-[30%] right-[30%] text-yellow-400 text-lg animate-pulse delay-2000">✨</div>
+        </div>
 
-        {/* Game Container */}
-        <Card className="border-4 border-orange-400 shadow-2xl bg-white relative overflow-hidden rounded-2xl">
-          <div className="absolute inset-0 bg-gradient-to-br from-orange-100/50 to-yellow-100/50 rounded-2xl"></div>
+        <div className="relative z-10 max-w-md mx-auto">
 
-          <CardHeader className="relative z-10 text-center pb-4">
-            <CardTitle className="text-2xl md:text-3xl font-bold text-orange-600 mb-4 tracking-wide">
-              🌟 {practice?.child_name || '小朋友'}的数学小天地 🌟
-            </CardTitle>
+          {/* Game Container */}
+          <Card className={`border-4 ${getThemeColors().border} shadow-2xl bg-white relative overflow-hidden rounded-2xl`}>
+            <div className={`absolute inset-0 bg-gradient-to-br ${getThemeColors().secondary}/30 rounded-2xl`}></div>
 
-            {/* Characters */}
-            <div className="flex justify-center gap-4 mb-4">
-              <span className="text-3xl animate-bounce">🦁</span>
-              <span className="text-3xl animate-bounce delay-300">🐸</span>
-              <span className="text-3xl animate-bounce delay-700">🐙</span>
-            </div>
+            <CardHeader className="relative z-10 text-center pb-4">
+              <CardTitle className={`text-2xl md:text-3xl font-bold ${getThemeColors().text} mb-4 tracking-wide`}>
+                {getCurrentTheme().icon} {practice?.child_name || '小朋友'}的数学小天地 {getCurrentTheme().icon}
+              </CardTitle>
 
-            {/* Score Board */}
-            <div className="flex gap-2 mb-4">
-              <Badge className="flex-1 bg-teal-500 hover:bg-teal-500 text-white py-2 px-2 text-xs font-bold">
-                🏆 答对: {correctAnswers}
-              </Badge>
-              <Badge className="flex-1 bg-teal-500 hover:bg-teal-500 text-white py-2 px-2 text-xs font-bold">
-                📚 题数: {totalQuestions}/{getMaxQuestions()}
-              </Badge>
-              {gameActive && (
-                <Badge className={`flex-1 ${getTimerDisplay().color} hover:${getTimerDisplay().color} text-white py-2 px-2 text-xs font-bold`}>
-                  ⏱️ {getTimerDisplay().text}
+              {/* Characters */}
+              <div className="flex justify-center gap-4 mb-4">
+                <span className="text-3xl animate-bounce">🦁</span>
+                <span className="text-3xl animate-bounce delay-300">🐸</span>
+                <span className="text-3xl animate-bounce delay-700">🐙</span>
+              </div>
+
+              {/* Score Board */}
+              <div className="flex gap-2 mb-4">
+                <Badge className={`flex-1 ${getThemeColors().accent} hover:${getThemeColors().accent} text-white py-2 px-2 text-xs font-bold`}>
+                  🏆 答对: {correctAnswers}
                 </Badge>
-              )}
-            </div>
-
-            {/* Progress Bar */}
-            <div className="mb-4">
-              <div className="text-sm font-bold text-gray-700 mb-2">游戏进度</div>
-              <div className="w-full h-4 bg-gray-200 border-2 border-gray-800 rounded-lg overflow-hidden">
-                <div
-                  className="h-full bg-green-500 transition-all duration-800 ease-out relative"
-                  style={{ width: `${(totalQuestions / getMaxQuestions()) * 100}%` }}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
-                </div>
-              </div>
-            </div>
-          </CardHeader>
-
-          <CardContent className="relative z-10 px-4 pb-6">
-            {loading && (
-              <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
-                <p className="text-lg text-gray-600">加载中...</p>
-              </div>
-            )}
-
-            {error && (
-              <div className="text-center py-8">
-                <BookOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold mb-2 text-gray-700">练习不存在</h3>
-                <p className="text-gray-600 mb-6">{error}</p>
-                <Link href={`/${locale}/practice`}>
-                  <Button className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg">
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    错误
-                  </Button>
-                </Link>
-              </div>
-            )}
-
-            {!loading && !error && practice && !gameActive && !gameEnded && (
-              <div className="space-y-4">
-                {/* Practice Info */}
-                <Card className="bg-blue-50 border-2 border-blue-200">
-                  <CardContent className="py-4">
-                    <h3 className="font-bold text-lg text-blue-800 mb-2">{practice.title}</h3>
-                    {practice.description && (
-                      <p className="text-blue-700 mb-3">{practice.description}</p>
-                    )}
-                    <div className="flex flex-wrap gap-2 mb-3">
-                      <Badge className="bg-blue-500 text-white">
-                        {practice.difficulty === 'within10' && '10以内'}
-                        {practice.difficulty === 'within20' && '20以内'}
-                        {practice.difficulty === 'within50' && '50以内'}
-                        {practice.difficulty === 'within100' && '100以内'}
-                      </Badge>
-                      <Badge className="bg-green-500 text-white">
-                        {practice.calculation_type === 'add' && '加法'}
-                        {practice.calculation_type === 'subtract' && '减法'}
-                        {practice.calculation_type === 'multiply' && '乘法'}
-                        {practice.calculation_type === 'divide' && '除法'}
-                        {practice.calculation_type === 'mixed' && '混合运算'}
-                      </Badge>
-                      <Badge className="bg-purple-500 text-white">
-                        {getMaxQuestions()} 道题
-                      </Badge>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-blue-600">
-                      <span className="text-2xl">{practice.gender === 'boy' ? '👦' : '👧'}</span>
-                      <span>为 {practice.child_name} 定制</span>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Rewards Preview */}
-                {practice.rewards && practice.rewards.length > 0 && (
-                  <Card className="bg-pink-50 border-2 border-pink-200">
-                    <CardContent className="py-4">
-                      <h4 className="font-bold text-pink-800 mb-2 flex items-center">
-                        <Star className="w-4 h-4 mr-2" />
-                        完成奖励
-                      </h4>
-                      <div className="flex flex-wrap gap-2">
-                        {practice.rewards.slice(0, 3).map((reward, index) => (
-                          <Badge key={index} className="bg-pink-500 text-white">
-                            {typeof reward === 'string'
-                              ? reward
-                              : (typeof reward === 'object' && reward !== null)
-                                ? (reward.text || reward.name || '奖励')
-                                : '奖励'}
-                          </Badge>
-                        ))}
-                        {practice.rewards.length > 3 && (
-                          <Badge className="bg-pink-300 text-pink-800">
-                            +{practice.rewards.length - 3} 更多
-                          </Badge>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
+                {practice?.test_mode === 'timed' ? (
+                  <Badge className={`flex-1 ${getThemeColors().accent} hover:${getThemeColors().accent} text-white py-2 px-2 text-xs font-bold`}>
+                    ⏰ 限时: {practice.time_limit}分钟
+                  </Badge>
+                ) : (
+                  <Badge className={`flex-1 ${getThemeColors().accent} hover:${getThemeColors().accent} text-white py-2 px-2 text-xs font-bold`}>
+                    📚 题数: {totalQuestions}/{getMaxQuestions()}
+                  </Badge>
                 )}
-
-                <Button
-                  onClick={startGame}
-                  className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-6 text-lg rounded-lg shadow-lg transform transition-transform hover:scale-105"
-                >
-                  <Play className="w-5 h-5 mr-2" />
-                  🚀 开始游戏
-                </Button>
-              </div>
-            )}
-
-            {gameActive && currentQuestion && (
-              <>
-                {/* Question */}
-                <Card className="bg-yellow-300 border-4 border-orange-400 mb-6 relative">
-                  <div className="absolute -top-4 -right-2 text-3xl animate-bounce">🤔</div>
-                  <CardContent className="py-6 text-center">
-                    <div className="text-3xl md:text-4xl font-bold text-orange-800">
-                      {currentQuestion.question} = ?
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Choices */}
-                <div className="grid grid-cols-2 gap-3 mb-6">
-                  {currentQuestion.choices.map((choice, index) => (
-                    <Button
-                      key={index}
-                      onClick={() => selectAnswer(index)}
-                      disabled={selectedAnswer !== -1}
-                      className={`
-                        h-16 text-2xl font-bold border-4 transition-all duration-200 transform
-                        ${selectedAnswer === -1
-                          ? 'bg-orange-500 hover:bg-orange-600 border-orange-700 text-white hover:scale-105 active:scale-95'
-                          : selectedAnswer === index
-                            ? index === currentQuestion.correctIndex
-                              ? 'bg-green-500 border-green-700 text-white animate-pulse'
-                              : 'bg-red-500 border-red-700 text-white animate-pulse'
-                            : index === currentQuestion.correctIndex && selectedAnswer !== -1
-                              ? 'bg-green-500 border-green-700 text-white animate-pulse'
-                              : 'bg-gray-400 border-gray-600 text-gray-200'
-                        }
-                      `}
-                    >
-                      {choice}
-                    </Button>
-                  ))}
-                </div>
-
-                {/* Feedback */}
-                {feedback && (
-                  <Card className={`mb-4 border-4 ${feedbackType === 'correct'
-                    ? 'bg-green-100 border-green-500'
-                    : 'bg-red-100 border-red-500'
-                    }`}>
-                    <CardContent className="py-4 text-center">
-                      <div className={`text-lg font-bold ${feedbackType === 'correct' ? 'text-green-800' : 'text-red-800'
-                        }`}>
-                        {feedback}
-                      </div>
-                    </CardContent>
-                  </Card>
+                {gameActive && (
+                  <Badge className={`flex-1 ${getTimerDisplay().color} hover:${getTimerDisplay().color} text-white py-2 px-2 text-xs font-bold`}>
+                    ⏱️ {getTimerDisplay().text}
+                  </Badge>
                 )}
+              </div>
 
-                {/* Next Button */}
-                {showNextButton && (
-                  <div className="text-center">
-                    <Button
-                      onClick={nextQuestion}
-                      className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg"
+              {/* Progress Bar - 只在开始练习后显示 */}
+              {(gameActive || gameEnded) && (
+                <div className="mb-4">
+                  <div className="text-sm font-bold text-gray-700 mb-2">练习进度</div>
+                  <div className="w-full h-4 bg-gray-200 border-2 border-gray-800 rounded-lg overflow-hidden">
+                    <div
+                      className={`h-full transition-all duration-800 ease-out relative ${getThemeColors().progress}`}
+                      style={{
+                        width: `${practice?.test_mode === 'timed' && practice.time_limit
+                          ? Math.min(100, (elapsedTime / (practice.time_limit * 60 * 1000)) * 100) // 基于时间进度
+                          : (totalQuestions / getMaxQuestions()) * 100 // 基于题目进度
+                          }%`
+                      }}
                     >
-                      ➡️ 下一题
-                    </Button>
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
+                    </div>
                   </div>
-                )}
-              </>
-            )}
+                </div>
+              )}
+            </CardHeader>
 
-            {gameEnded && (
-              <>
-                {/* Final Score */}
-                <Card className="bg-yellow-100 border-4 border-yellow-600 mb-4">
-                  <CardContent className="py-6 text-center">
-                    <div className="text-5xl mb-4 animate-bounce">{getFinalEmoji()}</div>
-                    <div className="text-xl font-bold text-yellow-800 mb-2">
-                      {getFinalMessage(getAccuracy(), correctAnswers, practice?.child_name || '小朋友')}
-                    </div>
-                    <div className="text-lg font-bold text-yellow-700 mb-2">
-                      正确率: {getAccuracy()}%
-                    </div>
-                    {totalTime > 0 && (
-                      <div className="text-md font-bold text-yellow-600">
-                        完成时间: {formatTime(totalTime)}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
+            <CardContent className="relative z-10 px-4 pb-6">
+              {loading && (
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+                  <p className="text-lg text-gray-600">加载中...</p>
+                </div>
+              )}
 
-                {/* Reward */}
-                {showReward && (
-                  <Card className="bg-pink-100 border-4 border-pink-500 mb-4 animate-pulse">
-                    <CardHeader>
-                      <CardTitle className="text-center text-pink-600 text-xl font-bold">
-                        🎉 恭喜获得奖励！
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="text-center">
-                      <div className="text-4xl mb-2 animate-bounce">
-                        🎁
+              {error && (
+                <div className="text-center py-8">
+                  <BookOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold mb-2 text-gray-700">练习不存在</h3>
+                  <p className="text-gray-600 mb-6">{error}</p>
+                  <Link href={`/${locale}/practice`}>
+                    <Button className={`${getThemeColors().button} text-white font-bold py-3 px-6 rounded-lg shadow-lg`}>
+                      <ArrowLeft className="w-4 h-4 mr-2" />
+                      返回
+                    </Button>
+                  </Link>
+                </div>
+              )}
+
+              {!loading && !error && practice && !gameActive && !gameEnded && (
+                <div className="space-y-4">
+                  {/* Practice Info */}
+                  <Card className={`${getThemeColors().light}`}>
+                    <CardContent className="py-4">
+                      <h3 className={`font-bold text-lg ${getThemeColors().text} mb-2`}>{practice.title}</h3>
+                      {practice.description && (
+                        <p className={`${getThemeColors().text} mb-3`}>{practice.description}</p>
+                      )}
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        <Badge className={`${getThemeColors().accent} text-white`}>
+                          {practice.difficulty === 'within10' && '10以内'}
+                          {practice.difficulty === 'within20' && '20以内'}
+                          {practice.difficulty === 'within50' && '50以内'}
+                          {practice.difficulty === 'within100' && '100以内'}
+                        </Badge>
+                        <Badge className={`${getThemeColors().accent} text-white`}>
+                          {practice.calculation_type === 'add' && '加法'}
+                          {practice.calculation_type === 'subtract' && '减法'}
+                          {practice.calculation_type === 'multiply' && '乘法'}
+                          {practice.calculation_type === 'divide' && '除法'}
+                          {practice.calculation_type === 'mixed' && '混合运算'}
+                        </Badge>
+                        <Badge className={`${getThemeColors().accent} text-white`}>
+                          {getMaxQuestions()} 道题
+                        </Badge>
                       </div>
-                      <div className="text-lg font-bold text-pink-600 mb-2">
-                        获得奖励：{selectedReward || '完成练习'}！
-                      </div>
-                      <div className="text-sm text-pink-500">
-                        你已经满足了奖励条件，真棒！
+                      <div className={`flex items-center gap-2 text-sm ${getThemeColors().text}`}>
+                        <span>为 {practice.child_name} 定制</span>
                       </div>
                     </CardContent>
                   </Card>
-                )}
 
-                {/* 如果没有获得奖励，显示鼓励信息 */}
-                {!showReward && !showRewardChoice && practice?.rewards && practice.rewards.length > 0 && (
-                  <Card className="bg-blue-50 border-2 border-blue-200 mb-4">
-                    <CardContent className="py-4 text-center">
-                      <div className="text-2xl mb-2">💪</div>
-                      <div className="text-sm text-blue-600 mb-2">
-                        继续努力，下次就能获得奖励了！
-                      </div>
-                      <div className="text-xs text-blue-500">
-                        {practice.reward_condition ? (
-                          practice.test_mode === 'normal' ? (
-                            `需要答对 ${practice.reward_condition.targetCorrect || Math.max(1, Math.ceil(totalQuestions * 0.8))} 题且在 ${practice.reward_condition.maxTime || Math.max(1, Math.ceil(totalQuestions * 0.5))} 分钟内完成`
-                          ) : (
-                            `需要答对至少 ${practice.reward_condition.minCorrect || Math.max(5, Math.ceil((practice.time_limit || 5) * 3 * 0.7))} 题，错误率不超过 ${practice.reward_condition.maxErrorRate !== undefined ? practice.reward_condition.maxErrorRate : 20}%`
-                          )
-                        ) : (
-                          '需要全部答对才能获得奖励'
-                        )}
+                  {/* Rewards Preview */}
+                  {practice.rewards && practice.rewards.length > 0 && (
+                    <Card className={`${getThemeColors().light}`}>
+                      <CardContent className="py-4">
+                        <h4 className={`font-bold ${getThemeColors().text} mb-2 flex items-center`}>
+                          <Star className="w-4 h-4 mr-2" />
+                          完成奖励
+                        </h4>
+                        <div className="flex flex-wrap gap-2">
+                          {practice.rewards.slice(0, 3).map((reward, index) => (
+                            <Badge key={index} className={`${getThemeColors().accent} text-white`}>
+                              {typeof reward === 'string'
+                                ? reward
+                                : (typeof reward === 'object' && reward !== null)
+                                  ? (reward.text || reward.name || '奖励')
+                                  : '奖励'}
+                            </Badge>
+                          ))}
+                          {practice.rewards.length > 3 && (
+                            <Badge className={`bg-gradient-to-r ${getThemeColors().secondary} text-white`}>
+                              +{practice.rewards.length - 3} 更多
+                            </Badge>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  <Button
+                    onClick={startGame}
+                    className={`w-full ${getThemeColors().button} text-white font-bold py-4 px-6 text-lg rounded-lg shadow-lg transform transition-transform hover:scale-105`}
+                  >
+                    开始
+                    <Play className="w-5 h-5 mr-2" />
+                  </Button>
+                </div>
+              )}
+
+              {gameActive && currentQuestion && (
+                <>
+                  {/* Question */}
+                  <Card className={`bg-gradient-to-br ${getThemeColors().secondary} border-4 ${getThemeColors().border} mb-6 relative`}>
+                    <div className="absolute -top-4 -right-2 text-3xl animate-bounce">🤔</div>
+                    <CardContent className="py-6 text-center">
+                      <div className="text-3xl md:text-4xl font-bold text-white drop-shadow-lg">
+                        {currentQuestion.question} = ?
                       </div>
                     </CardContent>
                   </Card>
-                )}
 
-                {/* 奖励选择对话框 */}
-                <Dialog open={showRewardChoice} onOpenChange={setShowRewardChoice}>
-                  <DialogContent className="max-w-md">
-                    <DialogHeader>
-                      <DialogTitle className="text-center text-xl font-bold text-pink-600">
-                        🎉 选择你的奖励！
-                      </DialogTitle>
-                    </DialogHeader>
-                    <div className="py-4">
-                      <div className="text-center mb-4">
-                        <div className="text-4xl mb-2">🎁</div>
-                        <p className="text-sm text-gray-600 mb-4">
-                          恭喜你完成了练习！请选择一个你喜欢的奖励：
-                        </p>
-                      </div>
-                      <div className="grid gap-3 max-h-60 overflow-y-auto">
-                        {getAvailableRewards().map((reward, index) => (
-                          <Button
-                            key={index}
-                            onClick={() => {
-                              setSelectedReward(reward);
-                              setShowRewardChoice(false);
-                              setShowReward(true);
-                            }}
-                            className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-bold py-4 px-4 rounded-lg text-left transform transition-transform hover:scale-105 shadow-lg"
-                          >
-                            <div className="flex items-center">
-                              <span className="text-2xl mr-3">🎁</span>
-                              <span className="text-lg">{reward}</span>
-                            </div>
-                          </Button>
-                        ))}
-                      </div>
-                      <div className="mt-4 text-center">
+                  {/* Choices */}
+                  <div className="grid grid-cols-2 gap-3 mb-6">
+                    {currentQuestion.choices.map((choice, index) => (
+                      <div
+                        key={index}
+                        className={`
+                        ${selectedAnswer === index && index !== currentQuestion.correctIndex
+                            ? 'animate-[wiggle_0.3s_ease-in-out_3]'
+                            : ''
+                          }
+                      `}
+                      >
                         <Button
-                          onClick={() => setShowRewardChoice(false)}
-                          variant="outline"
-                          className="text-gray-600 hover:text-gray-800"
+                          onClick={() => selectAnswer(index)}
+                          disabled={selectedAnswer !== -1}
+                          className={`
+                          w-full h-16 text-2xl font-bold border-4 transition-all duration-200 transform
+                          ${selectedAnswer === -1
+                              ? `${getThemeColors().button} ${getThemeColors().border} text-white hover:scale-105 active:scale-95`
+                              : selectedAnswer === index
+                                ? index === currentQuestion.correctIndex
+                                  ? 'bg-green-500 border-green-700 text-white animate-pulse'
+                                  : 'bg-red-500 border-red-700 text-white'
+                                : index === currentQuestion.correctIndex && selectedAnswer !== -1
+                                  ? 'bg-green-500 border-green-700 text-white animate-pulse'
+                                  : 'bg-gray-400 border-gray-600 text-gray-200'
+                            }
+                        `}
                         >
-                          稍后选择
+                          {choice}
                         </Button>
                       </div>
-                    </div>
-                  </DialogContent>
-                </Dialog>
+                    ))}
+                  </div>
 
-                {/* Restart Button */}
-                <div className="text-center">
-                  <Button
-                    onClick={restartGame}
-                    className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg"
-                  >
-                    🔄 重新开始
-                  </Button>
-                </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
+                  {/* Feedback - 计时模式下不显示文字反馈 */}
+                  {feedback && practice?.test_mode !== 'timed' && (
+                    <Card className={`mb-4 border-4 ${feedbackType === 'correct'
+                      ? 'bg-green-100 border-green-500'
+                      : 'bg-red-100 border-red-500'
+                      }`}>
+                      <CardContent className="py-4 text-center">
+                        <div className={`text-lg font-bold ${feedbackType === 'correct' ? 'text-green-800' : 'text-red-800'
+                          }`}>
+                          {feedback}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Next Button */}
+                  {showNextButton && (
+                    <div className="text-center">
+                      <Button
+                        onClick={nextQuestion}
+                        className={`${getThemeColors().button} text-white font-bold py-3 px-6 rounded-lg`}
+                      >
+                        ➡️ 下一题
+                      </Button>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {gameEnded && (
+                <>
+                  {/* Final Score */}
+                  <Card className={`bg-gradient-to-br ${getThemeColors().secondary}/20 border-4 ${getThemeColors().border} mb-4`}>
+                    <CardContent className="py-6 text-center">
+                      <div className="text-5xl mb-4 animate-bounce">{getFinalEmoji()}</div>
+                      <div className={`text-xl font-bold ${getThemeColors().text} mb-2`}>
+                        {getFinalMessage(getAccuracy(), correctAnswers, practice?.child_name || '小朋友')}
+                      </div>
+                      <div className={`text-lg font-bold ${getThemeColors().text} mb-2`}>
+                        正确率: {getAccuracy()}%
+                      </div>
+                      {totalTime > 0 && (
+                        <div className={`text-md font-bold ${getThemeColors().text}`}>
+                          完成时间: {formatTime(totalTime)}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  {/* Reward */}
+                  {showReward && (
+                    <Card className="bg-pink-100 border-4 border-pink-500 mb-4 animate-pulse">
+                      <CardHeader>
+                        <CardTitle className="text-center text-pink-600 text-xl font-bold">
+                          🎉 恭喜获得奖励！
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="text-center">
+                        <div className="text-4xl mb-2 animate-bounce">
+                          {selectedReward ? getRewardEmoji(selectedReward) : '🎁'}
+                        </div>
+                        <div className="text-lg font-bold text-pink-600 mb-2">
+                          获得奖励：{selectedReward || '完成练习'}！
+                        </div>
+                        <div className="text-sm text-pink-500">
+                          你已经满足了奖励条件，真棒！
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* 如果没有获得奖励，显示鼓励信息 */}
+                  {!showReward && !showRewardChoice && practice?.rewards && practice.rewards.length > 0 && (
+                    <Card className="bg-blue-50 border-2 border-blue-200 mb-4">
+                      <CardContent className="py-4 text-center">
+                        <div className="text-2xl mb-2">💪</div>
+                        <div className="text-sm text-blue-600 mb-2">
+                          继续努力，下次就能获得奖励了！
+                        </div>
+                        <div className="text-xs text-blue-500">
+                          {practice.reward_condition ? (
+                            practice.test_mode === 'normal' ? (
+                              `需要答对 ${practice.reward_condition.targetCorrect || Math.max(1, Math.ceil(totalQuestions * 0.8))} 题且在 ${practice.reward_condition.maxTime || Math.max(1, Math.ceil(totalQuestions * 0.5))} 分钟内完成`
+                            ) : (
+                              `需要答对至少 ${practice.reward_condition.minCorrect || Math.max(5, Math.ceil((practice.time_limit || 5) * 3 * 0.7))} 题，错误率不超过 ${practice.reward_condition.maxErrorRate !== undefined ? practice.reward_condition.maxErrorRate : 20}%`
+                            )
+                          ) : (
+                            '需要全部答对才能获得奖励'
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* 奖励选择对话框 */}
+                  <Dialog open={showRewardChoice} onOpenChange={setShowRewardChoice}>
+                    <DialogContent className="max-w-sm px-4 ">
+                      <DialogHeader>
+                        <DialogTitle className="text-center text-xl font-bold text-pink-600">
+                        </DialogTitle>
+                      </DialogHeader>
+                      <div className="py-4">
+                        <div className="text-center mb-4">
+                          <div className="text-4xl mb-2">🎉</div>
+                          <p className="text-sm text-gray-600 mb-4">
+                            恭喜你完成了练习！请选择一个你喜欢的奖励：
+                          </p>
+                        </div>
+                        <div className="grid gap-3 max-h-60 overflow-y-auto">
+                          {getAvailableRewards().map((reward, index) => (
+                            <Button
+                              key={index}
+                              onClick={() => {
+                                setSelectedReward(reward);
+                                setShowRewardChoice(false);
+                                setShowReward(true);
+                              }}
+                              className="w-full bg-gray-700 hover:bg-gray-800 text-white font-bold py-4 px-4 rounded text-left transform transition-transform shadow-md"
+                            >
+                              <div className="flex items-center">
+                                <span className="text-2xl mr-3">{getRewardEmoji(reward)}</span>
+                                <span className="text-lg">{reward}</span>
+                              </div>
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+
+                  {/* Restart Button */}
+                  <div className="text-center">
+                    <Button
+                      onClick={restartGame}
+                      className={`${getThemeColors().button} text-white font-bold py-3 px-6 rounded-lg`}
+                    >
+                      🔄 重新开始
+                    </Button>
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

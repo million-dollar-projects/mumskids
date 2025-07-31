@@ -1,3 +1,14 @@
+export interface ThemeColors {
+    primary: string;
+    secondary: string;
+    accent: string;
+    border: string;
+    text: string;
+    light: string;
+    button: string;
+    progress: string;
+}
+
 export interface Theme {
     id: string;
     name: string;
@@ -83,4 +94,93 @@ export const getThemeById = (id: string): Theme | undefined => {
 // 获取默认主题
 export const getDefaultTheme = (): Theme => {
     return themes[0]; // 默认使用彩虹主题
+};
+
+// 主题颜色配置
+const themeColorSchemes: Record<string, ThemeColors> = {
+    rainbow: {
+        primary: 'from-pink-400 to-purple-500',
+        secondary: 'from-pink-300 to-purple-400',
+        accent: 'bg-pink-500',
+        border: 'border-pink-400',
+        text: 'text-pink-600',
+        light: 'bg-pink-50 border-pink-200',
+        button: 'bg-pink-500 hover:bg-pink-600',
+        progress: 'bg-pink-500'
+    },
+    sunshine: {
+        primary: 'from-yellow-400 to-orange-500',
+        secondary: 'from-yellow-300 to-orange-400',
+        accent: 'bg-orange-500',
+        border: 'border-orange-400',
+        text: 'text-orange-600',
+        light: 'bg-orange-50 border-orange-200',
+        button: 'bg-orange-500 hover:bg-orange-600',
+        progress: 'bg-orange-500'
+    },
+    ocean: {
+        primary: 'from-cyan-400 to-blue-500',
+        secondary: 'from-cyan-300 to-blue-400',
+        accent: 'bg-blue-500',
+        border: 'border-blue-400',
+        text: 'text-blue-600',
+        light: 'bg-blue-50 border-blue-200',
+        button: 'bg-blue-500 hover:bg-blue-600',
+        progress: 'bg-blue-500'
+    },
+    forest: {
+        primary: 'from-lime-400 to-green-500',
+        secondary: 'from-lime-300 to-green-400',
+        accent: 'bg-green-500',
+        border: 'border-green-400',
+        text: 'text-green-600',
+        light: 'bg-green-50 border-green-200',
+        button: 'bg-green-500 hover:bg-green-600',
+        progress: 'bg-green-500'
+    },
+    candy: {
+        primary: 'from-pink-400 to-rose-500',
+        secondary: 'from-pink-300 to-rose-400',
+        accent: 'bg-rose-500',
+        border: 'border-rose-400',
+        text: 'text-rose-600',
+        light: 'bg-rose-50 border-rose-200',
+        button: 'bg-rose-500 hover:bg-rose-600',
+        progress: 'bg-rose-500'
+    },
+    lavender: {
+        primary: 'from-indigo-400 to-purple-500',
+        secondary: 'from-indigo-300 to-purple-400',
+        accent: 'bg-purple-500',
+        border: 'border-purple-400',
+        text: 'text-purple-600',
+        light: 'bg-purple-50 border-purple-200',
+        button: 'bg-purple-500 hover:bg-purple-600',
+        progress: 'bg-purple-500'
+    },
+    peach: {
+        primary: 'from-rose-400 to-pink-500',
+        secondary: 'from-rose-300 to-pink-400',
+        accent: 'bg-pink-500',
+        border: 'border-pink-400',
+        text: 'text-pink-600',
+        light: 'bg-pink-50 border-pink-200',
+        button: 'bg-pink-500 hover:bg-pink-600',
+        progress: 'bg-pink-500'
+    },
+    mint: {
+        primary: 'from-emerald-400 to-teal-500',
+        secondary: 'from-emerald-300 to-teal-400',
+        accent: 'bg-teal-500',
+        border: 'border-teal-400',
+        text: 'text-teal-600',
+        light: 'bg-teal-50 border-teal-200',
+        button: 'bg-teal-500 hover:bg-teal-600',
+        progress: 'bg-teal-500'
+    }
+};
+
+// 获取主题颜色配置
+export const getThemeColors = (themeId: string): ThemeColors => {
+    return themeColorSchemes[themeId] || themeColorSchemes.rainbow;
 };
