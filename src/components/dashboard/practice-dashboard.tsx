@@ -59,7 +59,7 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
         childName={practice.child_name}
         difficulty={practice.difficulty}
         calculationType={practice.calculation_type}
-        className="w-32 h-32"
+        className="w-24 h-24 sm:w-32 sm:h-32"
         size="small"
         theme={practice.selected_theme}
       />
@@ -187,8 +187,8 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
                         <div className="h-8 bg-gray-200 rounded w-16"></div>
                       </div>
                     </div>
-                    <div className="ml-6">
-                      <div className="w-32 h-32 bg-gray-200 rounded-lg"></div>
+                    <div className="ml-4 sm:ml-6 flex-shrink-0">
+                      <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gray-200 rounded-lg"></div>
                     </div>
                   </div>
                 </div>
@@ -259,7 +259,7 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
                       </div>
 
                       {/* Right side - Theme Icon */}
-                      <div className="ml-6">
+                      <div className="ml-4 sm:ml-6 flex-shrink-0">
                         {getThemeIcon(practice)}
                       </div>
                     </div>
