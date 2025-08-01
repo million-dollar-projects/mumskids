@@ -76,13 +76,35 @@ export default function HomePage({ params }: PageProps) {
                 </p>
               </div>
 
-              <div>
+              <div className="flex flex-col sm:flex-row gap-4 items-center">
                 <Link href={`/${locale}/auth/login`}>
                   <Button
                     size="lg"
-                    className="btn-primary-black px-4 py-2 text-base font-medium cursor-pointer"
+                    className="btn-primary-black px-4 py-2 text-base font-medium cursor-pointer w-full sm:w-auto"
                   >
                     {t.landing.cta}
+                  </Button>
+                </Link>
+
+                {/* 或者分隔符图标 */}
+                <div className="flex items-center justify-center">
+                  <div className="hidden sm:flex flex-col items-center space-y-1">
+                    <div className="w-px h-3 bg-gray-300"></div>
+                    <div className="w-1.5 h-1.5 rounded-full bg-gray-300"></div>
+                    <div className="w-px h-3 bg-gray-300"></div>
+                  </div>
+                  <div className="sm:hidden">
+                    <div className="w-1.5 h-1.5 rounded-full bg-gray-300"></div>
+                  </div>
+                </div>
+
+                <Link href={`/${locale}/discover`}>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="px-4 py-2 text-base font-medium cursor-pointer w-full sm:w-auto border-2 border-primary-black text-primary-black hover:bg-primary-black hover:text-white transition-colors"
+                  >
+                    {t.landing.exploreEvents}
                   </Button>
                 </Link>
               </div>
