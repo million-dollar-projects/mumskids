@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react';
-import { Search, Filter, ChevronDown, Users, Trophy, Target } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { PracticeCard } from '@/components/ui/practice-card';
 import { Button } from '@/components/ui/button';
 import { usePractices } from '@/lib/hooks/usePractices';
@@ -17,9 +17,8 @@ interface DiscoverPracticesProps {
 }
 
 export function DiscoverPractices({ locale, t }: DiscoverPracticesProps) {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
-  const [showFilters, setShowFilters] = useState(false);
+  const [searchQuery] = useState('');
+  const [selectedDifficulty] = useState<string>('all');
 
   const {
     data: practicesData,
@@ -130,8 +129,7 @@ export function DiscoverPractices({ locale, t }: DiscoverPracticesProps) {
         <div className="animate-in fade-in-0 duration-300">
           <div className="space-y-4">
             {filteredPractices.map((practice: Practice) => {
-              const stats = formatStats(practice);
-
+            
               return (
                 <div
                   key={practice.id}
@@ -178,21 +176,6 @@ export function DiscoverPractices({ locale, t }: DiscoverPracticesProps) {
                               {practice.question_count}道题目
                             </span>
                           </div>
-                        )}
-                        {/* Stats */}
-                        {stats.attempts > 0 && (
-                          <>
-                            <div className="flex items-center">
-                              <Users className="w-4 h-4 mr-1 text-gray-400" />
-                              <span>{stats.attempts}次练习</span>
-                            </div>
-                            {stats.bestScore !== null && (
-                              <div className="flex items-center">
-                                <Trophy className="w-4 h-4 mr-1 text-yellow-500" />
-                                <span>最佳: {stats.bestScore}%</span>
-                              </div>
-                            )}
-                          </>
                         )}
                       </div>
 
@@ -263,44 +246,6 @@ export function DiscoverPractices({ locale, t }: DiscoverPracticesProps) {
               </>
             )}
           </Button>
-        </div>
-      )}
-
-      {/* Empty State */}
-      {!practicesLoading && filteredPractices.length === 0 && (
-        <div className="text-center py-16">
-          <div className="mx-auto w-48 h-48 mb-8 relative">
-            <div className="w-full h-full bg-white border border-gray-200 shadow-lg opacity-50 rounded-2xl flex items-center justify-center relative">
-              {/* Math symbols */}
-              <div className="flex items-center justify-center space-x-3">
-                <span className="text-3xl font-bold text-gray-400">?</span>
-                <span className="text-3xl text-gray-300">+</span>
-                <span className="text-3xl font-bold text-gray-400">?</span>
-                <span className="text-3xl text-gray-300">=</span>
-                <span className="text-3xl font-bold text-gray-300">?</span>
-              </div>
-              {/* Search icon */}
-              <div className="absolute -top-2 -right-2 w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center border border-gray-200">
-                <Search className="w-6 h-6 text-gray-400" />
-              </div>
-            </div>
-          </div>
-          <h2 className="text-2xl font-semibold text-gray-400 mb-4">
-            {searchQuery || selectedDifficulty !== 'all' ? '没有找到匹配的练习' : t.discover.noResults}
-          </h2>
-          <p className="text-gray-400 mb-8 max-w-md mx-auto">
-            {searchQuery || selectedDifficulty !== 'all'
-              ? '尝试调整搜索条件或筛选器'
-              : t.discover.noResultsDesc
-            }
-          </p>
-          {(!searchQuery && selectedDifficulty === 'all') && (
-            <Link href={`/${locale}/practice/create`}>
-              <Button className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 cursor-pointer">
-                创建第一个公开练习
-              </Button>
-            </Link>
-          )}
         </div>
       )}
     </div>
