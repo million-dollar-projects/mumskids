@@ -5,6 +5,7 @@ import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { messages } from '@/i18n/messages';
 import { DiscoverPractices } from '@/components/discover/discover-practices';
+import { useAuth } from '@/lib/auth/context';
 
 interface DiscoverPageProps {
   params: Promise<{ locale: string }>;
@@ -12,6 +13,7 @@ interface DiscoverPageProps {
 
 export default function DiscoverPage({ params }: DiscoverPageProps) {
   const [locale, setLocale] = useState('zh');
+  const { user, loading } = useAuth();
 
   useEffect(() => {
     const getLocale = async () => {
@@ -25,8 +27,13 @@ export default function DiscoverPage({ params }: DiscoverPageProps) {
 
   return (
     <div className="min-h-screen">
-      <Header locale={locale} />
-      
+
+      <Header
+        locale={locale}
+        variant={user ? "authenticated" : "landing"}
+        isFixed={true}
+      />
+
       {/* Hero Section */}
       <div className="py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
