@@ -62,7 +62,7 @@ export default function HomePage({ params }: PageProps) {
       {/* 主要内容 */}
       <main className="px-6 pt-20">
         <div className="max-w-4xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[80vh]">
+          <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[60vh] sm:min-h-[80vh]">
             {/* 左侧内容 */}
             <div className="space-y-8">
               <div className="space-y-6">
@@ -89,14 +89,13 @@ export default function HomePage({ params }: PageProps) {
             </div>
 
             {/* 右侧3D手机展示 */}
-            <div className="flex justify-center lg:justify-end">
+            <div className="justify-center lg:justify-end hidden sm:flex">
               <div className="relative">
                 {/* 背景圆形装饰 */}
                 <div className="absolute inset-0 circle-bg rounded-full transform scale-110 opacity-60 animate-pulse-slow"></div>
 
                 {/* 手机容器 */}
-                <div className="relative z-10 transform rotate-12 hover:rotate-6 transition-transform duration-500 animate-float">
-                  {/* 使用SVG手机组件 */}
+                <div className="relative z-10 transform sm:rotate-12 hover:rotate-6 transition-transform duration-500 animate-float">
                   <PhoneMockup />
                 </div>
 

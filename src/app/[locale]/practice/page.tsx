@@ -10,7 +10,7 @@ interface PracticePageProps {
 }
 
 export default function PracticePage({ params }: PracticePageProps) {
-  const { user, loading } = useAuth();
+  const { loading } = useAuth();
   const router = useRouter();
   const [locale, setLocale] = useState('zh');
 

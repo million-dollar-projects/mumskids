@@ -60,8 +60,9 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
       <header className={`transition-all duration-300 ${isFixed ? 'fixed top-0 left-0 right-0 z-50' : ''} ${isFixed && isScrolled ? 'bg-white/20 backdrop-blur-sm' : ''}`} style={isFixed ? { paddingTop: 'env(safe-area-inset-top)' } : {}}>
         <div className="pt-6 pb-2 sm:py-2 px-4 sm:px-0">
           <div className="max-w-4xl mx-auto flex justify-between items-center">
-            <div className="text-xl sm:text-2xl font-bold text-primary-black">
-              {t.landing.brand}
+            <div className="text-xl sm:text-2xl font-bold text-primary-black flex items-center gap-2">
+              <Image src="/images/plus.png" alt="Plus" width={20} height={20} className="w-5 h-5 transition-transform duration-300 hover:rotate-180" />
+              <span>{t.landing.brand}</span>
             </div>
             <div className="flex items-center gap-2 sm:gap-4">
               {/* 语言切换 */}
@@ -80,10 +81,10 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
 
               {/* 登录按钮 */}
               {loading ? (
-                <div className="w-6 h-6 sm:w-8 sm:h-8 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+                <div className="w-6 h-6 sm:w-8 sm:h-8 animate-spin rounded border-1 border-primary border-t-transparent"></div>
               ) : (
                 <Link href={`/${locale}/auth/login`}>
-                  <Button size="sm" className="btn-primary-black cursor-pointer text-xs sm:text-sm px-3 sm:px-4">
+                  <Button size="sm" className="btn-primary-black cursor-pointer text-xs sm:text-sm px-3 sm:px-4 py-1 rounded">
                     {t.nav.login}
                   </Button>
                 </Link>
