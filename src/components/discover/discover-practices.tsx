@@ -28,8 +28,6 @@ export function DiscoverPractices({ locale, t }: DiscoverPracticesProps) {
     fetchNextPage,
   } = usePractices('public');
 
-  const difficultyOptions = getDifficultyOptions(locale);
-
   // 过滤练习
   const filteredPractices = useMemo(() => {
     if (!practicesData?.pages) return [];
@@ -56,6 +54,7 @@ export function DiscoverPractices({ locale, t }: DiscoverPracticesProps) {
 
   // 获取难度标签
   const getDifficultyLabel = (difficulty: string) => {
+    const difficultyOptions = getDifficultyOptions(locale);
     const option = difficultyOptions.find(opt => opt.id === difficulty);
     return option?.label || difficulty;
   };
@@ -129,7 +128,7 @@ export function DiscoverPractices({ locale, t }: DiscoverPracticesProps) {
         <div className="animate-in fade-in-0 duration-300">
           <div className="space-y-4">
             {filteredPractices.map((practice: Practice) => {
-            
+
               return (
                 <div
                   key={practice.id}
@@ -140,7 +139,7 @@ export function DiscoverPractices({ locale, t }: DiscoverPracticesProps) {
                     <div className="flex-1">
                       {/* Creator and Date */}
                       <div className="text-sm text-gray-500 mb-2">
-                        <span className="font-medium">{t.discover.createdBy} {practice.child_name}</span>
+                        <span className="font-medium">{practice.child_name} 的练习</span>
                         <span className="ml-4">{formatDate(practice.created_at)}</span>
                       </div>
 
