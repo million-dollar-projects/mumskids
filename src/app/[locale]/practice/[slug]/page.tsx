@@ -73,7 +73,7 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
 
           if (!response.ok) {
             if (response.status === 404) {
-              setError('练习不存在或您没有访问权限');
+              setError('练习不存在');
               return;
             }
             throw new Error('Failed to fetch practice');
@@ -125,7 +125,7 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
       const targetCorrect = rewardCondition.targetCorrect || Math.max(1, Math.ceil(totalCount * 0.8));
       const maxTime = rewardCondition.maxTime || Math.max(1, Math.ceil(totalCount * 0.5));
       const result = correctCount >= targetCorrect && completionTimeMinutes <= maxTime;
-      
+
       console.log('普通模式检查:', {
         correctCount,
         targetCorrect,
@@ -133,7 +133,7 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
         maxTime,
         result
       });
-      
+
       return result;
     } else if (rewardCondition.mode === 'timed' || practice.test_mode === 'timed') {
       // 计时模式：需要达到最少正确题数且错误率不超过限制
@@ -141,7 +141,7 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
       const maxErrorRate = rewardCondition.maxErrorRate !== undefined ? rewardCondition.maxErrorRate : 20;
       const errorRate = totalCount > 0 ? ((totalCount - correctCount) / totalCount) * 100 : 0;
       const result = correctCount >= minCorrect && errorRate <= maxErrorRate;
-      
+
       console.log('计时模式检查:', {
         correctCount,
         minCorrect,
@@ -149,7 +149,7 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
         maxErrorRate,
         result
       });
-      
+
       return result;
     }
 
@@ -247,7 +247,7 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
 
     // 检查是否满足奖励条件
     const shouldShowReward = checkRewardCondition(finalCorrect, finalTotal, finalTime);
-    
+
     // 调试信息
     console.log('奖励条件检查:', {
       correctAnswers: finalCorrect,
@@ -287,7 +287,7 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
         if (practice?.test_mode === 'timed' && practice.time_limit) {
           const timeLimit = practice.time_limit * 60 * 1000; // 转换为毫秒
           if (elapsed >= timeLimit) {
-            endGame(correctAnswers, totalQuestions);
+            endGame();
           }
         }
       }, 100); // 每100ms更新一次，提供更流畅的显示
@@ -298,11 +298,7 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
         clearInterval(interval);
       }
     };
-  }, [gameActive, startTime, practice, endGame]);
-
-
-
-
+  }, [gameActive, startTime, practice, endGame, correctAnswers, totalQuestions]);
 
   const generateQuestion = (): Question => {
     if (!practice) {
@@ -524,7 +520,7 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
   const getAccuracy = () => {
     return totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
   };
- 
+
   // 获取当前主题
   const getCurrentTheme = (): Theme => {
     if (!practice?.selected_theme) return getDefaultTheme();
@@ -579,7 +575,7 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
         </div>
 
         <div className="relative z-10 max-w-md mx-auto pb-20 sm:pb-0">
-          
+
           <div className="flex items-center justify-center gap-2 mb-4 sm:mb-4">
             <Image src="/images/plus.png" alt="LittlePlus" width={32} height={32} className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />
             <p className={`text-xl sm:text-2xl md:text-3xl font-bold ${getThemeColors().text} tracking-wide`}>
@@ -701,8 +697,8 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
                           <Star className="w-4 h-4 mr-2" />
                           完成可获得奖励
                         </h4>
-                         {/* 奖励条件 */}
-                         <div className={`text-sm ${getThemeColors().text} bg-purple-500/2 px-1 py-1 mb-2 rounded ${getThemeColors().border}`}>
+                        {/* 奖励条件 */}
+                        <div className={`text-sm ${getThemeColors().text} bg-purple-500/2 px-1 py-1 mb-2 rounded ${getThemeColors().border}`}>
                           <div className="text-xs">
                             {practice.reward_condition ? (
                               practice.test_mode === 'normal' ? (
@@ -725,7 +721,7 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
                             const rewardEmoji = typeof reward === 'object' && reward !== null
                               ? (reward.emoji || '🎁')
                               : getRewardEmoji(rewardText);
-                            
+
                             return (
                               <Badge key={index} className={`${getThemeColors().accent} text-white flex items-center gap-1`}>
                                 <span>{rewardEmoji}</span>
@@ -739,7 +735,7 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
                             </Badge>
                           )}
                         </div>
-                    
+
                       </CardContent>
                     </Card>
                   )}
@@ -801,7 +797,7 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
                     ))}
                   </div>
 
-                 
+
                 </>
               )}
 
@@ -953,17 +949,17 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
               </CardContent>
             </Card>
           )}
-          
+
           {/* Next Button */}
           {showNextButton && !gameEnded && (
             <div className="text-center mt-4 w-full">
-                <Button
-                 onClick={nextQuestion}
-                 className={`${getThemeColors().button} w-full text-white font-bold py-2.5 sm:py-3 px-4 sm:px-6 rounded`}
-               >
-                 下一题
-                 <ChevronRight className="w-4 h-4 ml-0" />
-               </Button>
+              <Button
+                onClick={nextQuestion}
+                className={`${getThemeColors().button} w-full text-white font-bold py-2.5 sm:py-3 px-4 sm:px-6 rounded`}
+              >
+                下一题
+                <ChevronRight className="w-4 h-4 ml-0" />
+              </Button>
             </div>
           )}
         </div>

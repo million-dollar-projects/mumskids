@@ -26,16 +26,8 @@ export async function GET(
       throw error;
     }
 
-    // 获取当前用户信息
-    const { data: { user } } = await supabase.auth.getUser();
-
-    // 如果练习不是公开的，且不是创建者，则返回404
-    if (!data.is_public && (!user || user.id !== data.created_by)) {
-      return NextResponse.json(
-        { error: 'Practice not found' },
-        { status: 404 }
-      );
-    }
+    // 移除权限检查 - 任何人都可以通过链接访问练习
+    // 无论练习是否为私密，只要知道链接就可以访问
 
     return NextResponse.json(data);
   } catch (error) {
