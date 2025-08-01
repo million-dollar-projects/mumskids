@@ -57,10 +57,10 @@ export default function HomePage({ params }: PageProps) {
   // 未登录用户的着陆页
   return (
     <div className="min-h-screen landing-bg">
-      <Header locale={locale} variant="landing" />
+      <Header locale={locale} variant="landing" isFixed={true} />
 
       {/* 主要内容 */}
-      <main className="px-6">
+      <main className="px-6 pt-20">
         <div className="max-w-4xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[80vh]">
             {/* 左侧内容 */}

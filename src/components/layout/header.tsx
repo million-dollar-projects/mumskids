@@ -19,9 +19,23 @@ interface HeaderProps {
 export function Header({ locale, variant = 'authenticated', backgroundClass = 'bg-transparent', isFixed = false }: HeaderProps) {
   const { user, loading } = useAuth();
   const [showNotifications, setShowNotifications] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const notificationRef = useRef<HTMLDivElement>(null);
 
   const t = messages[locale as keyof typeof messages] || messages.zh;
+
+  // 监听滚动事件
+  useEffect(() => {
+    if (!isFixed) return;
+
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      setIsScrolled(scrollTop > 0);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isFixed]);
 
   // 点击外部关闭通知弹窗
   useEffect(() => {
@@ -43,36 +57,38 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
   // 着陆页头部
   if (variant === 'landing') {
     return (
-      <header className="py-4 sm:py-6 px-4 sm:px-0">
-        <div className="max-w-4xl mx-auto flex justify-between items-center">
-          <div className="text-xl sm:text-2xl font-bold text-primary-black">
-            {t.landing.brand}
-          </div>
-          <div className="flex items-center gap-2 sm:gap-4">
-            {/* 语言切换 */}
-            <div className="flex gap-1 sm:gap-2">
-              <Link href="/zh">
-                <Button variant="ghost" size="sm" className="text-tertiary-gray cursor-pointer text-xs sm:text-sm px-2 sm:px-3">
-                  中文
-                </Button>
-              </Link>
-              <Link href="/en">
-                <Button variant="ghost" size="sm" className="text-tertiary-gray cursor-pointer text-xs sm:text-sm px-2 sm:px-3">
-                  English
-                </Button>
-              </Link>
+      <header className={`transition-all duration-300 ${isFixed ? 'fixed top-0 left-0 right-0 z-50' : ''} ${isFixed && isScrolled ? 'bg-white/20 backdrop-blur-sm' : ''}`} style={isFixed ? { paddingTop: 'env(safe-area-inset-top)' } : {}}>
+        <div className="pt-6 pb-2 sm:py-2 px-4 sm:px-0">
+          <div className="max-w-4xl mx-auto flex justify-between items-center">
+            <div className="text-xl sm:text-2xl font-bold text-primary-black">
+              {t.landing.brand}
             </div>
+            <div className="flex items-center gap-2 sm:gap-4">
+              {/* 语言切换 */}
+              <div className="flex gap-1 sm:gap-2">
+                <Link href="/zh">
+                  <Button variant="ghost" size="sm" className="text-tertiary-gray cursor-pointer text-xs sm:text-sm px-2 sm:px-3">
+                    中文
+                  </Button>
+                </Link>
+                <Link href="/en">
+                  <Button variant="ghost" size="sm" className="text-tertiary-gray cursor-pointer text-xs sm:text-sm px-2 sm:px-3">
+                    English
+                  </Button>
+                </Link>
+              </div>
 
-            {/* 登录按钮 */}
-            {loading ? (
-              <div className="w-6 h-6 sm:w-8 sm:h-8 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
-            ) : (
-              <Link href={`/${locale}/auth/login`}>
-                <Button size="sm" className="btn-primary-black cursor-pointer text-xs sm:text-sm px-3 sm:px-4">
-                  {t.nav.login}
-                </Button>
-              </Link>
-            )}
+              {/* 登录按钮 */}
+              {loading ? (
+                <div className="w-6 h-6 sm:w-8 sm:h-8 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+              ) : (
+                <Link href={`/${locale}/auth/login`}>
+                  <Button size="sm" className="btn-primary-black cursor-pointer text-xs sm:text-sm px-3 sm:px-4">
+                    {t.nav.login}
+                  </Button>
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </header>
