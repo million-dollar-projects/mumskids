@@ -2,6 +2,7 @@
   "nav": {
     "home": "首页",
     "practice": "练习",
+    "discover": "发现",
     "create": "创建",
     "settings": "设置",
     "login": "登录",
@@ -39,6 +40,19 @@
     "addReward": "添加奖励",
     "start": "开始练习",
     "save": "保存"
+  },
+  "discover": {
+    "title": "发现练习",
+    "subtitle": "探索其他用户分享的精彩数学练习",
+    "noResults": "暂无公开练习",
+    "noResultsDesc": "目前还没有公开的练习，快去创建一个分享给大家吧！",
+    "searchPlaceholder": "搜索练习...",
+    "filterByDifficulty": "按难度筛选",
+    "allDifficulties": "全部难度",
+    "createdBy": "创建者",
+    "attempts": "已练习 {count} 次",
+    "bestScore": "最佳成绩: {score}%",
+    "averageScore": "平均成绩: {score}%"
   },
   "quiz": {
     "question": "第 {current} 题，共 {total} 题",

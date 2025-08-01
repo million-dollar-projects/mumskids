@@ -1,0 +1,50 @@
+'use client'
+
+import { useEffect, useState } from 'react';
+import { Header } from '@/components/layout/header';
+import { Footer } from '@/components/layout/footer';
+import { messages } from '@/i18n/messages';
+import { DiscoverPractices } from '@/components/discover/discover-practices';
+
+interface DiscoverPageProps {
+  params: Promise<{ locale: string }>;
+}
+
+export default function DiscoverPage({ params }: DiscoverPageProps) {
+  const [locale, setLocale] = useState('zh');
+
+  useEffect(() => {
+    const getLocale = async () => {
+      const resolvedParams = await params;
+      setLocale(resolvedParams.locale);
+    };
+    getLocale();
+  }, [params]);
+
+  const t = messages[locale as keyof typeof messages] || messages.zh;
+
+  return (
+    <div className="min-h-screen">
+      <Header locale={locale} />
+      
+      {/* Hero Section */}
+      <div className="py-16">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            {t.discover.title}
+          </h1>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            {t.discover.subtitle}
+          </p>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+        <DiscoverPractices locale={locale} t={t} />
+      </main>
+
+      <Footer locale={locale} />
+    </div>
+  );
+}

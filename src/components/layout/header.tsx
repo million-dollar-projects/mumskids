@@ -137,6 +137,13 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
 
         {/* Right section - positioned absolutely to the right */}
         <div className="absolute right-4 sm:right-6 lg:right-8 top-0 h-16 flex items-center space-x-1 sm:space-x-2">
+          <Link href={`/${locale}/discover`}>
+            <button className="text-gray-700 hover:text-gray-900 font-medium text-xs sm:text-sm cursor-pointer px-2 sm:px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
+              <span className="hidden sm:inline">发现</span>
+              <span className="sm:hidden">发现</span>
+            </button>
+          </Link>
+          
           <Link href={`/${locale}/practice/create`}>
             <button className="text-gray-700 hover:text-gray-900 font-medium text-xs sm:text-sm cursor-pointer px-2 sm:px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
               <span className="hidden sm:inline">创建练习</span>

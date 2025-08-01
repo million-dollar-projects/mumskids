@@ -4,6 +4,7 @@ export const messages = {
     "nav": {
       "home": "首页",
       "practice": "练习",
+      "discover": "发现",
       "create": "创建",
       "settings": "设置",
       "login": "登录",
@@ -116,12 +117,26 @@ export const messages = {
       "loading": "加载中...",
       "error": "出错了",
       "success": "成功"
+    },
+    "discover": {
+      "title": "发现练习",
+      "subtitle": "探索其他用户分享的精彩数学练习",
+      "noResults": "暂无公开练习",
+      "noResultsDesc": "目前还没有公开的练习，快去创建一个分享给大家吧！",
+      "searchPlaceholder": "搜索练习...",
+      "filterByDifficulty": "按难度筛选",
+      "allDifficulties": "全部难度",
+      "createdBy": "创建者",
+      "attempts": "已练习 {count} 次",
+      "bestScore": "最佳成绩: {score}%",
+      "averageScore": "平均成绩: {score}%"
     }
   },
   en: {
     "nav": {
       "home": "Home",
       "practice": "Practice",
+      "discover": "Discover",
       "create": "Create",
       "settings": "Settings",
       "login": "Login",
@@ -234,6 +249,19 @@ export const messages = {
       "loading": "Loading...",
       "error": "Error",
       "success": "Success"
+    },
+    "discover": {
+      "title": "Discover Practices",
+      "subtitle": "Explore amazing math practices shared by other users",
+      "noResults": "No public practices",
+      "noResultsDesc": "There are no public practices yet. Create one and share it with everyone!",
+      "searchPlaceholder": "Search practices...",
+      "filterByDifficulty": "Filter by difficulty",
+      "allDifficulties": "All difficulties",
+      "createdBy": "Created by",
+      "attempts": "Practiced {count} times",
+      "bestScore": "Best score: {score}%",
+      "averageScore": "Average score: {score}%"
     }
   }
 } as const; 

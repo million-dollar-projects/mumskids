@@ -2,6 +2,7 @@
   "nav": {
     "home": "Home",
     "practice": "Practice",
+    "discover": "Discover",
     "create": "Create",
     "settings": "Settings",
     "login": "Login",
@@ -39,6 +40,19 @@
     "addReward": "Add Reward",
     "start": "Start Practice",
     "save": "Save"
+  },
+  "discover": {
+    "title": "Discover Practices",
+    "subtitle": "Explore amazing math practices shared by other users",
+    "noResults": "No public practices",
+    "noResultsDesc": "There are no public practices yet. Create one and share it with everyone!",
+    "searchPlaceholder": "Search practices...",
+    "filterByDifficulty": "Filter by difficulty",
+    "allDifficulties": "All difficulties",
+    "createdBy": "Created by",
+    "attempts": "Practiced {count} times",
+    "bestScore": "Best score: {score}%",
+    "averageScore": "Average score: {score}%"
   },
   "quiz": {
     "question": "Question {current} of {total}",
