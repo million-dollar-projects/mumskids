@@ -1,11 +1,11 @@
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { slug } = await params;
 
   try {
@@ -43,7 +43,7 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { slug } = await params;
 
   try {
