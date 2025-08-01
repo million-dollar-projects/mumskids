@@ -11,8 +11,10 @@ import { Button } from '@/components/ui/button';
 import { PracticeDetailSheet } from './practice-detail-sheet';
 import { usePractices } from '@/lib/hooks/usePractices';
 import { useQueryClient } from '@tanstack/react-query';
+import { getDifficultyOptions } from '@/lib/practice-config';
+import { practiceService } from '@/lib/services/practice-service';
 
-import { Practice, Reward, RewardCondition } from '@/types/practice';
+import { Practice } from '@/types/practice';
 import { PaginatedResponse } from '@/types/pagination';
 
 interface PracticeDashboardProps {
@@ -97,32 +99,12 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
   // 处理删除练习
   const handleDeletePractice = async (practiceId: string) => {
     try {
-      // 找到要删除的练习
-      let practiceToDelete: Practice | undefined;
-      if (practicesData?.pages) {
-        for (const page of practicesData.pages) {
-          const found = (page as PaginatedResponse<Practice>)?.data?.find((p: Practice) => p.id === practiceId);
-          if (found) {
-            practiceToDelete = found;
-            break;
-          }
-        }
-      }
-      
-      if (!practiceToDelete) {
-        console.error('Practice not found');
-        return;
+      if (!user?.id) {
+        throw new Error('用户未登录');
       }
 
-      // 调用删除API
-      const response = await fetch(`/api/practices/${practiceToDelete.slug}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to delete practice');
-      }
+      // 使用练习服务删除练习
+      await practiceService.deletePractice(practiceId, user.id);
 
       // 通知 React Query 重新获取数据
       queryClient.invalidateQueries({ queryKey: ['practices'] });
@@ -137,13 +119,9 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
 
   // 获取难度标签
   const getDifficultyLabel = (difficulty: string) => {
-    const labels = {
-      'within10': '10以内',
-      'within20': '20以内',
-      'within50': '50以内',
-      'within100': '100以内'
-    };
-    return labels[difficulty as keyof typeof labels] || difficulty;
+    const difficultyOptions = getDifficultyOptions(locale);
+    const option = difficultyOptions.find(opt => opt.id === difficulty);
+    return option?.label || difficulty;
   };
 
   return (
