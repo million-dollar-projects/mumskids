@@ -60,8 +60,8 @@ export default function HomePage({ params }: PageProps) {
       <Header locale={locale} variant="landing" isFixed={true} />
 
       {/* 主要内容 */}
-      <main className="px-6 pt-20">
-        <div className="max-w-4xl mx-auto">
+      <main className=" pt-20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[60vh] sm:min-h-[80vh]">
             {/* 左侧内容 */}
             <div className="space-y-8">
