@@ -872,7 +872,7 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
 
                   {/* 奖励选择对话框 */}
                   <Dialog open={showRewardChoice} onOpenChange={setShowRewardChoice}>
-                    <DialogContent className={`max-w-sm mx-4 sm:mx-auto px-3 sm:px-4 border-0 sm:border-2 ${getThemeColors().border}`}>
+                    <DialogContent className={`max-w-sm mx-auto px-3 sm:px-4 border-0 sm:border-2 ${getThemeColors().border}`}>
                       <DialogHeader>
                         <DialogTitle className={`text-center ${getThemeColors().text} text-xl font-bold`}>
                           🎉 恭喜获得奖励！
@@ -880,11 +880,8 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
                       </DialogHeader>
                       <div className="py-4">
                         <div className="text-center mb-4">
-                          <p className={`text-base sm:text-lg ${getThemeColors().text} mb-2 font-bold`}>
-                            太棒了！
-                          </p>
                           <p className={`text-sm ${getThemeColors().text} mb-3 sm:mb-4 font-bold`}>
-                            赶快选择一个你喜欢的奖励吧！
+                            赶快选择一个你喜欢的吧！
                           </p>
                         </div>
                         <div className="grid gap-3 max-h-60 overflow-y-auto">
