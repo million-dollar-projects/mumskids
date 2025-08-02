@@ -22,6 +22,17 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
   const [isScrolled, setIsScrolled] = useState(false);
   const notificationRef = useRef<HTMLDivElement>(null);
 
+  // 统一的header样式类
+  const getHeaderClasses = () => {
+    return `transition-all duration-300 ${isFixed ? 'fixed top-0 left-0 right-0 z-50' : ''} ${isFixed && isScrolled ? 'bg-white/20 backdrop-blur-sm' : backgroundClass
+      }`;
+  };
+
+  // 统一的样式对象
+  const getHeaderStyle = () => {
+    return isFixed ? { paddingTop: 'env(safe-area-inset-top)' } : {};
+  };
+
   const t = messages[locale as keyof typeof messages] || messages.zh;
 
   // 监听滚动事件
@@ -57,7 +68,7 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
   // 着陆页头部
   if (variant === 'landing') {
     return (
-      <header className={`transition-all duration-300 ${isFixed ? 'fixed top-0 left-0 right-0 z-50' : ''} ${isFixed && isScrolled ? 'bg-white/20 backdrop-blur-sm' : ''}`} style={isFixed ? { paddingTop: 'env(safe-area-inset-top)' } : {}}>
+      <header className={getHeaderClasses()} style={getHeaderStyle()}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-12">
             <Link href={`/${locale}`} className="text-sm font-bold text-primary-black flex items-center space-x-2 hover:opacity-80 transition-opacity">
@@ -99,12 +110,34 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
   // 加载状态头部
   if (loading) {
     return (
-      <header className={`${backgroundClass} transition-colors duration-500 ${isFixed ? 'fixed top-0 left-0 right-0 z-50' : ''}`}>
+      <header className={getHeaderClasses()} style={getHeaderStyle()}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-12">
+            {/* 左侧品牌区域骨架 */}
             <div className="flex items-center space-x-2">
               <div className="w-5 h-5 bg-gray-200 rounded animate-pulse"></div>
               <div className="w-20 h-4 bg-gray-200 rounded animate-pulse"></div>
+            </div>
+
+            {/* 右侧导航和用户区域骨架 */}
+            <div className="flex items-center space-x-1 sm:space-x-2">
+              {/* 导航按钮骨架 */}
+              <div className="hidden sm:flex items-center space-x-2">
+                <div className="w-12 h-6 bg-gray-200 rounded animate-pulse"></div>
+                <div className="w-16 h-6 bg-gray-200 rounded animate-pulse"></div>
+              </div>
+
+              {/* 移动端导航按钮骨架 */}
+              <div className="flex sm:hidden items-center space-x-1">
+                <div className="w-8 h-6 bg-gray-200 rounded animate-pulse"></div>
+                <div className="w-8 h-6 bg-gray-200 rounded animate-pulse"></div>
+              </div>
+
+              {/* 通知按钮骨架 */}
+              <div className="w-8 h-8 bg-gray-200 rounded-md animate-pulse"></div>
+
+              {/* 用户头像骨架 */}
+              <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
             </div>
           </div>
         </div>
@@ -115,7 +148,7 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
   // 已认证用户头部
   if (user) {
     return (
-      <header className={`transition-all duration-300 ${isFixed ? 'fixed top-0 left-0 right-0 z-50' : ''} ${isFixed && isScrolled ? 'bg-white/20 backdrop-blur-sm' : ''}`} style={isFixed ? { paddingTop: 'env(safe-area-inset-top)' } : {}}>
+      <header className={getHeaderClasses()} style={getHeaderStyle()}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-12">
             {/* Left section with navigation */}

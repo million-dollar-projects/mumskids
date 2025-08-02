@@ -26,16 +26,15 @@ export default function DiscoverPage({ params }: DiscoverPageProps) {
   const t = messages[locale as keyof typeof messages] || messages.zh;
 
   return (
-    <div className="min-h-screen">
-
+    <div className="min-h-screen flex flex-col">
       <Header
         locale={locale}
         variant={user ? "authenticated" : "landing"}
         isFixed={true}
       />
 
-      {/* Hero Section */}
-      <div className="sm:py-16 pt-16">
+      {/* Hero Section - 固定高度防止布局偏移 */}
+      <div className="sm:py-16 pt-16 flex-shrink-0">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 sm:text-center mt-10 sm:mt-0">
           <h1 className="text-4xl font-bold text-gray-900 mb-4 hidden sm:block">
             {t.discover.title}
@@ -46,8 +45,8 @@ export default function DiscoverPage({ params }: DiscoverPageProps) {
         </div>
       </div>
 
-      {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+      {/* Main Content - 使用flex-1确保占满剩余空间 */}
+      <main className="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-2 w-full">
         <DiscoverPractices locale={locale} t={t} />
       </main>
 
