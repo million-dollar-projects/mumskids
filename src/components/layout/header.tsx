@@ -101,7 +101,7 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
     return (
       <header className={`${backgroundClass} transition-colors duration-500 ${isFixed ? 'fixed top-0 left-0 right-0 z-50' : ''}`}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-12">
             <div className="flex items-center space-x-2">
               <div className="w-5 h-5 bg-gray-200 rounded animate-pulse"></div>
               <div className="w-20 h-4 bg-gray-200 rounded animate-pulse"></div>
@@ -115,9 +115,9 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
   // 已认证用户头部
   if (user) {
     return (
-      <header className={`${backgroundClass} transition-colors duration-500 ${isFixed ? 'fixed top-0 left-0 right-0 z-50' : 'relative'}`}>
+      <header className={`transition-all duration-300 ${isFixed ? 'fixed top-0 left-0 right-0 z-50' : ''} ${isFixed && isScrolled ? 'bg-white/20 backdrop-blur-sm' : ''}`} style={isFixed ? { paddingTop: 'env(safe-area-inset-top)' } : {}}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-12">
             {/* Left section with navigation */}
             <nav className="flex items-center">
               <Link href={`/${locale}`} className="flex items-center space-x-2 text-sm font-bold text-gray-900 cursor-pointer">
