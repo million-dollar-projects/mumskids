@@ -24,7 +24,7 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
 
   // 统一的header样式类
   const getHeaderClasses = () => {
-    return `transition-all duration-300 ${isFixed ? 'fixed top-0 left-0 right-0 z-50' : ''} ${isFixed && isScrolled ? 'bg-white/20 backdrop-blur-sm' : backgroundClass
+    return `transition-all duration-300 ${isFixed ? 'fixed top-0 left-0 right-0 z-50' : 'relative'} ${isFixed && isScrolled ? 'bg-white/20 backdrop-blur-sm' : backgroundClass
       }`;
   };
 
@@ -150,7 +150,7 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
     return (
       <header className={getHeaderClasses()} style={getHeaderStyle()}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-12">
+          <div className="flex items-center h-12">
             {/* Left section with navigation */}
             <nav className="flex items-center">
               <Link href={`/${locale}`} className="flex items-center space-x-2 text-sm font-bold text-gray-900 cursor-pointer">
@@ -164,9 +164,11 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
                 <span>LittlePlus</span>
               </Link>
             </nav>
+          </div>
+        </div>
 
-            {/* Right section */}
-            <div className="flex items-center space-x-1 sm:space-x-2">
+        {/* Right section - positioned absolutely to the browser window edge */}
+        <div className="absolute right-4 sm:right-6 lg:right-8 top-1/2 transform -translate-y-1/2 flex items-center space-x-1 sm:space-x-2">
               <Link href={`/${locale}/discover`}>
                 <button className="text-gray-700 hover:text-gray-900 font-medium text-xs sm:text-sm cursor-pointer px-2 sm:px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
                   <span className="hidden sm:inline">发现</span>
@@ -220,9 +222,7 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
                 )}
               </div>
 
-              <UserAvatarDropdown user={user} />
-            </div>
-          </div>
+              {user && <UserAvatarDropdown user={user} />}
         </div>
       </header>
     );
