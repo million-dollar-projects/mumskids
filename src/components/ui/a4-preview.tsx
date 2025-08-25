@@ -12,6 +12,7 @@ interface A4Settings {
     horizontal: number; // 水平间距 (px)
     vertical: number;   // 垂直间距 (px)
   };
+  showParentMessage: boolean; // 是否显示家长寄语
 }
 
 interface Question {
@@ -224,8 +225,25 @@ export function A4Preview({ settings, isGenerating }: A4PreviewProps) {
             )}
           </div>
 
-          {/* 底部信息 */}
-          <div className="mt-8 print:mt-6 text-center text-sm print:text-xs text-gray-500">
+          {/* 家长寄语 */}
+          {settings.showParentMessage && (
+            <div className="mt-6 print:mt-4">
+              <div className="text-left text-sm print:text-xs text-gray-700">
+                <h3 className="font-medium mb-3">家长寄语：</h3>
+                <div 
+                  className="border-2 border-dashed border-gray-300 rounded-lg p-4 min-h-[80px] print:min-h-[60px]"
+                  style={{
+                    background: 'transparent'
+                  }}
+                >
+                  {/* 空白区域，用于手写家长寄语 */}
+                </div>
+              </div>
+            </div>
+          )}
+
+           {/* 底部信息 */}
+           <div className="mt-8 print:mt-6 text-center text-sm print:text-xs text-gray-500">
             <div className="border-t border-gray-200 pt-4">
               <p>LittlePlus - 让数学学习更有趣</p>
               <p className="mt-1">

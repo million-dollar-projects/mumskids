@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
+import { Switch } from '@/components/ui/switch';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { messages } from '@/i18n/messages';
@@ -33,6 +34,7 @@ interface A4Settings {
     horizontal: number; // 水平间距 (px)
     vertical: number;   // 垂直间距 (px)
   };
+  showParentMessage: boolean; // 是否显示家长寄语
 }
 
 export default function CreateA4Page({ params }: CreateA4Props) {
@@ -50,7 +52,8 @@ export default function CreateA4Page({ params }: CreateA4Props) {
     spacing: {
       horizontal: 16, // 默认16px水平间距
       vertical: 24    // 默认24px垂直间距
-    }
+    },
+    showParentMessage: false // 默认不显示家长寄语
   });
 
   useEffect(() => {
@@ -70,7 +73,7 @@ export default function CreateA4Page({ params }: CreateA4Props) {
   //   }
   // }, [user, loading, router, locale]);
 
-  const handleSettingChange = (field: keyof A4Settings, value: string | number | { horizontal: number; vertical: number }) => {
+  const handleSettingChange = (field: keyof A4Settings, value: string | number | boolean | { horizontal: number; vertical: number }) => {
     setSettings(prev => ({
       ...prev,
       [field]: value
@@ -328,6 +331,22 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                     </span>
                   </div>
                 </div>
+              </div>
+
+              <Separator />
+
+              {/* 家长寄语 */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm font-medium text-gray-700">显示家长寄语</Label>
+                  <Switch
+                    checked={settings.showParentMessage}
+                    onCheckedChange={(checked) => handleSettingChange('showParentMessage', checked)}
+                  />
+                </div>
+                <p className="text-xs text-gray-500">
+                  开启后将在页面底部显示家长寄语填写区域
+                </p>
               </div>
             </div>
           </div>
