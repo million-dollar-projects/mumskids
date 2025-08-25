@@ -313,38 +313,48 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
 
     // 根据难度设置数字范围
     let maxNum = 10;
+    let maxResult = 10;
     switch (practice.difficulty) {
       case 'within10':
         maxNum = 10;
+        maxResult = 10;
         break;
       case 'within20':
         maxNum = 20;
+        maxResult = 20;
         break;
       case 'within50':
         maxNum = 50;
+        maxResult = 50;
         break;
       case 'within100':
         maxNum = 100;
+        maxResult = 100;
         break;
     }
 
-    const num1 = Math.floor(Math.random() * maxNum) + 1;
-    const num2 = Math.floor(Math.random() * maxNum) + 1;
-
     let question: string, correctAnswer: number;
     let operation: string;
+    let num1: number, num2: number;
 
     // 根据计算类型选择运算
     switch (practice.calculation_type) {
       case 'add':
         operation = '+';
+        // 确保加法结果不超过范围
+        do {
+          num1 = Math.floor(Math.random() * maxNum) + 1;
+          num2 = Math.floor(Math.random() * maxNum) + 1;
+        } while (num1 + num2 > maxResult);
         question = `${num1} + ${num2}`;
         correctAnswer = num1 + num2;
         break;
       case 'sub':
         operation = '-';
-        const larger = Math.max(num1, num2);
-        const smaller = Math.min(num1, num2);
+        const larger = Math.floor(Math.random() * maxNum) + 1;
+        const smaller = Math.floor(Math.random() * larger) + 1;
+        num1 = larger;
+        num2 = smaller;
         question = `${larger} - ${smaller}`;
         correctAnswer = larger - smaller;
         break;
@@ -353,11 +363,18 @@ export default function PracticeDetailPage({ params }: PracticeDetailProps) {
         const operations = ['+', '-'];
         operation = operations[Math.floor(Math.random() * operations.length)];
         if (operation === '+') {
+          // 确保加法结果不超过范围
+          do {
+            num1 = Math.floor(Math.random() * maxNum) + 1;
+            num2 = Math.floor(Math.random() * maxNum) + 1;
+          } while (num1 + num2 > maxResult);
           question = `${num1} + ${num2}`;
           correctAnswer = num1 + num2;
         } else {
-          const larger = Math.max(num1, num2);
-          const smaller = Math.min(num1, num2);
+          const larger = Math.floor(Math.random() * maxNum) + 1;
+          const smaller = Math.floor(Math.random() * larger) + 1;
+          num1 = larger;
+          num2 = smaller;
           question = `${larger} - ${smaller}`;
           correctAnswer = larger - smaller;
         }

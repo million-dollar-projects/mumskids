@@ -183,6 +183,13 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
                 </button>
               </Link>
 
+              <Link href={`/${locale}/practice/a4/create`}>
+                <button className="text-gray-700 hover:text-gray-900 font-medium text-xs sm:text-sm cursor-pointer px-2 sm:px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
+                  <span className="hidden sm:inline">A4 打印</span>
+                  <span className="sm:hidden">A4</span>
+                </button>
+              </Link>
+
               <div className="relative" ref={notificationRef}>
                 <button
                   onClick={() => setShowNotifications(!showNotifications)}
