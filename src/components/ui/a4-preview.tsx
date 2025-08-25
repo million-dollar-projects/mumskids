@@ -86,11 +86,11 @@ export function A4Preview({ settings, isGenerating }: A4PreviewProps) {
     return questions;
   };
 
-  // 当设置改变时重新生成题目
+  // 只有当影响题目内容的设置改变时才重新生成题目
   useEffect(() => {
     const newQuestions = generateQuestions(settings);
     setQuestions(newQuestions);
-  }, [settings]);
+  }, [settings.difficulty, settings.calculationType, settings.questionCount]);
 
   // 当isGenerating变化时重新生成题目
   useEffect(() => {
@@ -102,7 +102,7 @@ export function A4Preview({ settings, isGenerating }: A4PreviewProps) {
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [isGenerating, settings]);
+  }, [isGenerating, settings.difficulty, settings.calculationType, settings.questionCount]);
 
   // 计算每行显示的题目数量（根据难度调整）
   const getColumnsPerRow = (): number => {
