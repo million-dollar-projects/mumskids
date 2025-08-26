@@ -46,8 +46,8 @@ export default function CreateA4Page({ params }: CreateA4Props) {
     calculationType: 'add',
     questionCount: 20,
     spacing: {
-      horizontal: 400, // 默认16px水平间距
-      vertical: 50    // 默认24px垂直间距
+      horizontal: 150, // 默认150px水平间距，对应3列布局
+      vertical: 50    // 默认50px垂直间距
     },
     showParentMessage: false // 默认不显示家长寄语
   });
@@ -304,9 +304,9 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                       <div className="flex items-center space-x-3">
                         <Input
                           type="range"
-                          min="10"
-                          max="400"
-                          step="8"
+                          min="20"
+                          max="300"
+                          step="10"
                           value={settings.spacing.horizontal}
                           onChange={(e) => handleSettingChange('spacing', {
                             ...settings.spacing,

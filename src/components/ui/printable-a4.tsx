@@ -296,7 +296,17 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
         <div style={{ 
           flex: 1,
           display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
+          gridTemplateColumns: (() => {
+            // 根据水平间距动态调整列数
+            // 间距越小，列数越多
+            if (settings.spacing.horizontal <= 60) {
+              return 'repeat(4, 1fr)'; // 4列：间距 20-60
+            } else if (settings.spacing.horizontal <= 120) {
+              return 'repeat(3, 1fr)'; // 3列：间距 70-120  
+            } else {
+              return 'repeat(2, 1fr)'; // 2列：间距 130-300
+            }
+          })(),
           gap: `${Math.max(settings.spacing.vertical * 0.8, 8)}px ${Math.max(settings.spacing.horizontal * 0.8, 12)}px`,
           alignContent: 'flex-start'
         }}>
