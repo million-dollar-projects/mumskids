@@ -304,9 +304,9 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                       <div className="flex items-center space-x-3">
                         <Input
                           type="range"
-                          min="8"
+                          min="10"
                           max="400"
-                          step="10"
+                          step="8"
                           value={settings.spacing.horizontal}
                           onChange={(e) => handleSettingChange('spacing', {
                             ...settings.spacing,
@@ -327,7 +327,7 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                         <Input
                           type="range"
                           min="2"
-                          max="48"
+                          max="98"
                           step="2"
                           value={settings.spacing.vertical}
                           onChange={(e) => handleSettingChange('spacing', {

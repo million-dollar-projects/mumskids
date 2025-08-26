@@ -220,19 +220,12 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
         {/* 家长寄语 */}
         {settings.showParentMessage && (
           <div style={{ marginTop: '10mm' }}>
-            <h3 style={{ 
-              fontSize: '13px', 
-              fontWeight: '500', 
-              color: '#666',
-              margin: '0 0 5mm 0'
-            }}>
-              家长寄语：
-            </h3>
             <div style={{
               border: '2px dashed #ccc',
               borderRadius: '6px',
-              height: '30px',
-              backgroundColor: 'transparent'
+              height: '120px',
+              backgroundColor: 'transparent',
+              padding: '8px'
             }}></div>
           </div>
         )}
