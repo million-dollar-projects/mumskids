@@ -89,7 +89,7 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
         style={{
           width: '210mm',
           height: '297mm',
-          padding: '20mm',
+          padding: '15mm',
           margin: '0 auto',
           backgroundColor: 'white',
           fontFamily: '"PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
@@ -97,16 +97,34 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
           lineHeight: '1.5',
           display: 'flex',
           flexDirection: 'column',
-          boxSizing: 'border-box'
+          boxSizing: 'border-box',
+          border: '1px solid #e5e7eb',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+          position: 'relative'
         }}
       >
+        {/* A4标识 */}
+        <div style={{
+          position: 'absolute',
+          top: '-25px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          backgroundColor: '#f3f4f6',
+          color: '#6b7280',
+          padding: '4px 8px',
+          borderRadius: '4px',
+          fontSize: '12px',
+          fontWeight: '500'
+        }}>
+          A4 (210mm × 297mm)
+        </div>
         {/* 页面标题 */}
-        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '15mm' }}>
           <h1 style={{ 
-            fontSize: '24px', 
+            fontSize: '20px', 
             fontWeight: 'bold', 
             color: '#333',
-            margin: '0 0 15px 0'
+            margin: '0 0 10mm 0'
           }}>
             {settings.title}
           </h1>
@@ -115,14 +133,14 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
           <div style={{ 
             display: 'grid', 
             gridTemplateColumns: '1fr 1fr 1fr 1fr', 
-            gap: '15px',
-            fontSize: '14px',
+            gap: '10mm',
+            fontSize: '13px',
             color: '#666'
           }}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <span>姓名：</span>
+              <span style={{fontSize: '14px', fontWeight: 'bold'}}>姓名：</span>
               <span style={{ 
-                borderBottom: '2px solid #333', 
+                borderBottom: '1px solid #333', 
                 flex: 1, 
                 height: '24px',
                 display: 'flex',
@@ -136,27 +154,27 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
               </span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <span>日期：</span>
+              <span style={{fontSize: '14px', fontWeight: 'bold'}}>日期：</span>
               <span style={{ 
-                borderBottom: '2px solid #333', 
+                borderBottom: '1px solid #333', 
                 flex: 1, 
                 height: '24px',
                 marginLeft: '8px'
               }}></span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <span>用时：</span>
+              <span style={{fontSize: '14px', fontWeight: 'bold'}}>用时：</span>
               <span style={{ 
-                borderBottom: '2px solid #333', 
+                borderBottom: '1px solid #333', 
                 flex: 1, 
                 height: '24px',
                 marginLeft: '8px'
               }}></span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <span>得分：</span>
+              <span style={{fontSize: '14px', fontWeight: 'bold'}}>得分：</span>
               <span style={{ 
-                borderBottom: '2px solid #333', 
+                borderBottom: '1px solid #333', 
                 flex: 1, 
                 height: '24px',
                 marginLeft: '8px'
@@ -172,18 +190,19 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
           flexWrap: 'wrap',
           justifyContent: 'flex-start',
           alignContent: 'flex-start',
-          gap: `${settings.spacing.vertical}px ${settings.spacing.horizontal}px`
+          gap: `${Math.max(settings.spacing.vertical * 0.8, 8)}px ${Math.max(settings.spacing.horizontal * 0.8, 12)}px`
         }}>
           {questions.map((question) => (
             <div
               key={question.id}
               style={{
-                minWidth: '80px',
-                maxWidth: '120px',
+                minWidth: '60px',
+                maxWidth: '90px',
                 textAlign: 'center',
-                fontSize: '18px',
+                fontSize: '16px',
                 fontWeight: '600',
-                color: '#333'
+                color: '#333',
+                lineHeight: '1.4'
               }}
             >
               {question.expression}
@@ -193,19 +212,19 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
 
         {/* 家长寄语 */}
         {settings.showParentMessage && (
-          <div style={{ marginTop: '20px' }}>
+          <div style={{ marginTop: '10mm' }}>
             <h3 style={{ 
-              fontSize: '14px', 
+              fontSize: '13px', 
               fontWeight: '500', 
               color: '#666',
-              margin: '0 0 10px 0'
+              margin: '0 0 5mm 0'
             }}>
               家长寄语：
             </h3>
             <div style={{
               border: '2px dashed #ccc',
-              borderRadius: '8px',
-              height: '40px',
+              borderRadius: '6px',
+              height: '30px',
               backgroundColor: 'transparent'
             }}></div>
           </div>
@@ -213,14 +232,14 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
 
         {/* 页面底部 */}
         <div style={{ 
-          marginTop: '20px',
+          marginTop: '10mm',
           textAlign: 'center',
-          fontSize: '12px',
+          fontSize: '11px',
           color: '#999',
           borderTop: '1px solid #eee',
-          paddingTop: '10px'
+          paddingTop: '5mm'
         }}>
-          <p style={{ margin: '0 0 5px 0' }}>LittlePlus - 让数学学习更有趣</p>
+          <p style={{ margin: '0 0 3px 0' }}>LittlePlus - 让数学学习更有趣</p>
           <p style={{ margin: '0' }}>
             难度：{settings.difficulty === 'within10' ? '10以内' :
               settings.difficulty === 'within20' ? '20以内' :
