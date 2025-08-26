@@ -1,20 +1,17 @@
 'use client'
 
-import { useEffect, useState } from 'react';
-// import { useRouter } from 'next/navigation'; // A4页面无需路由跳转
+import { useEffect, useState, useRef } from 'react';
+import { useReactToPrint } from 'react-to-print';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
-// import { messages } from '@/i18n/messages'; // A4页面暂时不需要国际化
-// import { useAuth } from '@/lib/auth/context'; // A4页面无需登录验证
 import { Calculator, Target, FileText, Printer, Move } from 'lucide-react';
-import { A4Preview } from '@/components/ui/a4-preview';
+import { PrintableA4 } from '@/components/ui/printable-a4';
 import {
   difficultyOptions,
   calculationTypeOptions
@@ -38,11 +35,9 @@ interface A4Settings {
 }
 
 export default function CreateA4Page({ params }: CreateA4Props) {
-  // A4页面无需登录验证，移除未使用的变量
-  // const { user, loading } = useAuth();
-  // const router = useRouter();
   const [locale, setLocale] = useState('zh');
   const [isGenerating, setIsGenerating] = useState(false);
+  const printRef = useRef<HTMLDivElement>(null);
 
   const [settings, setSettings] = useState<A4Settings>({
     title: '数学练习',
@@ -82,9 +77,22 @@ export default function CreateA4Page({ params }: CreateA4Props) {
     }));
   };
 
-  const handlePrint = () => {
-    window.print();
-  };
+  const handlePrint = useReactToPrint({
+    contentRef: printRef,
+    documentTitle: `${settings.title}-${settings.childName || '练习'}`,
+    pageStyle: `
+      @page {
+        size: A4;
+        margin: 0;
+      }
+      @media print {
+        body {
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+      }
+    `
+  });
 
   const handleGenerate = () => {
     setIsGenerating(true);
@@ -160,10 +168,9 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                 </div>
               </div>
 
-              <A4Preview
-                settings={settings}
-                isGenerating={isGenerating}
-              />
+              <div style={{ transform: 'scale(0.6)', transformOrigin: 'top center' }}>
+                <PrintableA4 ref={printRef} settings={settings} />
+              </div>
             </div>
           </div>
 
@@ -362,14 +369,7 @@ export default function CreateA4Page({ params }: CreateA4Props) {
         </div>
       </div>
 
-      {/* 打印专用区域 */}
-      <div className="hidden print:block print-only">
-        <A4Preview
-          settings={settings}
-          isGenerating={isGenerating}
-          printPreviewMode={true}
-        />
-      </div>
+
     </>
   );
 }
