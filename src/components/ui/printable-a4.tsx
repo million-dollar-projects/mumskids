@@ -71,9 +71,19 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
           }
         }
 
+        // 格式化数字，确保对齐，使用不间断空格
+        const formatNumber = (num: number): string => {
+          if (maxNum >= 100) {
+            return num.toString().padStart(2, '\u00A0');
+          } else if (maxNum >= 10) {
+            return num.toString().padStart(2, '\u00A0');
+          }
+          return num.toString();
+        };
+
         questions.push({
           id: i + 1,
-          expression: `${num1} ${operator} ${num2} =`,
+          expression: `${formatNumber(num1)} ${operator} ${formatNumber(num2)} =`,
           answer
         });
       }
@@ -196,13 +206,15 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
             <div
               key={question.id}
               style={{
-                minWidth: '60px',
-                maxWidth: '90px',
-                textAlign: 'center',
+                minWidth: '85px',
+                maxWidth: '100px',
+                textAlign: 'left',
                 fontSize: '16px',
                 fontWeight: '600',
                 color: '#333',
-                lineHeight: '1.4'
+                lineHeight: '1.4',
+                fontFamily: '"Monaco", "Menlo", "Ubuntu Mono", monospace',
+                whiteSpace: 'pre'
               }}
             >
               {question.expression}
