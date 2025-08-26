@@ -32,49 +32,157 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
       const { difficulty, calculationType, questionCount } = settings;
       const questions: Question[] = [];
 
-      const getMaxNumber = (difficulty: string): number => {
+      // 根据难度等级设置数字范围和最小值
+      const getDifficultyConfig = (difficulty: string) => {
         switch (difficulty) {
-          case 'within10': return 10;
-          case 'within20': return 20;
-          case 'within50': return 50;
-          case 'within100': return 100;
-          default: return 10;
+          case 'within10':
+            return {
+              maxNum: 10,
+              minNum1: 2,    // 第一个数字最小值
+              minNum2: 2,    // 第二个数字最小值
+              minSum: 4,     // 加法结果最小值
+              minDifference: 1, // 减法结果最小值
+              complexityThreshold: 0.3 // 复杂度阈值
+            };
+          case 'within20':
+            return {
+              maxNum: 20,
+              minNum1: 3,
+              minNum2: 3,
+              minSum: 8,
+              minDifference: 2,
+              complexityThreshold: 0.4
+            };
+          case 'within50':
+            return {
+              maxNum: 50,
+              minNum1: 8,
+              minNum2: 5,
+              minSum: 15,
+              minDifference: 3,
+              complexityThreshold: 0.5
+            };
+          case 'within100':
+            return {
+              maxNum: 100,
+              minNum1: 15,
+              minNum2: 10,
+              minSum: 30,
+              minDifference: 5,
+              complexityThreshold: 0.6
+            };
+          default:
+            return {
+              maxNum: 10,
+              minNum1: 2,
+              minNum2: 2,
+              minSum: 4,
+              minDifference: 1,
+              complexityThreshold: 0.3
+            };
         }
       };
 
-      const maxNum = getMaxNumber(difficulty);
+      const config = getDifficultyConfig(difficulty);
 
+      // 检查题目复杂度是否足够
+      const isQuestionComplex = (num1: number, num2: number, operator: string, answer: number): boolean => {
+        const maxPossible = config.maxNum;
+        const complexity = (num1 + num2) / (maxPossible * 2);
+        
+        // 避免过于简单的组合
+        if (operator === '+') {
+          return complexity >= config.complexityThreshold && answer >= config.minSum;
+        } else if (operator === '-') {
+          return complexity >= config.complexityThreshold && answer >= config.minDifference && num1 >= config.minNum1;
+        }
+        return false;
+      };
+
+      // 生成单个题目
+      const generateSingleQuestion = (type: 'add' | 'sub'): { num1: number; num2: number; operator: string; answer: number } => {
+        let attempts = 0;
+        const maxAttempts = 50;
+        
+        while (attempts < maxAttempts) {
+          let num1: number, num2: number, operator: string, answer: number;
+          
+          if (type === 'add') {
+            // 加法：确保结果不超过maxNum，且具有一定复杂度
+            const minSum = Math.max(config.minSum, config.minNum1 + config.minNum2);
+            const maxSum = config.maxNum;
+            
+            // 先确定结果范围
+            answer = Math.floor(Math.random() * (maxSum - minSum + 1)) + minSum;
+            
+            // 基于结果生成两个加数
+            const minFirst = Math.max(config.minNum1, Math.ceil(answer * 0.3));
+            const maxFirst = Math.min(answer - config.minNum2, Math.floor(answer * 0.7));
+            
+            if (maxFirst >= minFirst) {
+              num1 = Math.floor(Math.random() * (maxFirst - minFirst + 1)) + minFirst;
+              num2 = answer - num1;
+              operator = '+';
+              
+              if (num2 >= config.minNum2 && isQuestionComplex(num1, num2, operator, answer)) {
+                return { num1, num2, operator, answer };
+              }
+            }
+          } else {
+            // 减法：确保结果为正数，且具有一定复杂度
+            const minResult = config.minDifference;
+            const maxResult = Math.floor(config.maxNum * 0.6); // 减法结果不要太大
+            
+            answer = Math.floor(Math.random() * (maxResult - minResult + 1)) + minResult;
+            
+            // 基于结果生成被减数和减数
+            const minMinuend = Math.max(config.minNum1, answer + config.minNum2);
+            const maxMinuend = Math.min(config.maxNum, answer + Math.floor(config.maxNum * 0.4));
+            
+            if (maxMinuend >= minMinuend) {
+              num1 = Math.floor(Math.random() * (maxMinuend - minMinuend + 1)) + minMinuend;
+              num2 = num1 - answer;
+              operator = '-';
+              
+              if (num2 >= config.minNum2 && isQuestionComplex(num1, num2, operator, answer)) {
+                return { num1, num2, operator, answer };
+              }
+            }
+          }
+          
+          attempts++;
+        }
+        
+        // 如果无法生成复杂题目，使用基础逻辑但确保最小复杂度
+        if (type === 'add') {
+          const num1 = Math.floor(Math.random() * (config.maxNum - config.minNum1)) + config.minNum1;
+          const num2 = Math.floor(Math.random() * (config.maxNum - num1 - config.minNum2)) + config.minNum2;
+          return { num1, num2, operator: '+', answer: num1 + num2 };
+        } else {
+          const num1 = Math.floor(Math.random() * (config.maxNum - config.minNum1)) + config.minNum1;
+          const num2 = Math.floor(Math.random() * (num1 - config.minDifference - config.minNum2)) + config.minNum2;
+          return { num1, num2, operator: '-', answer: num1 - num2 };
+        }
+      };
+
+      // 生成所有题目
       for (let i = 0; i < questionCount; i++) {
-        let num1: number, num2: number, operator: string, answer: number;
+        let questionData: { num1: number; num2: number; operator: string; answer: number };
 
         if (calculationType === 'add') {
-          num1 = Math.floor(Math.random() * maxNum) + 1;
-          num2 = Math.floor(Math.random() * (maxNum - num1)) + 1;
-          operator = '+';
-          answer = num1 + num2;
+          questionData = generateSingleQuestion('add');
         } else if (calculationType === 'sub') {
-          num1 = Math.floor(Math.random() * maxNum) + 1;
-          num2 = Math.floor(Math.random() * num1) + 1;
-          operator = '-';
-          answer = num1 - num2;
+          questionData = generateSingleQuestion('sub');
         } else {
-          if (Math.random() > 0.5) {
-            num1 = Math.floor(Math.random() * maxNum) + 1;
-            num2 = Math.floor(Math.random() * (maxNum - num1)) + 1;
-            operator = '+';
-            answer = num1 + num2;
-          } else {
-            num1 = Math.floor(Math.random() * maxNum) + 1;
-            num2 = Math.floor(Math.random() * num1) + 1;
-            operator = '-';
-            answer = num1 - num2;
-          }
+          // 加减混合：确保两种类型的题目都有
+          const isAddition = Math.random() > 0.5;
+          questionData = generateSingleQuestion(isAddition ? 'add' : 'sub');
         }
 
         questions.push({
           id: i + 1,
-          expression: `${num1} ${operator} ${num2} =`,
-          answer
+          expression: `${questionData.num1} ${questionData.operator} ${questionData.num2} =`,
+          answer: questionData.answer
         });
       }
 
