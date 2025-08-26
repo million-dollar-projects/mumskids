@@ -71,19 +71,9 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
           }
         }
 
-        // 格式化数字，确保对齐，使用不间断空格
-        const formatNumber = (num: number): string => {
-          if (maxNum >= 100) {
-            return num.toString().padStart(2, '\u00A0');
-          } else if (maxNum >= 10) {
-            return num.toString().padStart(2, '\u00A0');
-          }
-          return num.toString();
-        };
-
         questions.push({
           id: i + 1,
-          expression: `${formatNumber(num1)} ${operator} ${formatNumber(num2)} =`,
+          expression: `${num1} ${operator} ${num2} =`,
           answer
         });
       }
@@ -102,7 +92,7 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
           padding: '15mm',
           margin: '0 auto',
           backgroundColor: 'white',
-          fontFamily: '"PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
+          fontFamily: '"Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", "Helvetica Neue", Arial, sans-serif',
           fontSize: '14px',
           lineHeight: '1.5',
           display: 'flex',
@@ -128,6 +118,7 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
         }}>
           A4 (210mm × 297mm)
         </div>
+        
         {/* 页面标题 */}
         <div style={{ textAlign: 'center', marginBottom: '15mm' }}>
           <h1 style={{ 
@@ -148,7 +139,7 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
             color: '#666'
           }}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <span style={{fontSize: '14px', fontWeight: 'bold'}}>姓名：</span>
+              <span style={{fontSize: '14px', fontWeight: 'bold', minWidth: '35px'}}>姓名：</span>
               <span style={{ 
                 borderBottom: '1px solid #333', 
                 flex: 1, 
@@ -164,7 +155,7 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
               </span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <span style={{fontSize: '14px', fontWeight: 'bold'}}>日期：</span>
+              <span style={{fontSize: '14px', fontWeight: 'bold', minWidth: '35px'}}>日期：</span>
               <span style={{ 
                 borderBottom: '1px solid #333', 
                 flex: 1, 
@@ -173,7 +164,7 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
               }}></span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <span style={{fontSize: '14px', fontWeight: 'bold'}}>用时：</span>
+              <span style={{fontSize: '14px', fontWeight: 'bold', minWidth: '35px'}}>用时：</span>
               <span style={{ 
                 borderBottom: '1px solid #333', 
                 flex: 1, 
@@ -182,7 +173,7 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
               }}></span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <span style={{fontSize: '14px', fontWeight: 'bold'}}>得分：</span>
+              <span style={{fontSize: '14px', fontWeight: 'bold', minWidth: '35px'}}>得分：</span>
               <span style={{ 
                 borderBottom: '1px solid #333', 
                 flex: 1, 
@@ -196,28 +187,32 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
         {/* 题目区域 */}
         <div style={{ 
           flex: 1,
-          display: 'flex',
-          flexWrap: 'wrap',
-          justifyContent: 'flex-start',
-          alignContent: 'flex-start',
-          gap: `${Math.max(settings.spacing.vertical * 0.8, 8)}px ${Math.max(settings.spacing.horizontal * 0.8, 12)}px`
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: `${Math.max(settings.spacing.vertical * 0.8, 8)}px ${Math.max(settings.spacing.horizontal * 0.8, 12)}px`,
+          alignContent: 'flex-start'
         }}>
           {questions.map((question) => (
             <div
               key={question.id}
               style={{
-                minWidth: '85px',
-                maxWidth: '100px',
-                textAlign: 'left',
+                display: 'flex',
+                alignItems: 'center',
                 fontSize: '16px',
                 fontWeight: '600',
                 color: '#333',
                 lineHeight: '1.4',
-                fontFamily: '"Monaco", "Menlo", "Ubuntu Mono", monospace',
-                whiteSpace: 'pre'
+                fontFamily: '"Consolas", "Monaco", "Menlo", "Ubuntu Mono", "Courier New", monospace',
+                minHeight: '24px'
               }}
             >
-              {question.expression}
+              <span style={{ 
+                display: 'inline-block',
+                minWidth: '80px',
+                textAlign: 'left'
+              }}>
+                {question.expression}
+              </span>
             </div>
           ))}
         </div>
