@@ -46,8 +46,8 @@ export default function CreateA4Page({ params }: CreateA4Props) {
     calculationType: 'add',
     questionCount: 20,
     spacing: {
-      horizontal: 16, // 默认16px水平间距
-      vertical: 24    // 默认24px垂直间距
+      horizontal: 400, // 默认16px水平间距
+      vertical:60    // 默认24px垂直间距
     },
     showParentMessage: false // 默认不显示家长寄语
   });
