@@ -47,7 +47,7 @@ export default function CreateA4Page({ params }: CreateA4Props) {
     questionCount: 20,
     spacing: {
       horizontal: 400, // 默认16px水平间距
-      vertical:60    // 默认24px垂直间距
+      vertical: 50    // 默认24px垂直间距
     },
     showParentMessage: false // 默认不显示家长寄语
   });
@@ -176,10 +176,10 @@ export default function CreateA4Page({ params }: CreateA4Props) {
 
               {/* 右侧 - 设置面板 */}
               <div className="lg:col-span-4 no-print">
-                <div className="bg-white rounded border p-4 mt-12 space-y-4">
+                <div className="bg-white rounded border p-3 mt-8 space-y-3">
                  
                   {/* 练习标题 */}
-                  <div className="space-y-1.5">
+                  <div className="space-y-1">
                     <Label htmlFor="title" className="text-sm font-medium text-gray-700 hidden">
                       练习标题
                     </Label>
@@ -188,12 +188,12 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                       value={settings.title}
                       onChange={(e) => handleSettingChange('title', e.target.value)}
                       placeholder="输入练习标题"
-                      className="w-full"
+                      className="w-full h-9"
                     />
                   </div>
 
                   {/* 小朋友姓名 */}
-                  <div className="space-y-1.5">
+                  <div className="space-y-1">
                     <Label htmlFor="childName" className="text-sm font-medium text-gray-700 hidden">
                       小朋友姓名
                     </Label>
@@ -203,14 +203,14 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                       onChange={(e) => handleSettingChange('childName', e.target.value)}
                       placeholder="输入小朋友姓名"
                       maxLength={8}
-                      className="w-full"
+                      className="w-full h-9"
                     />
                   </div>
 
-                  <Separator />
+                  <Separator className="my-2" />
 
                   {/* 计算难度 */}
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     <div className="flex items-center gap-2">
                       <Target className="w-4 h-4 text-gray-500" />
                       <Label className="text-sm font-medium text-gray-700">计算难度</Label>
@@ -220,7 +220,7 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                       onValueChange={(value: 'within10' | 'within20' | 'within50' | 'within100') =>
                         handleSettingChange('difficulty', value)
                       }
-                      className="space-y-1.5"
+                      className="space-y-1"
                     >
                       {difficultyOptions.map((option) => (
                         <div key={option.id} className="flex items-center space-x-2">
@@ -236,10 +236,10 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                     </RadioGroup>
                   </div>
 
-                  <Separator />
+                  <Separator className="my-2" />
 
                   {/* 计算方式 */}
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     <div className="flex items-center gap-2">
                       <Calculator className="w-4 h-4 text-gray-500" />
                       <Label className="text-sm font-medium text-gray-700">计算方式</Label>
@@ -249,7 +249,7 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                       onValueChange={(value: 'add' | 'sub' | 'addsub') =>
                         handleSettingChange('calculationType', value)
                       }
-                      className="space-y-1.5"
+                      className="space-y-1"
                     >
                       {calculationTypeOptions.map((option) => (
                         <div key={option.id} className="flex items-center space-x-2">
@@ -265,10 +265,10 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                     </RadioGroup>
                   </div>
 
-                  <Separator />
+                  <Separator className="my-2" />
 
                   {/* 题目个数 */}
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     <Label htmlFor="questionCount" className="text-sm font-medium text-gray-700">
                       题目个数 (5-100)
                     </Label>
@@ -285,21 +285,21 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                         }
                       }}
                       placeholder="输入题目数量 (5-100)"
-                      className="w-full"
+                      className="w-full h-9"
                     />
                   </div>
 
-                  <Separator />
+                  <Separator className="my-2" />
 
                   {/* 题目间距 */}
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <Move className="w-4 h-4 text-gray-500" />
                       <Label className="text-sm font-medium text-gray-700">题目间距</Label>
                     </div>
 
                     {/* 水平间距 */}
-                    <div className="space-y-1.5">
+                    <div className="space-y-1">
                       <Label className="text-xs text-gray-600">水平间距</Label>
                       <div className="flex items-center space-x-3">
                         <Input
@@ -321,7 +321,7 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                     </div>
 
                     {/* 垂直间距 */}
-                    <div className="space-y-1.5">
+                    <div className="space-y-1">
                       <Label className="text-xs text-gray-600">垂直间距</Label>
                       <div className="flex items-center space-x-3">
                         <Input
@@ -343,10 +343,10 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                     </div>
                   </div>
 
-                  <Separator />
+                  <Separator className="my-2" />
 
                   {/* 家长寄语 */}
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
                       <Label className="text-sm font-medium text-gray-700">显示家长寄语</Label>
                       <Switch
