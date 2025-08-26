@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation'; // A4页面无需路由跳转
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,8 +11,8 @@ import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
-import { messages } from '@/i18n/messages';
-import { useAuth } from '@/lib/auth/context';
+// import { messages } from '@/i18n/messages'; // A4页面暂时不需要国际化
+// import { useAuth } from '@/lib/auth/context'; // A4页面无需登录验证
 import { Calculator, Target, FileText, Printer, Move } from 'lucide-react';
 import { A4Preview } from '@/components/ui/a4-preview';
 import {
@@ -38,8 +38,9 @@ interface A4Settings {
 }
 
 export default function CreateA4Page({ params }: CreateA4Props) {
-  const { user, loading } = useAuth();
-  const router = useRouter();
+  // A4页面无需登录验证，移除未使用的变量
+  // const { user, loading } = useAuth();
+  // const router = useRouter();
   const [locale, setLocale] = useState('zh');
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -64,7 +65,8 @@ export default function CreateA4Page({ params }: CreateA4Props) {
     getLocale();
   }, [params]);
 
-  const t = messages[locale as keyof typeof messages] || messages.zh;
+  // A4页面暂时不需要国际化消息
+  // const t = messages[locale as keyof typeof messages] || messages.zh;
 
   // A4页面无需登录验证
   // useEffect(() => {
@@ -113,17 +115,19 @@ export default function CreateA4Page({ params }: CreateA4Props) {
   // }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-300 via-sky-200 to-blue-300">
-      <div className="no-print">
-        <Header locale={locale} backgroundClass="bg-transparent" isFixed={false} />
-      </div>
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-6">
-        {/* 页面标题 */}
-        <div className="mb-6 no-print">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">A4 打印创建</h1>
-          <p className="text-gray-600">创建适合打印的A4格式数学练习题</p>
+    <>
+      {/* 屏幕显示区域 */}
+      <div className="min-h-screen bg-gradient-to-br from-sky-300 via-sky-200 to-blue-300 print:hidden">
+        <div className="no-print">
+          <Header locale={locale} backgroundClass="bg-transparent" isFixed={false} />
         </div>
+
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-6">
+          {/* 页面标题 */}
+          <div className="mb-6 no-print">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">A4 打印创建</h1>
+            <p className="text-gray-600">创建适合打印的A4格式数学练习题</p>
+          </div>
 
         {/* 主要内容区域 */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -350,12 +354,22 @@ export default function CreateA4Page({ params }: CreateA4Props) {
               </div>
             </div>
           </div>
-        </div>
-      </main>
+          </div>
+        </main>
 
-      <div className="no-print">
-        <Footer locale={locale} />
+        <div className="no-print">
+          <Footer locale={locale} />
+        </div>
       </div>
-    </div>
+
+      {/* 打印专用区域 */}
+      <div className="hidden print:block print-only">
+        <A4Preview
+          settings={settings}
+          isGenerating={isGenerating}
+          printPreviewMode={true}
+        />
+      </div>
+    </>
   );
 }

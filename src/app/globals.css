@@ -262,3 +262,58 @@ body {
 .border-purple-600 {
   border-color: var(--purple-600);
 }
+
+/* 打印专用样式 */
+@media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+  
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+    width: 100% !important;
+    height: 100% !important;
+    overflow: hidden !important;
+    /* 移除页面背景渐变 */
+    background-image: none !important;
+    background-attachment: initial !important;
+  }
+  
+  /* 确保只显示一页 */
+  @page {
+    size: A4;
+    margin: 0;
+  }
+  
+  /* 隐藏所有非打印内容 */
+  .no-print, 
+  .print\\:hidden,
+  header,
+  footer,
+  .min-h-screen:not(.print-only) {
+    display: none !important;
+  }
+  
+  /* 显示打印专用内容 */
+  .print-only {
+    display: block !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  /* 防止分页 */
+  .print-only * {
+    page-break-inside: avoid !important;
+    page-break-before: avoid !important;
+    page-break-after: avoid !important;
+  }
+}

@@ -401,10 +401,14 @@ export function A4Preview({ settings, isGenerating, printPreviewMode = false }: 
             color-adjust: exact !important;
           }
           
-          body {
-            margin: 0;
-            padding: 0;
+          html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+            background: white !important;
             font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            width: 100% !important;
+            height: 100% !important;
+            overflow: hidden !important;
           }
           
           @page {
@@ -413,8 +417,13 @@ export function A4Preview({ settings, isGenerating, printPreviewMode = false }: 
           }
           
           /* 隐藏非打印元素 */
-          header, .no-print {
+          header, .no-print, .print\\:hidden {
             display: none !important;
+          }
+          
+          /* 显示打印专用元素 */
+          .print-only {
+            display: block !important;
           }
 
           /* 打印时使用精确的A4尺寸 */
@@ -426,6 +435,10 @@ export function A4Preview({ settings, isGenerating, printPreviewMode = false }: 
             transform: none !important;
             margin: 0 !important;
             overflow: hidden !important; /* 防止内容溢出导致分页 */
+            background: white !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
           }
 
           /* 打印时的内容布局控制 */
@@ -472,6 +485,26 @@ export function A4Preview({ settings, isGenerating, printPreviewMode = false }: 
           /* 打印时的精确尺寸控制 */
           .print-preview-mode {
             transform: none !important;
+            background: white !important;
+          }
+          
+          /* 确保打印区域占满整个页面 */
+          .print-only {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            background: white !important;
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+          
+          /* 强制单页打印 */
+          .print-only .a4-container {
+            page-break-after: avoid !important;
+            page-break-before: avoid !important;
+            page-break-inside: avoid !important;
           }
         }
 
