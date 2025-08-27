@@ -13,6 +13,12 @@ import { Footer } from '@/components/layout/footer';
 import { Calculator, Target, FileText, Printer, Move } from 'lucide-react';
 import { PrintableA4 } from '@/components/ui/printable-a4';
 import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
+import {
   difficultyOptions,
   calculationTypeOptions
 } from '@/lib/practice-config';
@@ -39,6 +45,7 @@ interface A4Settings {
 export default function CreateA4Page({ params }: CreateA4Props) {
   const [locale, setLocale] = useState('zh');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [openAccordion, setOpenAccordion] = useState<string | undefined>('practice');
   const printRef = useRef<HTMLDivElement>(null);
 
   const [settings, setSettings] = useState<A4Settings>({
@@ -215,183 +222,177 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                     />
                   </div>
 
-                  <Separator className="my-2" />
+                  <Separator className="my-1" />
 
-                  {/* 计算难度 */}
-                  <div className="space-y-1.5">
-                    <div className="flex items-center gap-2">
-                      <Target className="w-4 h-4 text-gray-500" />
-                      <Label className="text-sm font-medium text-gray-700">计算难度</Label>
-                    </div>
-                    <RadioGroup
-                      value={settings.difficulty}
-                      onValueChange={(value: 'within10' | 'within20' | 'within50' | 'within100') =>
-                        handleSettingChange('difficulty', value)
-                      }
-                      className="space-y-1"
-                    >
-                      {difficultyOptions.map((option) => (
-                        <div key={option.id} className="flex items-center space-x-2">
-                          <RadioGroupItem value={option.id} id={option.id} />
-                          <Label
-                            htmlFor={option.id}
-                            className="text-sm text-gray-700 cursor-pointer"
+                  {/* 练习设置 */}
+                  <Accordion type="single" collapsible className="w-full mb-0" value={openAccordion} onValueChange={setOpenAccordion}>
+                    <AccordionItem value="practice">
+                      <AccordionTrigger className="text-sm font-medium text-gray-700">
+                        练习设置
+                      </AccordionTrigger>
+                      <AccordionContent className="space-y-4">
+                        {/* 计算难度 */}
+                        <div className="space-y-1.5">
+                          <div className="flex items-center gap-2">
+                            <Target className="w-4 h-4 text-gray-500" />
+                            <Label className="text-sm font-medium text-gray-700">计算难度</Label>
+                          </div>
+                          <RadioGroup
+                            value={settings.difficulty}
+                            onValueChange={(value: 'within10' | 'within20' | 'within50' | 'within100') =>
+                              handleSettingChange('difficulty', value)
+                            }
+                            className="space-y-1"
                           >
-                            {option.label}
-                          </Label>
+                            {difficultyOptions.map((option) => (
+                              <div key={option.id} className="flex items-center space-x-2">
+                                <RadioGroupItem value={option.id} id={option.id} />
+                                <Label
+                                  htmlFor={option.id}
+                                  className="text-sm text-gray-700 cursor-pointer"
+                                >
+                                  {option.label}
+                                </Label>
+                              </div>
+                            ))}
+                          </RadioGroup>
                         </div>
-                      ))}
-                    </RadioGroup>
-                  </div>
 
-                  <Separator className="my-2" />
-
-                  {/* 计算方式 */}
-                  <div className="space-y-1.5">
-                    <div className="flex items-center gap-2">
-                      <Calculator className="w-4 h-4 text-gray-500" />
-                      <Label className="text-sm font-medium text-gray-700">计算方式</Label>
-                    </div>
-                    <RadioGroup
-                      value={settings.calculationType}
-                      onValueChange={(value: 'add' | 'sub' | 'addsub') =>
-                        handleSettingChange('calculationType', value)
-                      }
-                      className="space-y-1"
-                    >
-                      {calculationTypeOptions.map((option) => (
-                        <div key={option.id} className="flex items-center space-x-2">
-                          <RadioGroupItem value={option.id} id={option.id} />
-                          <Label
-                            htmlFor={option.id}
-                            className="text-sm text-gray-700 cursor-pointer"
+                        {/* 计算方式 */}
+                        <div className="space-y-1.5">
+                          <div className="flex items-center gap-2">
+                            <Calculator className="w-4 h-4 text-gray-500" />
+                            <Label className="text-sm font-medium text-gray-700">计算方式</Label>
+                          </div>
+                          <RadioGroup
+                            value={settings.calculationType}
+                            onValueChange={(value: 'add' | 'sub' | 'addsub') =>
+                              handleSettingChange('calculationType', value)
+                            }
+                            className="space-y-1"
                           >
-                            {option.label}
-                          </Label>
+                            {calculationTypeOptions.map((option) => (
+                              <div key={option.id} className="flex items-center space-x-2">
+                                <RadioGroupItem value={option.id} id={option.id} />
+                                <Label
+                                  htmlFor={option.id}
+                                  className="text-sm text-gray-700 cursor-pointer"
+                                >
+                                  {option.label}
+                                </Label>
+                              </div>
+                            ))}
+                          </RadioGroup>
                         </div>
-                      ))}
-                    </RadioGroup>
-                  </div>
 
-                  <Separator className="my-2" />
+                        {/* 题目个数 */}
+                        <div className="space-y-1.5">
+                          <Label htmlFor="questionCount" className="text-sm font-medium text-gray-700">
+                            题目个数 (5-100)
+                          </Label>
+                          <Input
+                            id="questionCount"
+                            type="number"
+                            min="5"
+                            max="100"
+                            value={settings.questionCount}
+                            onChange={(e) => {
+                              const value = parseInt(e.target.value);
+                              if (!isNaN(value) && value >= 5 && value <= 100) {
+                                handleSettingChange('questionCount', value);
+                              }
+                            }}
+                            placeholder="输入题目数量 (5-100)"
+                            className="w-full h-9"
+                          />
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
 
-                  {/* 题目个数 */}
-                  <div className="space-y-1.5">
-                    <Label htmlFor="questionCount" className="text-sm font-medium text-gray-700">
-                      题目个数 (5-100)
-                    </Label>
-                    <Input
-                      id="questionCount"
-                      type="number"
-                      min="5"
-                      max="100"
-                      value={settings.questionCount}
-                      onChange={(e) => {
-                        const value = parseInt(e.target.value);
-                        if (!isNaN(value) && value >= 5 && value <= 100) {
-                          handleSettingChange('questionCount', value);
-                        }
-                      }}
-                      placeholder="输入题目数量 (5-100)"
-                      className="w-full h-9"
-                    />
-                  </div>
+                  <Separator className="my-0" />
 
-                  <Separator className="my-2" />
+                  {/* 显示设置 */}
+                  <Accordion type="single" collapsible className="w-full" value={openAccordion} onValueChange={setOpenAccordion}>
+                    <AccordionItem value="appearance">
+                      <AccordionTrigger className="text-sm font-medium text-gray-700">
+                        显示设置
+                      </AccordionTrigger>
+                      <AccordionContent className="space-y-4">
+                        {/* 字体大小 */}
+                        <div className="space-y-1">
+                          <Label className="text-xs text-gray-600">字体大小</Label>
+                          <div className="flex items-center space-x-3">
+                            <Input
+                              type="range"
+                              min="12"
+                              max="24"
+                              step="1"
+                              value={settings.fontSize}
+                              onChange={(e) => handleSettingChange('fontSize', parseInt(e.target.value))}
+                              className="flex-1"
+                            />
+                            <span className="text-xs text-gray-500 min-w-[32px]">
+                              {settings.fontSize}px
+                            </span>
+                          </div>
+                        </div>
+                        
+                        {/* 粗体设置 */}
+                        <div className="flex items-center justify-between">
+                          <Label className="text-xs text-gray-600">粗体显示</Label>
+                          <Switch
+                            checked={settings.isBold}
+                            onCheckedChange={(checked) => handleSettingChange('isBold', checked)}
+                          />
+                        </div>
+                        
+                        {/* 水平间距 */}
+                        <div className="space-y-1">
+                          <Label className="text-xs text-gray-600">水平间距</Label>
+                          <div className="flex items-center space-x-3">
+                            <Input
+                              type="range"
+                              min="20"
+                              max="300"
+                              step="10"
+                              value={settings.spacing.horizontal}
+                              onChange={(e) => handleSettingChange('spacing', {
+                                ...settings.spacing,
+                                horizontal: parseInt(e.target.value)
+                              })}
+                              className="flex-1"
+                            />
+                            <span className="text-xs text-gray-500 min-w-[32px]">
+                              {settings.spacing.horizontal}px
+                            </span>
+                          </div>
+                        </div>
 
-                  {/* 题目间距 */}
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <Move className="w-4 h-4 text-gray-500" />
-                      <Label className="text-sm font-medium text-gray-700">题目间距</Label>
-                    </div>
-
-                    {/* 水平间距 */}
-                    <div className="space-y-1">
-                      <Label className="text-xs text-gray-600">水平间距</Label>
-                      <div className="flex items-center space-x-3">
-                        <Input
-                          type="range"
-                          min="20"
-                          max="300"
-                          step="10"
-                          value={settings.spacing.horizontal}
-                          onChange={(e) => handleSettingChange('spacing', {
-                            ...settings.spacing,
-                            horizontal: parseInt(e.target.value)
-                          })}
-                          className="flex-1"
-                        />
-                        <span className="text-xs text-gray-500 min-w-[32px]">
-                          {settings.spacing.horizontal}px
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* 垂直间距 */}
-                    <div className="space-y-1">
-                      <Label className="text-xs text-gray-600">垂直间距</Label>
-                      <div className="flex items-center space-x-3">
-                        <Input
-                          type="range"
-                          min="2"
-                          max="98"
-                          step="2"
-                          value={settings.spacing.vertical}
-                          onChange={(e) => handleSettingChange('spacing', {
-                            ...settings.spacing,
-                            vertical: parseInt(e.target.value)
-                          })}
-                          className="flex-1"
-                        />
-                        <span className="text-xs text-gray-500 min-w-[32px]">
-                          {settings.spacing.vertical}px
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <Separator className="my-2" />
-
-                  {/* 字体设置 */}
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <FileText className="w-4 h-4 text-gray-500" />
-                      <Label className="text-sm font-medium text-gray-700">字体设置</Label>
-                    </div>
-                    
-                    {/* 字体大小 */}
-                    <div className="space-y-1">
-                      <Label className="text-xs text-gray-600">字体大小</Label>
-                      <div className="flex items-center space-x-3">
-                        <Input
-                          type="range"
-                          min="12"
-                          max="24"
-                          step="1"
-                          value={settings.fontSize}
-                          onChange={(e) => handleSettingChange('fontSize', parseInt(e.target.value))}
-                          className="flex-1"
-                        />
-                        <span className="text-xs text-gray-500 min-w-[32px]">
-                          {settings.fontSize}px
-                        </span>
-                      </div>
-                    </div>
-                    
-                    {/* 粗体设置 */}
-                    <div className="flex items-center justify-between">
-                      <Label className="text-xs text-gray-600">粗体显示</Label>
-                      <Switch
-                        checked={settings.isBold}
-                        onCheckedChange={(checked) => handleSettingChange('isBold', checked)}
-                      />
-                    </div>
-                    
-                    <p className="text-xs text-gray-500">
-                      调整练习题的字体样式，适合不同年龄段的孩子
-                    </p>
-                  </div>
+                        {/* 垂直间距 */}
+                        <div className="space-y-1">
+                          <Label className="text-xs text-gray-600">垂直间距</Label>
+                          <div className="flex items-center space-x-3">
+                            <Input
+                              type="range"
+                              min="2"
+                              max="98"
+                              step="2"
+                              value={settings.spacing.vertical}
+                              onChange={(e) => handleSettingChange('spacing', {
+                                ...settings.spacing,
+                                vertical: parseInt(e.target.value)
+                              })}
+                              className="flex-1"
+                            />
+                            <span className="text-xs text-gray-500 min-w-[32px]">
+                              {settings.spacing.vertical}px
+                            </span>
+                          </div>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
 
                   <Separator className="my-2" />
 
