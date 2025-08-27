@@ -191,7 +191,7 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                 </div>
 
                 {/* 设置面板 */}
-                <div className="bg-white rounded border p-3 space-y-3">
+                <div className="bg-gray-50 rounded border p-3 space-y-3">
                  
                   {/* 练习标题 */}
                   <div className="space-y-1">
@@ -208,7 +208,7 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                   </div>
 
                   {/* 小朋友姓名 */}
-                  <div className="space-y-1">
+                  <div className="space-y-1 mb-0">
                     <Label htmlFor="childName" className="text-sm font-medium text-gray-700 hidden">
                       小朋友姓名
                     </Label>
@@ -216,7 +216,7 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                       id="childName"
                       value={settings.childName}
                       onChange={(e) => handleSettingChange('childName', e.target.value)}
-                      placeholder="输入小朋友姓名"
+                      placeholder="小朋友姓名"
                       maxLength={8}
                       className="w-full h-9"
                     />
@@ -310,9 +310,25 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                     </AccordionItem>
                   </Accordion>
 
-                  <Separator className="my-0" />
+                  <Separator className="my-2" />
 
-                  {/* 显示设置 */}
+                  {/* 家长寄语 */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-sm font-medium text-gray-700">显示家长寄语</Label>
+                      <Switch
+                        checked={settings.showParentMessage}
+                        onCheckedChange={(checked) => handleSettingChange('showParentMessage', checked)}
+                      />
+                    </div>
+                    <p className="text-xs text-gray-500">
+                      开启后将在页面底部显示家长寄语填写区域
+                    </p>
+                  </div>
+                </div>
+
+                {/* 显示设置 */}
+                <div className="bg-gray-50 rounded border px-3 py-0 mb-4 mt-3">
                   <Accordion type="single" collapsible className="w-full" value={openAccordion} onValueChange={setOpenAccordion}>
                     <AccordionItem value="appearance">
                       <AccordionTrigger className="text-sm font-medium text-gray-700">
@@ -393,22 +409,6 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                       </AccordionContent>
                     </AccordionItem>
                   </Accordion>
-
-                  <Separator className="my-2" />
-
-                  {/* 家长寄语 */}
-                  <div className="space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <Label className="text-sm font-medium text-gray-700">显示家长寄语</Label>
-                      <Switch
-                        checked={settings.showParentMessage}
-                        onCheckedChange={(checked) => handleSettingChange('showParentMessage', checked)}
-                      />
-                    </div>
-                    <p className="text-xs text-gray-500">
-                      开启后将在页面底部显示家长寄语填写区域
-                    </p>
-                  </div>
                 </div>
               </div>
             </div>
