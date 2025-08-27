@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react';
+import React, { useMemo } from 'react';
 
 interface Question {
   id: number;
@@ -25,10 +25,11 @@ interface A4Settings {
 
 interface PrintableA4Props {
   settings: A4Settings;
+  regenerateKey?: number;
 }
 
 export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
-  ({ settings }, ref) => {
+  ({ settings, regenerateKey }, ref) => {
     // 生成数学题目
     const generateQuestions = (settings: A4Settings): Question[] => {
       const { difficulty, calculationType, questionCount } = settings;
@@ -191,7 +192,21 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
       return questions;
     };
 
-    const questions = generateQuestions(settings);
+    // 只在影响题目内容的设置变化时或手动重新生成时重新生成题目
+    const questions = useMemo(() => {
+      return generateQuestions({
+        difficulty: settings.difficulty,
+        calculationType: settings.calculationType,
+        questionCount: settings.questionCount,
+        // 这些字段不影响题目生成，但需要传递以满足接口要求
+        title: settings.title,
+        childName: settings.childName,
+        spacing: settings.spacing,
+        showParentMessage: settings.showParentMessage,
+        fontSize: settings.fontSize,
+        isBold: settings.isBold
+      });
+    }, [settings.difficulty, settings.calculationType, settings.questionCount, regenerateKey]);
 
     return (
       <div

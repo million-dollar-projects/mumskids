@@ -10,7 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
-import { Calculator, Target, FileText, Printer, Move } from 'lucide-react';
+import { Calculator, Target, FileText, Printer } from 'lucide-react';
 import { PrintableA4 } from '@/components/ui/printable-a4';
 import {
   Accordion,
@@ -46,6 +46,7 @@ export default function CreateA4Page({ params }: CreateA4Props) {
   const [locale, setLocale] = useState('zh');
   const [isGenerating, setIsGenerating] = useState(false);
   const [openAccordion, setOpenAccordion] = useState<string | undefined>('practice');
+  const [regenerateKey, setRegenerateKey] = useState(0); // 用于强制重新生成题目
   const printRef = useRef<HTMLDivElement>(null);
 
   const [settings, setSettings] = useState<A4Settings>({
@@ -107,8 +108,9 @@ export default function CreateA4Page({ params }: CreateA4Props) {
 
   const handleGenerate = () => {
     setIsGenerating(true);
-    // 模拟生成新题目的延迟
+    // 通过改变key来强制重新生成题目
     setTimeout(() => {
+      setRegenerateKey(prev => prev + 1);
       setIsGenerating(false);
     }, 800);
   };
@@ -161,7 +163,7 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                   transformOrigin: 'left top',
                   marginBottom: '-150px' // 减少底部空白
                 }}>
-                  <PrintableA4 ref={printRef} settings={settings} />
+                  <PrintableA4 ref={printRef} settings={settings} regenerateKey={regenerateKey} />
                 </div>
               </div>
               </div>
