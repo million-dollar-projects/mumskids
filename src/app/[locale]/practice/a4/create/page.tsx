@@ -32,6 +32,8 @@ interface A4Settings {
     vertical: number;   // 垂直间距 (px)
   };
   showParentMessage: boolean; // 是否显示家长寄语
+  fontSize: number; // 练习题字体大小 (px)
+  isBold: boolean; // 是否粗体显示练习题
 }
 
 export default function CreateA4Page({ params }: CreateA4Props) {
@@ -49,7 +51,9 @@ export default function CreateA4Page({ params }: CreateA4Props) {
       horizontal: 150, // 默认150px水平间距，对应3列布局
       vertical: 50    // 默认50px垂直间距
     },
-    showParentMessage: false // 默认不显示家长寄语
+    showParentMessage: false, // 默认不显示家长寄语
+    fontSize: 16, // 默认16px字体大小
+    isBold: true // 默认粗体显示
   });
 
   useEffect(() => {
@@ -345,6 +349,48 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                         </span>
                       </div>
                     </div>
+                  </div>
+
+                  <Separator className="my-2" />
+
+                  {/* 字体设置 */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-gray-500" />
+                      <Label className="text-sm font-medium text-gray-700">字体设置</Label>
+                    </div>
+                    
+                    {/* 字体大小 */}
+                    <div className="space-y-1">
+                      <Label className="text-xs text-gray-600">字体大小</Label>
+                      <div className="flex items-center space-x-3">
+                        <Input
+                          type="range"
+                          min="12"
+                          max="24"
+                          step="1"
+                          value={settings.fontSize}
+                          onChange={(e) => handleSettingChange('fontSize', parseInt(e.target.value))}
+                          className="flex-1"
+                        />
+                        <span className="text-xs text-gray-500 min-w-[32px]">
+                          {settings.fontSize}px
+                        </span>
+                      </div>
+                    </div>
+                    
+                    {/* 粗体设置 */}
+                    <div className="flex items-center justify-between">
+                      <Label className="text-xs text-gray-600">粗体显示</Label>
+                      <Switch
+                        checked={settings.isBold}
+                        onCheckedChange={(checked) => handleSettingChange('isBold', checked)}
+                      />
+                    </div>
+                    
+                    <p className="text-xs text-gray-500">
+                      调整练习题的字体样式，适合不同年龄段的孩子
+                    </p>
                   </div>
 
                   <Separator className="my-2" />

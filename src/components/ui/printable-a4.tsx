@@ -19,6 +19,8 @@ interface A4Settings {
     vertical: number;
   };
   showParentMessage: boolean;
+  fontSize: number; // 练习题字体大小 (px)
+  isBold: boolean; // 是否粗体显示练习题
 }
 
 interface PrintableA4Props {
@@ -307,7 +309,8 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
               return 'repeat(2, 1fr)'; // 2列：间距 130-300
             }
           })(),
-          gap: `${Math.max(settings.spacing.vertical * 0.8, 8)}px ${Math.max(settings.spacing.horizontal * 0.8, 12)}px`,
+          rowGap: `${Math.max(settings.spacing.vertical * 0.8, 8)}px`,
+          columnGap: `${Math.max(settings.spacing.horizontal * 0.8, 12)}px`,
           alignContent: 'flex-start'
         }}>
           {questions.map((question) => (
@@ -316,12 +319,12 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                fontSize: '16px',
-                fontWeight: '600',
+                fontSize: `${settings.fontSize}px`,
+                fontWeight: settings.isBold ? '600' : '400',
                 color: '#333',
-                lineHeight: '1.4',
+                lineHeight: '1.2',
                 fontFamily: '"Consolas", "Monaco", "Menlo", "Ubuntu Mono", "Courier New", monospace',
-                minHeight: '24px'
+                minHeight: '24px' // 固定最小高度，不随字体大小变化
               }}
             >
               <span style={{ 
