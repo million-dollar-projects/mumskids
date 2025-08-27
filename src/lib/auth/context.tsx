@@ -10,6 +10,8 @@ interface AuthContextType {
   loading: boolean
   signInWithGoogle: () => Promise<void>
   signOut: () => Promise<void>
+  sendEmailOtp: (email: string) => Promise<{ success: boolean; error?: string }>
+  verifyEmailOtp: (email: string, token: string) => Promise<{ success: boolean; error?: string }>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -97,12 +99,68 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }
 
+  const sendEmailOtp = async (email: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await fetch('/api/auth/email-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        return { success: false, error: data.error || '发送验证码失败' }
+      }
+
+      return { success: true }
+    } catch (error) {
+      console.error('发送邮箱验证码失败:', error)
+      return { success: false, error: '网络错误，请稍后重试' }
+    }
+  }
+
+  const verifyEmailOtp = async (email: string, token: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, token }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        return { success: false, error: data.error || '验证失败' }
+      }
+
+      // 验证成功后，刷新会话状态
+      const supabase = getSupabaseClient()
+      if (supabase) {
+        const { data: { session } } = await supabase.auth.getSession()
+        setSession(session)
+        setUser(session?.user ?? null)
+      }
+
+      return { success: true }
+    } catch (error) {
+      console.error('验证邮箱验证码失败:', error)
+      return { success: false, error: '网络错误，请稍后重试' }
+    }
+  }
+
   const value = {
     user,
     session,
     loading,
     signInWithGoogle,
     signOut,
+    sendEmailOtp,
+    verifyEmailOtp,
   }
 
   return (

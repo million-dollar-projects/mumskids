@@ -140,7 +140,7 @@ export default function CreateA4Page({ params }: CreateA4Props) {
       {/* 屏幕显示区域 */}
       <div className="min-h-screen bg-gradient-to-br from-sky-300 via-sky-200 to-blue-300 print:hidden">
         <div className="no-print">
-          <Header locale={locale} backgroundClass="bg-transparent" isFixed={false} />
+          <Header locale={locale} variant="landing" backgroundClass="bg-transparent" isFixed={false} />
         </div>
 
         <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-6">

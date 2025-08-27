@@ -76,6 +76,25 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
               <span>{t.landing.brand}</span>
             </Link>
             <div className="flex items-center space-x-1 sm:space-x-2">
+              {/* 导航链接 */}
+              <div className="hidden sm:flex items-center space-x-2">
+                <Link href={`/${locale}/discover`}>
+                  <button className="text-gray-700 hover:text-gray-900 font-medium text-xs sm:text-sm cursor-pointer px-2 sm:px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
+                    发现
+                  </button>
+                </Link>
+                <Link href={`/${locale}/practice/create`}>
+                  <button className="text-gray-700 hover:text-gray-900 font-medium text-xs sm:text-sm cursor-pointer px-2 sm:px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
+                    创建练习
+                  </button>
+                </Link>
+                <Link href={`/${locale}/practice/a4/create`}>
+                  <button className="text-gray-700 hover:text-gray-900 font-medium text-xs sm:text-sm cursor-pointer px-2 sm:px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
+                    A4 打印
+                  </button>
+                </Link>
+              </div>
+              
               {/* 语言切换 */}
               <div className="flex gap-1 sm:gap-2">
                 <Link href="/zh">

@@ -9,6 +9,7 @@ import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { useAuth } from '@/lib/auth/context';
 import { messages } from '@/i18n/messages';
+import { EmailLogin } from '@/components/auth/email-login';
 
 interface LoginPageProps {
   params: Promise<{ locale: string }>;
@@ -152,19 +153,13 @@ export default function LoginPage({ params }: LoginPageProps) {
             </div>
 
             {/* 邮箱登录 */}
-            <div className="space-y-4">
-              <div className="text-center p-3 bg-gray-50 rounded-xl">
-                <div className="text-sm text-gray-600">
-                  {t.auth.emailLogin} 功能开发中...
-                </div>
-              </div>
-              <Button
-                className="w-full h-12 bg-gray-100 text-gray-400 rounded-xl cursor-not-allowed"
-                disabled
-              >
-                {t.auth.emailLogin}
-              </Button>
-            </div>
+            <EmailLogin 
+              t={t} 
+              onSuccess={() => {
+                // 登录成功后跳转到主页
+                router.push(`/${locale}`);
+              }}
+            />
 
             <div className="text-center pt-2">
               <p className="text-xs text-gray-500">
