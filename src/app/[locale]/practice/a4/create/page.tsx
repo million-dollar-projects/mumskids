@@ -138,30 +138,11 @@ export default function CreateA4Page({ params }: CreateA4Props) {
             {/* 左侧 - A4预览 */}
             <div className="lg:col-span-8">
               <div className="p-0 h-fit">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center mb-4">
                   <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                     <FileText className="w-5 h-5" />
                     A4 预览
                   </h2>
-                  <div className="flex gap-2">
-                    <Button
-                      onClick={handleGenerate}
-                      disabled={isGenerating}
-                      variant="outline"
-                      size="sm"
-                      className="cursor-pointer"
-                    >
-                      {isGenerating ? '生成中...' : '重新生成'}
-                    </Button>
-                    <Button
-                      onClick={handlePrint}
-                      size="sm"
-                      className="cursor-pointer flex items-center gap-2"
-                    >
-                      <Printer className="w-4 h-4" />
-                      打印
-                    </Button>
-                  </div>
                 </div>
 
                 <div style={{ 
@@ -174,9 +155,32 @@ export default function CreateA4Page({ params }: CreateA4Props) {
               </div>
               </div>
 
-              {/* 右侧 - 设置面板 */}
+              {/* 右侧 - 操作按钮 */}
               <div className="lg:col-span-4 no-print">
-                <div className="bg-white rounded border p-3 mt-8 space-y-3">
+                <div className="bg-white rounded border p-3 mt-11 mb-4">
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={handleGenerate}
+                      disabled={isGenerating}
+                      variant="outline"
+                      size="sm"
+                      className="cursor-pointer flex-1"
+                    >
+                      {isGenerating ? '生成中...' : '重新生成'}
+                    </Button>
+                    <Button
+                      onClick={handlePrint}
+                      size="sm"
+                      className="cursor-pointer flex items-center gap-2 flex-1"
+                    >
+                      <Printer className="w-4 h-4" />
+                      打印
+                    </Button>
+                  </div>
+                </div>
+
+                {/* 设置面板 */}
+                <div className="bg-white rounded border p-3 space-y-3">
                  
                   {/* 练习标题 */}
                   <div className="space-y-1">
