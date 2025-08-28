@@ -20,7 +20,20 @@ export const messages = {
       "phone": "手机号",
       "password": "密码",
       "login": "登录",
-      "register": "注册"
+      "register": "注册",
+      "emailRequired": "请输入邮箱地址",
+      "emailInvalid": "请输入有效的邮箱地址",
+      "otpRequired": "请输入验证码",
+      "sendOtp": "发送验证码",
+      "verifyOtp": "验证",
+      "otpSent": "验证码已发送",
+      "otpSentDesc": "验证码已发送到您的邮箱，请查收",
+      "backToEmail": "返回邮箱输入",
+      "resendOtp": "重新发送",
+      "otpExpired": "验证码已过期",
+      "otpInvalid": "验证码错误",
+      "emailPlaceholder": "请输入邮箱地址",
+      "otpPlaceholder": "请输入6位验证码"
     },
     "landing": {
       "title": "数学练习",
@@ -152,7 +165,20 @@ export const messages = {
       "phone": "Phone",
       "password": "Password",
       "login": "Login",
-      "register": "Register"
+      "register": "Register",
+      "emailRequired": "Please enter your email address",
+      "emailInvalid": "Please enter a valid email address",
+      "otpRequired": "Please enter the verification code",
+      "sendOtp": "Send Code",
+      "verifyOtp": "Verify",
+      "otpSent": "Verification code sent",
+      "otpSentDesc": "Verification code has been sent to your email",
+      "backToEmail": "Back to Email",
+      "resendOtp": "Resend",
+      "otpExpired": "Verification code expired",
+      "otpInvalid": "Invalid verification code",
+      "emailPlaceholder": "Enter your email address",
+      "otpPlaceholder": "Enter 6-digit code"
     },
     "landing": {
       "title": "Math Practice",
