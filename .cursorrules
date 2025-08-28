@@ -1,0 +1,141 @@
+# MumsKids Project - Cursor Rules
+
+## 项目概述
+这是一个基于 Next.js 15 的儿童数学练习应用，专为小朋友设计的口算/心算能力提升平台。
+
+## 技术栈
+- **框架**: Next.js 15.4.4 (App Router)
+- **语言**: TypeScript (严格模式)
+- **样式**: Tailwind CSS v4 + shadcn/ui
+- **数据库**: Supabase (PostgreSQL)
+- **认证**: Supabase Auth (邮箱OTP)
+- **状态管理**: TanStack React Query v5
+- **国际化**: next-intl
+- **部署**: Vercel
+
+## 代码风格规范
+
+### 文件命名约定
+- **组件文件**: kebab-case (例: `email-login.tsx`, `practice-card.tsx`)
+- **页面文件**: kebab-case (例: `page.tsx`, `layout.tsx`)
+- **工具文件**: kebab-case (例: `utils.ts`, `practice-service.ts`)
+- **类型文件**: kebab-case (例: `practice.ts`, `supabase.ts`)
+- **配置文件**: kebab-case (例: `default-rewards.ts`)
+
+### 目录结构
+```
+src/
+├── app/                    # Next.js App Router
+│   ├── [locale]/          # 国际化路由
+│   └── api/               # API 路由
+├── components/            # React 组件
+│   ├── ui/               # shadcn/ui 基础组件
+│   ├── auth/             # 认证相关组件
+│   ├── layout/           # 布局组件
+│   └── dashboard/        # 仪表板组件
+├── lib/                  # 工具库和服务
+│   ├── supabase/         # Supabase 配置
+│   ├── auth/             # 认证上下文
+│   └── services/         # 业务服务
+└── types/                # TypeScript 类型定义
+```
+
+### TypeScript 规范
+- **接口命名**: PascalCase (例: `Practice`, `RewardCondition`)
+- **类型导出**: 优先使用 `interface` 而非 `type`
+- **Props 接口**: 组件名 + `Props` (例: `HeaderProps`, `EmailLoginProps`)
+- **严格类型检查**: 启用所有严格模式配置
+- **导入别名**: 使用 `@/*` 别名引用 src 目录
+
+### React 组件规范
+- **组件命名**: PascalCase (例: `EmailLogin`, `PracticeCard`)
+- **文件导出**: 使用命名导出而非默认导出（除页面组件外）
+- **Hook 使用**: 优先使用自定义 hook 封装逻辑
+- **Props 解构**: 在函数参数中直接解构 props
+- **事件处理**: 使用 `handle` 前缀命名事件处理函数
+
+### 样式规范 (Tailwind CSS)
+- **儿童友好设计**: 使用项目定制的 boy/girl 主题色
+- **字体大小**: 使用 `child-*` 自定义字体类 (child-sm, child-base, child-lg)
+- **按钮样式**: 使用 `boy`/`girl` 变体和 `child`/`child-lg` 尺寸
+- **圆角**: 儿童友好的大圆角 (`rounded-xl`, `rounded-2xl`)
+- **间距**: 使用 `child-btn`, `child-card` 自定义间距
+- **响应式**: 优先考虑移动端体验
+
+### 组件开发规范
+- **UI 组件**: 基于 shadcn/ui，扩展儿童友好的变体
+- **业务组件**: 按功能模块分组 (auth/, dashboard/, discover/)
+- **布局组件**: 统一的 header/footer 设计
+- **表单组件**: 使用 React Hook Form + Zod 验证
+
+### API 和数据规范
+- **API 路由**: RESTful 设计，使用 NextResponse
+- **数据获取**: 使用 React Query 进行状态管理
+- **错误处理**: 统一的错误响应格式
+- **类型安全**: Supabase 生成的类型定义
+- **认证**: 基于 Supabase Auth 的 session 管理
+
+### 国际化规范
+- **语言支持**: 中文 (zh) 和英文 (en)
+- **消息文件**: `/messages/[locale].json`
+- **路由结构**: `[locale]` 动态路由
+- **翻译函数**: 使用 `useTranslations` hook
+
+## 开发最佳实践
+
+### 性能优化
+- 使用 Next.js Image 组件优化图片
+- 实现 React.memo 防止不必要的重渲染
+- 使用 dynamic import 进行代码分割
+- Supabase 查询优化和分页
+
+### 安全性
+- 服务端验证所有用户输入
+- 使用 Supabase RLS (Row Level Security)
+- 环境变量管理敏感配置
+- CSRF 和 XSS 防护
+
+### 测试策略
+- 优先编写组件单元测试
+- API 路由集成测试
+- 用户流程端到端测试
+- 可访问性测试
+
+### 错误处理
+- 使用 Sonner 进行用户友好的提示
+- 统一的错误边界组件
+- 详细的服务端错误日志
+- 优雅降级的 UI 处理
+
+## 特定项目规则
+
+### 儿童友好设计
+- 使用大字体和按钮尺寸
+- 明亮的色彩和圆润的边角
+- 简单直观的交互设计
+- 视觉反馈和动画效果
+
+### 数学练习功能
+- 支持加法、减法、混合运算
+- 难度等级：10以内、20以内、50以内、100以内
+- 测试模式：普通模式、限时模式
+- 奖励系统：emoji 奖励和自定义条件
+
+### 数据结构
+- Practice: 练习配置和统计数据
+- Reward: 奖励系统配置
+- User: Supabase Auth 用户管理
+
+## 代码质量
+- 使用 ESLint + Next.js 规则
+- Prettier 代码格式化
+- 严格的 TypeScript 检查
+- 组件 prop 类型完整性
+
+## 部署和环境
+- **开发**: `npm run dev` (Turbopack)
+- **构建**: `npm run build`
+- **Lint**: `npm run lint`
+- **环境变量**: Supabase 配置需要正确设置
+
+请确保所有新代码都遵循这些规范，保持项目的一致性和可维护性。
