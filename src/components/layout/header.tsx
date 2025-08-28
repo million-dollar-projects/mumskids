@@ -4,6 +4,7 @@ import { useRef, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { UserAvatarDropdown } from '@/components/ui/user-avatar-dropdown';
+import { LanguageSwitcher } from '@/components/ui/language-switcher';
 import { Star, Bell } from 'lucide-react';
 import Image from 'next/image';
 import { messages } from '@/i18n/messages';
@@ -95,19 +96,8 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
                 </Link>
               </div>
               
-              {/* 语言切换 */}
-              <div className="flex gap-1 sm:gap-2">
-                <Link href="/zh">
-                  <Button variant="ghost" size="sm" className="text-tertiary-gray cursor-pointer text-xs sm:text-sm px-2 sm:px-3">
-                    中文
-                  </Button>
-                </Link>
-                <Link href="/en">
-                  <Button variant="ghost" size="sm" className="text-tertiary-gray cursor-pointer text-xs sm:text-sm px-2 sm:px-3">
-                    English
-                  </Button>
-                </Link>
-              </div>
+              {/* 语言切换器 */}
+              <LanguageSwitcher currentLocale={locale} variant="compact" />
 
               {/* 登录按钮 */}
               {loading ? (
@@ -144,13 +134,18 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
               <div className="hidden sm:flex items-center space-x-2">
                 <div className="w-12 h-6 bg-gray-200 rounded animate-pulse"></div>
                 <div className="w-16 h-6 bg-gray-200 rounded animate-pulse"></div>
+                <div className="w-16 h-6 bg-gray-200 rounded animate-pulse"></div>
               </div>
 
               {/* 移动端导航按钮骨架 */}
               <div className="flex sm:hidden items-center space-x-1">
                 <div className="w-8 h-6 bg-gray-200 rounded animate-pulse"></div>
                 <div className="w-8 h-6 bg-gray-200 rounded animate-pulse"></div>
+                <div className="w-8 h-6 bg-gray-200 rounded animate-pulse"></div>
               </div>
+
+              {/* 语言切换器骨架 */}
+              <div className="w-8 h-8 bg-gray-200 rounded-md animate-pulse"></div>
 
               {/* 通知按钮骨架 */}
               <div className="w-8 h-8 bg-gray-200 rounded-md animate-pulse"></div>
@@ -209,6 +204,9 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
                 </button>
               </Link>
 
+              {/* 语言切换器 */}
+              <LanguageSwitcher currentLocale={locale} variant="compact" />
+
               <div className="relative" ref={notificationRef}>
                 <button
                   onClick={() => setShowNotifications(!showNotifications)}
@@ -254,5 +252,48 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
     );
   }
 
-  return null;
+  // 未登录状态头部
+  return (
+    <header className={getHeaderClasses()} style={getHeaderStyle()}>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-12">
+          <Link href={`/${locale}`} className="text-sm font-bold text-gray-900 flex items-center space-x-2 hover:opacity-80 transition-opacity">
+            <Image src="/images/plus.png" alt="Plus" width={20} height={20} className="w-5 h-5 transition-transform duration-300 hover:rotate-180" />
+            <span>LittlePlus</span>
+          </Link>
+          
+          <div className="flex items-center space-x-1 sm:space-x-2">
+            {/* 导航链接 */}
+            <div className="hidden sm:flex items-center space-x-2">
+              <Link href={`/${locale}/discover`}>
+                <button className="text-gray-700 hover:text-gray-900 font-medium text-xs sm:text-sm cursor-pointer px-2 sm:px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
+                  发现
+                </button>
+              </Link>
+              <Link href={`/${locale}/practice/create`}>
+                <button className="text-gray-700 hover:text-gray-900 font-medium text-xs sm:text-sm cursor-pointer px-2 sm:px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
+                  创建练习
+                </button>
+              </Link>
+              <Link href={`/${locale}/practice/a4/create`}>
+                <button className="text-gray-700 hover:text-gray-900 font-medium text-xs sm:text-sm cursor-pointer px-2 sm:px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
+                  A4 打印
+                </button>
+              </Link>
+            </div>
+            
+            {/* 语言切换器 */}
+            <LanguageSwitcher currentLocale={locale} variant="compact" />
+
+            {/* 登录按钮 */}
+            <Link href={`/${locale}/auth/login`}>
+              <Button size="sm" className="btn-primary-black cursor-pointer text-xs sm:text-sm px-3 sm:px-4 py-1 rounded">
+                {t.nav.login}
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    </header>
+  );
 }
