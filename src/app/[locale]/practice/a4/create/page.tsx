@@ -143,7 +143,7 @@ export default function CreateA4Page({ params }: CreateA4Props) {
           <Header locale={locale} variant="landing" backgroundClass="bg-transparent" isFixed={false} />
         </div>
 
-        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-6">
+        <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-6">
          
 
           {/* 主要内容区域 */}
@@ -159,7 +159,7 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                 </div>
 
                 <div style={{ 
-                  transform: 'scale(0.69)', 
+                  transform: 'scale(0.82)', 
                   transformOrigin: 'left top',
                   marginBottom: '-150px' // 减少底部空白
                 }}>

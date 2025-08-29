@@ -70,7 +70,7 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
   if (variant === 'landing') {
     return (
       <header className={getHeaderClasses()} style={getHeaderStyle()}>
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-12">
             <Link href={`/${locale}`} className="text-sm font-bold text-primary-black flex items-center space-x-2 hover:opacity-80 transition-opacity">
               <Image src="/images/plus.png" alt="Plus" width={20} height={20} className="w-5 h-5 transition-transform duration-300 hover:rotate-180" />
@@ -120,7 +120,7 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
   if (loading) {
     return (
       <header className={getHeaderClasses()} style={getHeaderStyle()}>
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-12">
             {/* 左侧品牌区域骨架 */}
             <div className="flex items-center space-x-2">
@@ -163,7 +163,7 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
   if (user) {
     return (
       <header className={getHeaderClasses()} style={getHeaderStyle()}>
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center h-12">
             {/* Left section with navigation */}
             <nav className="flex items-center">
@@ -255,7 +255,7 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
   // 未登录状态头部
   return (
     <header className={getHeaderClasses()} style={getHeaderStyle()}>
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-12">
           <Link href={`/${locale}`} className="text-sm font-bold text-gray-900 flex items-center space-x-2 hover:opacity-80 transition-opacity">
             <Image src="/images/plus.png" alt="Plus" width={20} height={20} className="w-5 h-5 transition-transform duration-300 hover:rotate-180" />

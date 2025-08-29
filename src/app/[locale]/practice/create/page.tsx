@@ -167,7 +167,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
     <div className={`min-h-screen transition-colors duration-500 ${pageBackgroundClass}`}>
       <Header locale={locale} backgroundClass="bg-transparent" isFixed={false} />
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-6">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-6">
         <div className="items-center justify-end mb-0 hidden sm:flex">
           <div className="flex items-center space-x-4 bg-purple-900/5 rounded p-0 pointer-events-auto cursor-pointer">
             <DropdownMenu
