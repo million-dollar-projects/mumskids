@@ -205,7 +205,7 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                       value={settings.title}
                       onChange={(e) => handleSettingChange('title', e.target.value)}
                       placeholder="输入练习标题"
-                      className="w-full h-9"
+                      className="w-full h-9 focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-none"
                     />
                   </div>
 
@@ -220,7 +220,7 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                       onChange={(e) => handleSettingChange('childName', e.target.value)}
                       placeholder="小朋友姓名"
                       maxLength={8}
-                      className="w-full h-9"
+                      className="w-full h-9 focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-none"
                     />
                   </div>
 
@@ -305,7 +305,7 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                               }
                             }}
                             placeholder="输入题目数量 (5-100)"
-                            className="w-full h-9"
+                            className="w-full h-9 focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-none"
                           />
                         </div>
                       </AccordionContent>
