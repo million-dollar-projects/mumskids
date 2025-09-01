@@ -25,9 +25,10 @@ export interface ThemeTranslation {
 
 export interface ThemeMessages {
     practice?: {
-        themes?: Record<string, ThemeTranslation> & {
+        themes?: {
             themeLabel?: string;
             selectTheme?: string;
+            [K: string]: string | { name: string; description: string } | undefined;
         };
         practiceCard?: {
             nickname: string;
@@ -35,6 +36,7 @@ export interface ThemeMessages {
         };
         [key: string]: unknown;
     };
+    [key: string]: unknown;
 }
 
 // 基础主题配置 - 儿童友好的主题配置，明亮护眼，可爱渐变
@@ -93,11 +95,16 @@ const baseThemes: Omit<Theme, 'name' | 'description'>[] = [
 export const getThemes = (locale: string = 'zh', t?: ThemeMessages): Theme[] => {
     const isZh = locale === 'zh';
     
-    return baseThemes.map(theme => ({
-        ...theme,
-        name: t?.practice?.themes?.[theme.id]?.name || (isZh ? getDefaultThemeName(theme.id) : getDefaultThemeNameEn(theme.id)),
-        description: t?.practice?.themes?.[theme.id]?.description || (isZh ? getDefaultThemeDescription(theme.id) : getDefaultThemeDescriptionEn(theme.id))
-    }));
+    return baseThemes.map(theme => {
+        const themeTranslation = t?.practice?.themes?.[theme.id];
+        const isThemeTranslation = themeTranslation && typeof themeTranslation === 'object' && 'name' in themeTranslation;
+        
+        return {
+            ...theme,
+            name: isThemeTranslation ? themeTranslation.name : (isZh ? getDefaultThemeName(theme.id) : getDefaultThemeNameEn(theme.id)),
+            description: isThemeTranslation ? themeTranslation.description : (isZh ? getDefaultThemeDescription(theme.id) : getDefaultThemeDescriptionEn(theme.id))
+        };
+    });
 };
 
 // 默认中文主题名称
