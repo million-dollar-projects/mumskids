@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Plus, X, Gift, Shuffle, UserCheck, Lightbulb, Settings } from 'lucide-react';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
-import { defaultRewards } from '@/config/default-rewards';
+import { getDefaultRewards, DefaultReward } from '@/config/default-rewards';
 import { Reward, RewardCondition } from '@/types/practice';
 import { messages } from '@/i18n/messages';
 
@@ -44,7 +44,7 @@ export function RewardSelector({
   const [showEmojiDialog, setShowEmojiDialog] = useState(false);
   const [showRecommendations, setShowRecommendations] = useState(false);
   const [showAllRecommendations, setShowAllRecommendations] = useState(false);
-  const [pendingRewards, setPendingRewards] = useState<(typeof defaultRewards[0])[]>([]);
+  const [pendingRewards, setPendingRewards] = useState<DefaultReward[]>([]);
   const [showConditionDialog, setShowConditionDialog] = useState(false);
 
   const t = messages[locale as keyof typeof messages] || messages.zh;
@@ -130,7 +130,7 @@ export function RewardSelector({
     setShowEmojiDialog(false);
   };
 
-  const togglePendingReward = (recommendedReward: typeof defaultRewards[0]) => {
+  const togglePendingReward = (recommendedReward: DefaultReward) => {
     const isAlreadyPending = pendingRewards.some(reward => reward.text === recommendedReward.text);
     if (isAlreadyPending) {
       setPendingRewards(prev => prev.filter(reward => reward.text !== recommendedReward.text));
@@ -346,7 +346,7 @@ export function RewardSelector({
               <div className="space-y-4">
                 <p className="text-sm text-gray-600">{t.practice.rewardSelector.clickToSelect}{pendingRewards.length > 0 ? t.practice.rewardSelector.multipleSelect : ''}：</p>
                 <div className="grid grid-cols-1 gap-2 max-h-80 overflow-y-auto">
-                  {defaultRewards
+                  {getDefaultRewards(locale)
                     .filter(rec => !rewards.some(reward => reward.text === rec.text))
                     .slice(0, showAllRecommendations ? undefined : 12)
                     .map((recommendedReward, index) => {
@@ -372,7 +372,7 @@ export function RewardSelector({
                       );
                     })}
                 </div>
-                {!showAllRecommendations && defaultRewards.filter(rec => !rewards.some(reward => reward.text === rec.text)).length > 12 && (
+                {!showAllRecommendations && getDefaultRewards(locale).filter(rec => !rewards.some(reward => reward.text === rec.text)).length > 12 && (
                   <button
                     onClick={() => setShowAllRecommendations(true)}
                     className="text-sm text-gray-600 hover:text-gray-700 cursor-pointer hover:underline w-full text-center py-2"
@@ -380,7 +380,7 @@ export function RewardSelector({
                     {t.practice.rewardSelector.showMore}
                   </button>
                 )}
-                {showAllRecommendations && defaultRewards.filter(rec => !rewards.some(reward => reward.text === rec.text)).length > 12 && (
+                {showAllRecommendations && getDefaultRewards(locale).filter(rec => !rewards.some(reward => reward.text === rec.text)).length > 12 && (
                   <button
                     onClick={() => setShowAllRecommendations(false)}
                     className="text-sm text-gray-600 hover:text-gray-700 cursor-pointer hover:underline w-full text-center py-2"

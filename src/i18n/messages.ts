@@ -263,6 +263,36 @@ export const messages = {
         "confirm": "确定"
       }
     },
+    "rewards": {
+      "categories": {
+        "entertainment": "娱乐",
+        "food": "食物",
+        "activity": "活动",
+        "privilege": "特权"
+      },
+      "defaults": {
+        "watchTv10m": "看电视10分钟",
+        "tablet15m": "玩平板15分钟",
+        "cartoonEpisode": "看动画片一集",
+        "listenStory15m": "听故事15分钟",
+        "playGame20m": "玩游戏20分钟",
+        "cookie": "奖励一个小饼干",
+        "candy": "吃一颗糖果",
+        "juice": "喝一杯果汁",
+        "cupcake": "吃一个小蛋糕",
+        "chooseSnack": "选择今天的零食",
+        "playWithDad": "和爸爸玩游戏",
+        "drawWithMom": "和妈妈一起画画",
+        "park30m": "去公园玩30分钟",
+        "bike15m": "骑自行车15分钟",
+        "videoChatFriends": "和朋友视频聊天",
+        "sleepLate10m": "晚睡10分钟",
+        "chooseClothes": "选择明天的衣服",
+        "decideDinner": "决定晚餐吃什么",
+        "skipCleanup": "不用收拾玩具一次",
+        "getHug": "获得一个拥抱"
+      }
+    },
     "a4": {
       "title": "A4 预览",
       "regenerate": "重新生成",
@@ -609,6 +639,36 @@ export const messages = {
         "normalModeDesc": "Need to answer {target} questions correctly and complete within {time} minutes",
         "timedModeDesc": "Need to complete at least {minCorrect} questions within {timeLimit} minutes, with an error rate of no more than {errorRate}%",
         "confirm": "Confirm"
+      }
+    },
+    "rewards": {
+      "categories": {
+        "entertainment": "Entertainment",
+        "food": "Food",
+        "activity": "Activity",
+        "privilege": "Privilege"
+      },
+      "defaults": {
+        "watchTv10m": "Watch TV for 10 minutes",
+        "tablet15m": "Tablet time for 15 minutes",
+        "cartoonEpisode": "Watch one cartoon episode",
+        "listenStory15m": "Listen to a story for 15 minutes",
+        "playGame20m": "Play games for 20 minutes",
+        "cookie": "Get a cookie",
+        "candy": "Have a candy",
+        "juice": "Drink a cup of juice",
+        "cupcake": "Have a cupcake",
+        "chooseSnack": "Choose today's snack",
+        "playWithDad": "Play with Dad",
+        "drawWithMom": "Draw with Mom",
+        "park30m": "Go to the park for 30 minutes",
+        "bike15m": "Ride a bike for 15 minutes",
+        "videoChatFriends": "Video chat with friends",
+        "sleepLate10m": "Stay up 10 minutes later",
+        "chooseClothes": "Choose tomorrow's clothes",
+        "decideDinner": "Decide what's for dinner",
+        "skipCleanup": "Skip cleaning up toys once",
+        "getHug": "Get a hug"
       }
     },
     "a4": {
