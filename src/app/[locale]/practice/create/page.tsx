@@ -24,9 +24,9 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { RewardSelector } from '@/components/ui/reward-selector';
 import { toast } from 'sonner';
 import {
-  difficultyOptions,
-  calculationTypeOptions,
-  testModeOptions,
+  getDifficultyOptions,
+  getCalculationTypeOptions,
+  getTestModeOptions,
   questionCountOptions,
   timeLimitOptions,
   getVisibilityOptions
@@ -77,6 +77,9 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
 
   const t = messages[locale as keyof typeof messages] || messages.zh;
   const visibilityOptions = getVisibilityOptions(locale);
+  const difficultyOptions = getDifficultyOptions(locale);
+  const calculationTypeOptions = getCalculationTypeOptions(locale);
+  const testModeOptions = getTestModeOptions(locale);
 
   const currentTheme = themes.find(t => t.id === form.selectedTheme);
   const pageBackgroundClass = currentTheme?.bgClass || 'bg-transparent';
@@ -102,7 +105,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
     }
 
     if (!user?.id) {
-      alert('请先登录');
+      alert(t.practice.createPractice.pleaseLogin);
       router.push(`/${locale}/auth/login`);
       return;
     }
@@ -121,15 +124,15 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
 
       if (!response.ok) {
         if (response.status === 401) {
-          alert('请先登录');
+          alert(t.practice.createPractice.pleaseLogin);
           router.push(`/${locale}/auth/login`);
           return;
         }
         if (response.status === 400) {
-          alert(`请填写所有必填字段: ${(result.fields || []).join(', ')}`);
+          alert(t.practice.createPractice.fillRequiredFields.replace('{fields}', (result.fields || []).join(', ')));
           return;
         }
-        throw new Error(result.details || '保存失败，请重试');
+        throw new Error(result.details || t.practice.createPractice.saveFailed);
       }
 
       // 使所有练习相关的查询缓存失效
@@ -138,7 +141,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
       router.push(`/${locale}`);
     } catch (error) {
       console.error('保存失败:', error);
-      alert('保存失败，请重试');
+      alert(t.practice.createPractice.saveFailed);
     } finally {
       setSaving(false);
     }
@@ -249,13 +252,13 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
                     handleInputChange('title', e.target.value);
                   } else {
                     // 超出字符限制时显示提示
-                    toast.error('练习名称最多20个字符');
+                    toast.error(t.practice.createPractice.titleTooLong);
                   }
                 }}
                 className="text-2xl sm:text-4xl md:text-4xl font-bold text-[#1315175c] shadow-none 
                 border-none outline-none py-4 px-0 h-auto focus-visible:ring-0 bg-transparent 
                 placeholder:text-2xl sm:placeholder:text-4xl placeholder:font-bold placeholder:text-[#1315175c]"
-                placeholder="练习名称"
+                placeholder={t.practice.createPractice.titlePlaceholder}
               />
             </div>
             {/* 描述暂时隐藏 */}
@@ -263,7 +266,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
               <Input
                 value={form.description}
                 onChange={(e) => handleInputChange('description', e.target.value)}
-                placeholder="简单描述这个练习的目标和内容..."
+                placeholder={t.practice.createPractice.descriptionPlaceholder}
                 className="w-full border-none shadow-none outline-none px-2 py-2 h-auto focus-visible:ring-0 bg-transparent 
                  placeholder:font-bold placeholder:text-[#1315175c] bg-purple-900/5"
               />
@@ -278,13 +281,13 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
                     handleInputChange('childName', e.target.value);
                   }
                 }}
-                placeholder="小朋友昵称"
+                placeholder={t.practice.createPractice.childNamePlaceholder}
                 maxLength={8}
                 className="w-full border-none shadow-none outline-none px-2 py-2 h-auto focus-visible:ring-0 bg-transparent 
                   placeholder:font-bold placeholder:text-[#1315175c] bg-purple-900/5"
               />
               <div className="text-xs text-gray-500 mt-1 px-2">
-                {form.childName.length}/8 字符
+                {form.childName.length}/8 {t.practice.createPractice.characters}
               </div>
             </div>
 
@@ -296,7 +299,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
               <div className="flex items-center justify-between bg-purple-900/5 py-1 px-2 rounded">
                 <div className="flex items-center gap-3">
                   <Target className="w-5 h-5 text-gray-400" />
-                  <span className="font-medium">计算难度</span>
+                  <span className="font-medium">{t.practice.createPractice.calculationDifficulty}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-gray-600">
@@ -317,9 +320,9 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
               <Dialog open={showDifficultyDialog} onOpenChange={setShowDifficultyDialog}>
                 <DialogContent className={`sm:max-w-[425px] ${dialogBackgroundClass}`}>
                   <DialogHeader>
-                    <DialogTitle className="text-xl font-bold">选择难度</DialogTitle>
+                    <DialogTitle className="text-xl font-bold">{t.practice.createPractice.selectDifficulty}</DialogTitle>
                     <DialogDescription className="text-gray-500">
-                      请选择练习题目的难度范围
+                      {t.practice.createPractice.selectDifficultyDesc}
                     </DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-4 py-2">
@@ -355,7 +358,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
               <div className="flex items-center justify-between bg-purple-900/5 py-1 px-2 rounded">
                 <div className="flex items-center gap-3">
                   <Calculator className="w-5 h-5 text-gray-400" />
-                  <span className="font-medium">计算方式</span>
+                  <span className="font-medium">{t.practice.createPractice.calculationType}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-gray-600">
@@ -376,9 +379,9 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
               <Dialog open={showCalculationDialog} onOpenChange={setShowCalculationDialog}>
                 <DialogContent className={`sm:max-w-[425px] ${dialogBackgroundClass}`}>
                   <DialogHeader>
-                    <DialogTitle className="text-xl font-bold">选择计算方式</DialogTitle>
+                    <DialogTitle className="text-xl font-bold">{t.practice.createPractice.selectCalculationType}</DialogTitle>
                     <DialogDescription className="text-gray-500">
-                      请选择练习题目的计算方式
+                      {t.practice.createPractice.selectCalculationTypeDesc}
                     </DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-4 py-4">
@@ -414,12 +417,12 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
               <div className="flex items-center justify-between bg-purple-900/5 py-1 px-2 rounded">
                 <div className="flex items-center gap-3">
                   <Timer className="w-5 h-5 text-gray-400" />
-                  <span className="font-medium">练习方式</span>
+                  <span className="font-medium">{t.practice.createPractice.practiceMode}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-gray-600">
-                    {form.testMode === 'normal' && `${testModeOptions.find(option => option.id === 'normal')?.label} (${form.questionCount}题)`}
-                    {form.testMode === 'timed' && `${testModeOptions.find(option => option.id === 'timed')?.label} (${form.timeLimit}分钟)`}
+                    {form.testMode === 'normal' && `${testModeOptions.find(option => option.id === 'normal')?.label} (${form.questionCount}${t.practice.createPractice.questions})`}
+                    {form.testMode === 'timed' && `${testModeOptions.find(option => option.id === 'timed')?.label} (${form.timeLimit}${t.practice.createPractice.minutes})`}
                   </span>
                   <Button
                     variant="ghost"
@@ -436,9 +439,9 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
               <Dialog open={showTestModeDialog} onOpenChange={setShowTestModeDialog}>
                 <DialogContent className={`sm:max-w-[425px] ${dialogBackgroundClass}`}>
                   <DialogHeader>
-                    <DialogTitle className="text-xl font-bold">选择练习模式</DialogTitle>
+                    <DialogTitle className="text-xl font-bold">{t.practice.createPractice.selectPracticeMode}</DialogTitle>
                     <DialogDescription className="text-gray-500">
-                      请选择练习题目的练习模式和相关设置
+                      {t.practice.createPractice.selectPracticeModeDesc}
                     </DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-6 py-4">
@@ -470,12 +473,12 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
                                 onValueChange={(value) => handleInputChange('questionCount', parseInt(value))}
                               >
                                 <SelectTrigger className="w-full">
-                                  <SelectValue placeholder="选择题目数量" />
+                                  <SelectValue placeholder={t.practice.createPractice.selectQuestionCount} />
                                 </SelectTrigger>
                                 <SelectContent className={`${dialogBackgroundClass} border shadow-lg`}>
                                   {questionCountOptions.map((count) => (
                                     <SelectItem key={count} value={count.toString()}>
-                                      {count} 题
+                                      {count} {t.practice.createPractice.questions}
                                     </SelectItem>
                                   ))}
                                 </SelectContent>
@@ -489,12 +492,12 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
                                 onValueChange={(value) => handleInputChange('timeLimit', parseInt(value))}
                               >
                                 <SelectTrigger className="w-full">
-                                  <SelectValue placeholder="选择时间" />
+                                  <SelectValue placeholder={t.practice.createPractice.selectTime} />
                                 </SelectTrigger>
                                 <SelectContent className={`${dialogBackgroundClass} border shadow-lg`}>
                                   {timeLimitOptions.map((minutes) => (
                                     <SelectItem key={minutes} value={minutes.toString()}>
-                                      {minutes} 分钟
+                                      {minutes} {t.practice.createPractice.minutes}
                                     </SelectItem>
                                   ))}
                                 </SelectContent>
@@ -510,7 +513,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
                       onClick={() => setShowTestModeDialog(false)}
                       className="w-full bg-gray-900 hover:bg-gray-800 text-white cursor-pointer h-11"
                     >
-                      确 定
+                      {t.practice.createPractice.confirm}
                     </Button>
                   </DialogFooter>
                 </DialogContent>
@@ -529,6 +532,7 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
                 testMode={form.testMode}
                 questionCount={form.questionCount}
                 timeLimit={form.timeLimit}
+                locale={locale}
               />
             </div>
 
@@ -544,10 +548,10 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
               {saving ? (
                 <>
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                  创建练习
+                  {t.practice.createPractice.creatingPractice}
                 </>
               ) : (
-                '创建练习'
+                t.practice.createPractice.createPractice
               )}
             </Button>
           </div>

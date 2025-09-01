@@ -12,6 +12,7 @@ import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { defaultRewards } from '@/config/default-rewards';
 import { Reward, RewardCondition } from '@/types/practice';
+import { messages } from '@/i18n/messages';
 
 export interface RewardSelectorProps {
   rewards: Reward[];
@@ -23,6 +24,7 @@ export interface RewardSelectorProps {
   testMode: 'normal' | 'timed';
   questionCount?: number;
   timeLimit?: number;
+  locale?: string;
 }
 
 export function RewardSelector({
@@ -34,7 +36,8 @@ export function RewardSelector({
   maxRewards = 5,
   testMode,
   questionCount = 10,
-  timeLimit = 2
+  timeLimit = 2,
+  locale = 'zh'
 }: RewardSelectorProps) {
   const [newRewardText, setNewRewardText] = useState('');
   const [selectedEmoji, setSelectedEmoji] = useState('🎁');
@@ -43,6 +46,8 @@ export function RewardSelector({
   const [showAllRecommendations, setShowAllRecommendations] = useState(false);
   const [pendingRewards, setPendingRewards] = useState<(typeof defaultRewards[0])[]>([]);
   const [showConditionDialog, setShowConditionDialog] = useState(false);
+
+  const t = messages[locale as keyof typeof messages] || messages.zh;
 
   const [rewardCondition, setRewardCondition] = useState<RewardCondition>(() => {
     if (testMode === 'timed') {
@@ -161,14 +166,14 @@ export function RewardSelector({
     <div>
       <div className="flex items-center gap-3 mb-3">
         <Gift className="w-5 h-5 text-gray-400" />
-        <span className="font-medium">完成奖励(可选)</span>
+        <span className="font-medium">{t.practice.rewardSelector.title}</span>
       </div>
 
       {/* Emoji选择对话框 */}
       <Dialog open={showEmojiDialog} onOpenChange={setShowEmojiDialog}>
         <DialogContent className="max-w-[430px] bg-white p-0 overflow-hidden">
           <DialogHeader className="p-4 pb-0">
-            <DialogTitle className="text-lg font-bold">选择奖品符号</DialogTitle>
+            <DialogTitle className="text-lg font-bold">{t.practice.rewardSelector.selectEmoji}</DialogTitle>
           </DialogHeader>
 
           <div className="p-2 pt-2">
@@ -176,7 +181,7 @@ export function RewardSelector({
               data={data}
               onEmojiSelect={handleEmojiSelect}
               theme="light"
-              locale="en"
+              locale={locale === 'zh' ? 'zh' : 'en'}
               previewPosition="none"
               searchPosition="top"
               maxFrequentRows={2}
@@ -212,7 +217,7 @@ export function RewardSelector({
             {/* 发放方式选择 */}
             {rewards.length > 1 && (
               <div className="bg-purple-900/5 p-3 rounded-lg">
-                <p className="text-sm font-medium mb-2">奖励发放方式：</p>
+                <p className="text-sm font-medium mb-2">{t.practice.rewardSelector.distributionMode}</p>
                 <RadioGroup
                   value={distributionMode}
                   onValueChange={(value: 'random' | 'choice') => onDistributionModeChange(value)}
@@ -222,14 +227,14 @@ export function RewardSelector({
                     <RadioGroupItem value="random" id="random" checked={distributionMode === 'random'} />
                     <Label htmlFor="random" className="text-sm cursor-pointer flex items-center gap-1">
                       <Shuffle className="w-3 h-3" />
-                      随机一个 - 系统随机选择一个奖励
+                      {t.practice.rewardSelector.randomMode}
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2 cursor-pointer">
                     <RadioGroupItem value="choice" id="choice" checked={distributionMode === 'choice'} />
                     <Label htmlFor="choice" className="text-sm cursor-pointer flex items-center gap-1">
                       <UserCheck className="w-3 h-3" />
-                      自己选择 - 小朋友自己选择喜欢的奖励
+                      {t.practice.rewardSelector.choiceMode}
                     </Label>
                   </div>
                 </RadioGroup>
@@ -242,10 +247,15 @@ export function RewardSelector({
                 <div className="flex-1">
                   <p className="text-xs text-gray-600">
                     {testMode === 'normal'
-                      ? `答对 ${rewardCondition.targetCorrect || Math.max(1, Math.ceil(questionCount * 0.8))} 题且在 ${rewardCondition.maxTime || Math.max(1, Math.ceil(questionCount * 0.5))} 分钟内完成`
-                      : `在 ${timeLimit} 分钟内完成至少 ${rewardCondition.minCorrect || Math.max(5, Math.ceil(timeLimit * 3 * 0.7))} 题，错误率不超过 ${rewardCondition.maxErrorRate !== undefined ? rewardCondition.maxErrorRate : 20}%`
+                      ? t.practice.rewardSelector.normalModeDesc
+                          .replace('{target}', (rewardCondition.targetCorrect || Math.max(1, Math.ceil(questionCount * 0.8))).toString())
+                          .replace('{time}', (rewardCondition.maxTime || Math.max(1, Math.ceil(questionCount * 0.5))).toString())
+                      : t.practice.rewardSelector.timedModeDesc
+                          .replace('{timeLimit}', timeLimit.toString())
+                          .replace('{minCorrect}', (rewardCondition.minCorrect || Math.max(5, Math.ceil(timeLimit * 3 * 0.7))).toString())
+                          .replace('{errorRate}', (rewardCondition.maxErrorRate !== undefined ? rewardCondition.maxErrorRate : 20).toString())
                     }
-                    可获得奖励
+                    {t.practice.rewardSelector.rewardCondition}
                   </p>
                 </div>
                 <Button
@@ -253,7 +263,7 @@ export function RewardSelector({
                   size="sm"
                   onClick={() => setShowConditionDialog(true)}
                   className="text-gray-600 hover:text-gray-700 hover:bg-blue-50 p-1 h-auto cursor-pointer"
-                  title="点击修改条件"
+                  title={t.practice.rewardSelector.modifyCondition}
                 >
                   <Settings className="w-4 h-4 text-gray-600" />
                 </Button>
@@ -278,7 +288,7 @@ export function RewardSelector({
               onChange={(e) => setNewRewardText(e.target.value)}
               className='w-full border-none shadow-none outline-none px-2 py-2 h-auto focus-visible:ring-0 bg-transparent 
                   placeholder:font-bold placeholder:text-[#1315175c] bg-purple-900/5 cursor-pointer'
-              placeholder="自定义添加完成奖励..."
+              placeholder={t.practice.rewardSelector.customRewardPlaceholder}
               onKeyDown={(e) => e.key === 'Enter' && addReward()}
               disabled={rewards.length >= maxRewards}
             />
@@ -304,18 +314,18 @@ export function RewardSelector({
           </div>
 
           {rewards.length >= maxRewards && (
-            <p className="text-xs text-gray-500">最多可以添加 {maxRewards} 个奖励</p>
+            <p className="text-xs text-gray-500">{t.practice.rewardSelector.maxRewards.replace('{count}', maxRewards.toString())}</p>
           )}
 
           {/* 推荐奖励 Dialog */}
           <Dialog open={showRecommendations} onOpenChange={cancelPendingRewards}>
             <DialogContent className="max-w-[500px] bg-white">
               <DialogHeader>
-                <DialogTitle className="text-xl font-bold">推荐奖励</DialogTitle>
+                <DialogTitle className="text-xl font-bold">{t.practice.rewardSelector.recommendedRewards}</DialogTitle>
                 {/* 预选择的奖励显示 */}
                 {pendingRewards.length > 0 && (
                   <div className="mt-3 p-3 bg-blue-50 rounded-lg">
-                    <p className="text-sm text-gray-600 mb-2">已选择的奖励：</p>
+                    <p className="text-sm text-gray-600 mb-2">{t.practice.rewardSelector.selectedRewards}</p>
                     <div className="flex flex-wrap gap-2">
                       {pendingRewards.map((reward, index) => (
                         <Badge key={index} variant="secondary" className="gap-2 text-sm bg-blue-100 text-blue-800">
@@ -334,7 +344,7 @@ export function RewardSelector({
                 )}
               </DialogHeader>
               <div className="space-y-4">
-                <p className="text-sm text-gray-600">点击选择奖励{pendingRewards.length > 0 ? '（可多选）' : ''}：</p>
+                <p className="text-sm text-gray-600">{t.practice.rewardSelector.clickToSelect}{pendingRewards.length > 0 ? t.practice.rewardSelector.multipleSelect : ''}：</p>
                 <div className="grid grid-cols-1 gap-2 max-h-80 overflow-y-auto">
                   {defaultRewards
                     .filter(rec => !rewards.some(reward => reward.text === rec.text))
@@ -357,7 +367,7 @@ export function RewardSelector({
                         >
                           <span className="text-xl">{recommendedReward.emoji}</span>
                           <span className="font-medium flex-1">{recommendedReward.text}</span>
-                          {isSelected && <span className="text-blue-600 text-xs">✓ 已选择</span>}
+                          {isSelected && <span className="text-blue-600 text-xs">{t.practice.rewardSelector.selected}</span>}
                         </button>
                       );
                     })}
@@ -367,7 +377,7 @@ export function RewardSelector({
                     onClick={() => setShowAllRecommendations(true)}
                     className="text-sm text-gray-600 hover:text-gray-700 cursor-pointer hover:underline w-full text-center py-2"
                   >
-                    更多推荐
+                    {t.practice.rewardSelector.showMore}
                   </button>
                 )}
                 {showAllRecommendations && defaultRewards.filter(rec => !rewards.some(reward => reward.text === rec.text)).length > 12 && (
@@ -375,7 +385,7 @@ export function RewardSelector({
                     onClick={() => setShowAllRecommendations(false)}
                     className="text-sm text-gray-600 hover:text-gray-700 cursor-pointer hover:underline w-full text-center py-2"
                   >
-                    收起
+                    {t.practice.rewardSelector.showLess}
                   </button>
                 )}
               </div>
@@ -385,14 +395,14 @@ export function RewardSelector({
                   onClick={cancelPendingRewards}
                   className="cursor-pointer flex-1"
                 >
-                  取消
+                  {t.practice.rewardSelector.cancel}
                 </Button>
                 <Button
                   onClick={confirmPendingRewards}
                   disabled={pendingRewards.length === 0}
                   className="cursor-pointer bg-gray-900 hover:bg-gray-700 text-white flex-1"
                 >
-                  确认添加 {pendingRewards.length > 0 && `(${pendingRewards.length})`}
+                  {t.practice.rewardSelector.confirmAdd} {pendingRewards.length > 0 && `(${pendingRewards.length})`}
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -402,23 +412,23 @@ export function RewardSelector({
           <Dialog open={showConditionDialog} onOpenChange={setShowConditionDialog}>
             <DialogContent className="max-w-[500px] bg-white">
               <DialogHeader>
-                <DialogTitle className="text-xl font-bold">设置奖励条件</DialogTitle>
+                <DialogTitle className="text-xl font-bold">{t.practice.rewardSelector.setRewardCondition}</DialogTitle>
               </DialogHeader>
               <div className="space-y-6">
                 {/* 当前练习模式显示 */}
                 <div className="p-4 bg-gray-50 rounded-lg">
-                  <Label className="text-base font-medium mb-2 block">当前练习模式</Label>
+                  <Label className="text-base font-medium mb-2 block">{t.practice.rewardSelector.currentPracticeMode}</Label>
                   <div className="flex items-center space-x-3">
                     <div className={`px-3 py-2 rounded-md text-sm font-medium ${testMode === 'normal'
                       ? 'bg-blue-100 text-blue-800'
                       : 'bg-green-100 text-green-800'
                       }`}>
-                      {testMode === 'normal' ? '普通模式' : '计时模式'}
+                      {testMode === 'normal' ? t.practice.rewardSelector.normalMode : t.practice.rewardSelector.timedMode}
                     </div>
                     <span className="text-gray-600 text-sm">
                       {testMode === 'normal'
-                        ? `${questionCount} 题`
-                        : `${timeLimit} 分钟`
+                        ? `${questionCount} ${t.practice.createPractice.questions}`
+                        : `${timeLimit} ${t.practice.createPractice.minutes}`
                       }
                     </span>
                   </div>
@@ -429,7 +439,7 @@ export function RewardSelector({
                   <div className="space-y-4 p-4 bg-blue-50 rounded-lg">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label className="text-sm text-gray-600">目标正确题数</Label>
+                        <Label className="text-sm text-gray-600">{t.practice.rewardSelector.targetCorrectQuestions}</Label>
                         <Input
                           type="number"
                           value={rewardCondition.targetCorrect || 8}
@@ -443,7 +453,7 @@ export function RewardSelector({
                         />
                       </div>
                       <div>
-                        <Label className="text-sm text-gray-600">超时时间(分钟)</Label>
+                        <Label className="text-sm text-gray-600">{t.practice.rewardSelector.timeoutMinutes}</Label>
                         <Input
                           type="number"
                           value={rewardCondition.maxTime || 3}
@@ -458,7 +468,10 @@ export function RewardSelector({
                       </div>
                     </div>
                     <p className="text-xs text-blue-600">
-                      需要答对 {rewardCondition.targetCorrect || 8} 题且在 {rewardCondition.maxTime || 3} 分钟内完成
+                      {t.practice.rewardSelector.normalModeDesc
+                        .replace('{target}', (rewardCondition.targetCorrect || 8).toString())
+                        .replace('{time}', (rewardCondition.maxTime || 3).toString())
+                      }
                     </p>
                   </div>
                 )}
@@ -468,7 +481,7 @@ export function RewardSelector({
                   <div className="space-y-4 p-4 bg-green-50 rounded-lg">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label className="text-sm text-gray-600">最少完成题数</Label>
+                        <Label className="text-sm text-gray-600">{t.practice.rewardSelector.minQuestions}</Label>
                         <Input
                           type="number"
                           value={rewardCondition.minCorrect || 10}
@@ -482,7 +495,7 @@ export function RewardSelector({
                         />
                       </div>
                       <div>
-                        <Label className="text-sm text-gray-600">最大错误率（%）</Label>
+                        <Label className="text-sm text-gray-600">{t.practice.rewardSelector.maxErrorRate}</Label>
                         <Input
                           type="number"
                           value={rewardCondition.maxErrorRate !== undefined ? rewardCondition.maxErrorRate : 20}
@@ -500,7 +513,11 @@ export function RewardSelector({
                       </div>
                     </div>
                     <p className="text-xs text-green-600">
-                      需要在 {timeLimit} 分钟内完成至少 {rewardCondition.minCorrect || 10} 题，错误率不超过 {rewardCondition.maxErrorRate !== undefined ? rewardCondition.maxErrorRate : 20}%
+                      {t.practice.rewardSelector.timedModeDesc
+                        .replace('{timeLimit}', timeLimit.toString())
+                        .replace('{minCorrect}', (rewardCondition.minCorrect || 10).toString())
+                        .replace('{errorRate}', (rewardCondition.maxErrorRate !== undefined ? rewardCondition.maxErrorRate : 20).toString())
+                      }
                     </p>
                   </div>
                 )}
@@ -511,7 +528,7 @@ export function RewardSelector({
                   onClick={() => setShowConditionDialog(false)}
                   className="cursor-pointer flex-1"
                 >
-                  取消
+                  {t.practice.rewardSelector.cancel}
                 </Button>
                 <Button
                   onClick={() => {
@@ -520,7 +537,7 @@ export function RewardSelector({
                   }}
                   className="cursor-pointer bg-gray-900 hover:bg-gray-700 text-white flex-1"
                 >
-                  确定
+                  {t.practice.rewardSelector.confirm}
                 </Button>
               </DialogFooter>
             </DialogContent>
