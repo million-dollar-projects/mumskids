@@ -1,6 +1,6 @@
 import { Card } from '@/components/ui/card';
 import { Target } from 'lucide-react';
-import { difficultyOptions, calculationTypeOptions } from '@/lib/practice-config';
+import { getDifficultyOptions, getCalculationTypeOptions } from '@/lib/practice-config';
 import { getThemeById, getDefaultTheme } from '@/lib/themes';
 
 interface PracticeCardProps {
@@ -10,6 +10,15 @@ interface PracticeCardProps {
   className?: string;
   size?: 'small' | 'large';
   theme?: string;
+  locale?: string;
+  t?: {
+    practice: {
+      practiceCard: {
+        nickname: string;
+        calculation: string;
+      };
+    };
+  };
 }
 
 export function PracticeCard({
@@ -18,7 +27,9 @@ export function PracticeCard({
   calculationType,
   className = "",
   size = 'large',
-  theme
+  theme,
+  locale = 'zh',
+  t
 }: PracticeCardProps) {
   // 根据昵称长度和卡片大小动态调整字体大小
   const getNameFontSize = (name?: string) => {
@@ -73,9 +84,17 @@ export function PracticeCard({
     };
   };
 
+  // 获取多语言配置的选项
+  const difficultyOptions = getDifficultyOptions(locale);
+  const calculationTypeOptions = getCalculationTypeOptions(locale);
+  
   const difficultyLabel = difficultyOptions.find(option => option.id === difficulty)?.label || '';
   const calculationLabel = calculationTypeOptions.find(option => option.id === calculationType)?.label || '';
   const decorations = getDecorationSizes();
+  
+  // 获取多语言文案，如果没有传入 t，则使用默认值
+  const nicknameText = t?.practice.practiceCard.nickname || (locale === 'en' ? 'Nickname' : '昵称');
+  const calculationText = t?.practice.practiceCard.calculation || (locale === 'en' ? 'Calculation' : '运算');
   
   // 获取主题配置
   const currentTheme = theme ? getThemeById(theme) : getDefaultTheme();
@@ -85,10 +104,10 @@ export function PracticeCard({
     <Card className={`aspect-square max-w-[200px] sm:max-w-none mx-auto sm:mx-0 ${themeGradient} border-none shadow-xl flex items-center justify-center relative overflow-hidden ${className}`}>
       <div className={`text-center text-white ${getPadding()}`}>
         <div className={`font-bold ${getMarginBottom()} transform leading-tight ${getNameFontSize(childName)}`}>
-          {childName ? childName.toUpperCase() : '昵称'}
+          {childName ? childName.toUpperCase() : nicknameText}
         </div>
         <div className={`${getDescriptionFontSize()} font-medium opacity-90`}>
-          {`${difficultyLabel}${calculationLabel}运算`}
+          {`${difficultyLabel} ${calculationLabel} ${calculationText}`}
         </div>
       </div>
 

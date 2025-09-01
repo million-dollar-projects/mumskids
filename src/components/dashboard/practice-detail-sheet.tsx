@@ -132,6 +132,8 @@ export function PracticeDetailSheet({
                     className="w-full h-32"
                     size="small"
                     theme={practice.selected_theme}
+                    locale={locale}
+                    t={messages[locale as keyof typeof messages] || messages.zh}
                   />
                 </div>
               </div>

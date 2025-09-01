@@ -79,6 +79,10 @@ export const messages = {
       "within20": "20以内",
       "within50": "50以内",
       "within100": "100以内",
+      "practiceCard": {
+        "nickname": "昵称",
+        "calculation": "运算"
+      },
       "questionCount": "题目数量",
       "rewards": "奖励设置",
       "addReward": "添加奖励",
@@ -387,6 +391,10 @@ export const messages = {
       "within20": "Within 20",
       "within50": "Within 50",
       "within100": "Within 100",
+      "practiceCard": {
+        "nickname": "Nickname",
+        "calculation": "Calculation"
+      },
       "questionCount": "Number of Questions",
       "rewards": "Rewards",
       "addReward": "Add Reward",

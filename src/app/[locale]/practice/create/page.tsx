@@ -231,6 +231,8 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
               difficulty={form.difficulty}
               calculationType={form.calculationType}
               theme={form.selectedTheme}
+              locale={locale}
+              t={t}
             />
 
             {/* 主题选择 */}

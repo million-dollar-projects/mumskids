@@ -62,6 +62,8 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
         className="w-24 h-24 sm:w-32 sm:h-32"
         size="small"
         theme={practice.selected_theme}
+        locale={locale}
+        t={t}
       />
     );
   };
