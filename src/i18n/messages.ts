@@ -8,7 +8,11 @@ export const messages = {
       "create": "创建",
       "settings": "设置",
       "login": "登录",
-      "logout": "退出"
+      "logout": "退出",
+      "createPractice": "创建练习",
+      "a4Print": "A4 打印",
+      "createShort": "创建",
+      "a4Short": "A4"
     },
     "auth": {
       "title": "LittlePlus",
@@ -45,7 +49,11 @@ export const messages = {
       "footer": {
         "support": "使用条款",
         "privacy": "隐私政策", 
-        "security": "帮助"
+        "security": "帮助",
+        "discover": "发现",
+        "pricing": "定价",
+        "help": "帮助",
+        "startWithLittlePlus": "使用 LittlePlus 开始练习 →"
       }
     },
     "events": {
@@ -98,7 +106,65 @@ export const messages = {
       "createdBy": "创建者",
       "totalQuestions": "总题数",
       "estimatedTime": "预计用时",
-      "minutes": "分钟"
+      "minutes": "分钟",
+      "dashboard": {
+        "pageTitle": "练习",
+        "myPractices": "我的练习",
+        "publicPractices": "公开练习",
+        "startPractice": "开始练习",
+        "viewDetails": "查看详细",
+        "viewDetailsShort": "详细",
+        "loadingMore": "加载中...",
+        "loadMore": "加载更多",
+        "remaining": "个剩余",
+        "showing": "显示",
+        "of": "/",
+        "practices": "个练习",
+        "difficulty": "难度:",
+        "timeLimit": "分钟限时",
+        "questions": "道题目",
+        "noMyPractices": "还没有数学练习",
+        "noPublicPractices": "暂无公开练习",
+        "noMyPracticesDesc": "为孩子创建第一个数学练习，让学习变得更有趣！",
+        "noPublicPracticesDesc": "目前还没有公开的练习，快去创建一个分享给大家吧！",
+        "createPractice": "创建练习",
+        "today": "今天",
+        "weekdays": {
+          "sunday": "星期日",
+          "monday": "星期一",
+          "tuesday": "星期二",
+          "wednesday": "星期三",
+          "thursday": "星期四",
+          "friday": "星期五",
+          "saturday": "星期六"
+        }
+      },
+      "detailSheet": {
+        "calculationDifficulty": "计算难度",
+        "calculationType": "计算方式",
+        "practiceMode": "练习方式",
+        "normalMode": "普通模式",
+        "timedMode": "计时模式",
+        "questions": "题",
+        "minutes": "分钟",
+        "randomRewards": "随机奖励",
+        "selectRewards": "自选奖励",
+        "rewardCondition": "获得条件",
+        "minCorrect": "最少完成",
+        "maxErrorRate": "错误率不超过",
+        "targetCorrect": "答对",
+        "maxTime": "分钟内完成",
+        "description": "练习描述",
+        "startPractice": "开始练习",
+        "copyLink": "复制链接",
+        "delete": "删除",
+        "confirmDelete": "确认删除练习",
+        "deleteDescription": "您确定要删除练习「{title}」吗？此操作无法撤销，所有相关的练习记录也将被删除。",
+        "cancel": "取消",
+        "confirmDeleteAction": "确认删除",
+        "deleting": "删除中...",
+        "createdAt": "创建于"
+      }
     },
     "a4": {
       "title": "A4 预览",
@@ -167,6 +233,10 @@ export const messages = {
       "error": "出错了",
       "success": "成功"
     },
+    "notifications": {
+      "emptyTitle": "这里很安静",
+      "emptyDescription": "创建练习并分享给好友。"
+    },
     "discover": {
       "title": "发现练习",
       "subtitle": "探索其他用户分享的精彩数学练习",
@@ -189,7 +259,11 @@ export const messages = {
       "create": "Create",
       "settings": "Settings",
       "login": "Login",
-      "logout": "Logout"
+      "logout": "Logout",
+      "createPractice": "Create Practice",
+      "a4Print": "A4 Print",
+      "createShort": "Create",
+      "a4Short": "A4"
     },
     "auth": {
       "title": "LittlePlus",
@@ -226,7 +300,11 @@ export const messages = {
       "footer": {
         "support": "Terms of Use",
         "privacy": "Privacy Policy",
-        "security": "Help"
+        "security": "Help",
+        "discover": "Discover",
+        "pricing": "Pricing",
+        "help": "Help",
+        "startWithLittlePlus": "Start practicing with LittlePlus →"
       }
     },
     "events": {
@@ -279,7 +357,65 @@ export const messages = {
       "createdBy": "Created by",
       "totalQuestions": "Total Questions",
       "estimatedTime": "Estimated Time",
-      "minutes": "minutes"
+      "minutes": "minutes",
+      "dashboard": {
+        "pageTitle": "Practice",
+        "myPractices": "My Practices",
+        "publicPractices": "Public Practices",
+        "startPractice": "Start Practice",
+        "viewDetails": "View Details",
+        "viewDetailsShort": "Details",
+        "loadingMore": "Loading...",
+        "loadMore": "Load More",
+        "remaining": "remaining",
+        "showing": "Showing",
+        "of": "/",
+        "practices": "practices",
+        "difficulty": "Difficulty:",
+        "timeLimit": "Time Limit",
+        "questions": "questions",
+        "noMyPractices": "No math practices yet",
+        "noPublicPractices": "No public practices",
+        "noMyPracticesDesc": "Create your first math practice for your child to make learning more fun!",
+        "noPublicPracticesDesc": "There are no public practices yet. Create one and share it with everyone!",
+        "createPractice": "Create Practice",
+        "today": "Today",
+        "weekdays": {
+          "sunday": "Sunday",
+          "monday": "Monday",
+          "tuesday": "Tuesday",
+          "wednesday": "Wednesday",
+          "thursday": "Thursday",
+          "friday": "Friday",
+          "saturday": "Saturday"
+        }
+      },
+      "detailSheet": {
+        "calculationDifficulty": "Calculation Difficulty",
+        "calculationType": "Calculation Type",
+        "practiceMode": "Practice Mode",
+        "normalMode": "Normal Mode",
+        "timedMode": "Timed Mode",
+        "questions": "Questions",
+        "minutes": "Minutes",
+        "randomRewards": "Random Rewards",
+        "selectRewards": "Select Rewards",
+        "rewardCondition": "Reward Condition",
+        "minCorrect": "Min Correct",
+        "maxErrorRate": "Max Error Rate",
+        "targetCorrect": "Target Correct",
+        "maxTime": "Max Time",
+        "description": "Description",
+        "startPractice": "Start Practice",
+        "copyLink": "Copy Link",
+        "delete": "Delete",
+        "confirmDelete": "Confirm Delete Practice",
+        "deleteDescription": "Are you sure you want to delete practice \"{title}\"? This action cannot be undone, and all related practice records will also be deleted.",
+        "cancel": "Cancel",
+        "confirmDeleteAction": "Confirm Delete",
+        "deleting": "Deleting...",
+        "createdAt": "Created At"
+      }
     },
     "a4": {
       "title": "A4 Preview",
@@ -347,6 +483,10 @@ export const messages = {
       "loading": "Loading...",
       "error": "Error",
       "success": "Success"
+    },
+    "notifications": {
+      "emptyTitle": "It's quiet here",
+      "emptyDescription": "Create a practice and share it with your friends."
     },
     "discover": {
       "title": "Discover Practices",

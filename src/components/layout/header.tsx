@@ -23,6 +23,9 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
   const [isScrolled, setIsScrolled] = useState(false);
   const notificationRef = useRef<HTMLDivElement>(null);
 
+  // 获取翻译函数
+  const t = messages[locale as keyof typeof messages] || messages.zh;
+
   // 统一的header样式类
   const getHeaderClasses = () => {
     return `transition-all duration-300 ${isFixed ? 'fixed top-0 left-0 right-0 z-50' : 'relative'} ${isFixed && isScrolled ? 'bg-white/20 backdrop-blur-sm' : backgroundClass
@@ -33,8 +36,6 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
   const getHeaderStyle = () => {
     return isFixed ? { paddingTop: 'env(safe-area-inset-top)' } : {};
   };
-
-  const t = messages[locale as keyof typeof messages] || messages.zh;
 
   // 监听滚动事件
   useEffect(() => {
@@ -81,17 +82,17 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
               <div className="hidden sm:flex items-center space-x-2">
                 <Link href={`/${locale}/discover`}>
                   <button className="text-gray-700 hover:text-gray-900 font-medium text-xs sm:text-sm cursor-pointer px-2 sm:px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
-                    发现
+                    {t.nav.discover}
                   </button>
                 </Link>
                 <Link href={`/${locale}/practice/create`}>
                   <button className="text-gray-700 hover:text-gray-900 font-medium text-xs sm:text-sm cursor-pointer px-2 sm:px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
-                    创建练习
+                    {t.nav.createPractice}
                   </button>
                 </Link>
                 <Link href={`/${locale}/practice/a4/create`}>
                   <button className="text-gray-700 hover:text-gray-900 font-medium text-xs sm:text-sm cursor-pointer px-2 sm:px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
-                    A4 打印
+                    {t.nav.a4Print}
                   </button>
                 </Link>
               </div>
@@ -185,22 +186,22 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
         <div className="absolute right-4 sm:right-6 lg:right-8 top-1/2 transform -translate-y-1/2 flex items-center space-x-1 sm:space-x-2">
               <Link href={`/${locale}/discover`}>
                 <button className="text-gray-700 hover:text-gray-900 font-medium text-xs sm:text-sm cursor-pointer px-2 sm:px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
-                  <span className="hidden sm:inline">发现</span>
-                  <span className="sm:hidden">发现</span>
+                  <span className="hidden sm:inline">{t.nav.discover}</span>
+                  <span className="sm:hidden">{t.nav.discover}</span>
                 </button>
               </Link>
 
               <Link href={`/${locale}/practice/create`}>
                 <button className="text-gray-700 hover:text-gray-900 font-medium text-xs sm:text-sm cursor-pointer px-2 sm:px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
-                  <span className="hidden sm:inline">创建练习</span>
-                  <span className="sm:hidden">创建</span>
+                  <span className="hidden sm:inline">{t.nav.createPractice}</span>
+                  <span className="sm:hidden">{t.nav.createShort}</span>
                 </button>
               </Link>
 
               <Link href={`/${locale}/practice/a4/create`}>
                 <button className="text-gray-700 hover:text-gray-900 font-medium text-xs sm:text-sm cursor-pointer px-2 sm:px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
-                  <span className="hidden sm:inline">A4 打印</span>
-                  <span className="sm:hidden">A4</span>
+                  <span className="hidden sm:inline">{t.nav.a4Print}</span>
+                  <span className="sm:hidden">{t.nav.a4Short}</span>
                 </button>
               </Link>
 
@@ -237,10 +238,10 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
                       </div>
 
                       {/* 主要文字 */}
-                      <h3 className="text-lg sm:text-xl font-medium text-gray-700 mb-2 sm:mb-3">这里很安静</h3>
+                      <h3 className="text-lg sm:text-xl font-medium text-gray-700 mb-2 sm:mb-3">{t.notifications.emptyTitle}</h3>
 
                       {/* 副标题 */}
-                      <p className="text-gray-500 text-xs sm:text-sm">创建练习并分享给好友。</p>
+                      <p className="text-gray-500 text-xs sm:text-sm">{t.notifications.emptyDescription}</p>
                     </div>
                   </div>
                 )}
@@ -267,17 +268,17 @@ export function Header({ locale, variant = 'authenticated', backgroundClass = 'b
             <div className="hidden sm:flex items-center space-x-2">
               <Link href={`/${locale}/discover`}>
                 <button className="text-gray-700 hover:text-gray-900 font-medium text-xs sm:text-sm cursor-pointer px-2 sm:px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
-                  发现
+                  {t.nav.discover}
                 </button>
               </Link>
               <Link href={`/${locale}/practice/create`}>
                 <button className="text-gray-700 hover:text-gray-900 font-medium text-xs sm:text-sm cursor-pointer px-2 sm:px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
-                  创建练习
+                  {t.nav.createPractice}
                 </button>
               </Link>
               <Link href={`/${locale}/practice/a4/create`}>
                 <button className="text-gray-700 hover:text-gray-900 font-medium text-xs sm:text-sm cursor-pointer px-2 sm:px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
-                  A4 打印
+                  {t.nav.a4Print}
                 </button>
               </Link>
             </div>

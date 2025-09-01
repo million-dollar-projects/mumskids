@@ -69,7 +69,7 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
   // 格式化时间
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleTimeString('zh-CN', {
+    return date.toLocaleTimeString(locale === 'zh' ? 'zh-CN' : 'en-US', {
       hour: '2-digit',
       minute: '2-digit',
       hour12: false
@@ -83,10 +83,18 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
     const isToday = date.toDateString() === today.toDateString();
 
     if (isToday) {
-      return '今天';
+      return t.practice.dashboard.today;
     }
 
-    const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+    const weekdays = [
+      t.practice.dashboard.weekdays.sunday,
+      t.practice.dashboard.weekdays.monday,
+      t.practice.dashboard.weekdays.tuesday,
+      t.practice.dashboard.weekdays.wednesday,
+      t.practice.dashboard.weekdays.thursday,
+      t.practice.dashboard.weekdays.friday,
+      t.practice.dashboard.weekdays.saturday
+    ];
     return weekdays[date.getDay()];
   };
 
@@ -132,7 +140,7 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 pt-20">
         {/* Page Header */}
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">练习</h1>
+          <h1 className="text-3xl font-bold text-gray-900">{t.practice.dashboard.pageTitle}</h1>
           <div className="flex space-x-4">
             <button
               onClick={() => {
@@ -147,7 +155,7 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
                 : 'text-gray-600 hover:bg-gray-100'
                 } ${isTabChanging ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
-              我的练习
+              {t.practice.dashboard.myPractices}
             </button>
             <button
               onClick={() => {
@@ -162,7 +170,7 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
                 : 'text-gray-600 hover:bg-gray-100'
                 } ${isTabChanging ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
-              公开练习
+              {t.practice.dashboard.publicPractices}
             </button>
           </div>
         </div>
@@ -224,18 +232,18 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
                         <div className="hidden sm:flex items-center space-x-4 text-sm text-gray-500 mb-4">
                           <div className="flex items-center">
                             <MapPin className="w-4 h-4 mr-1 text-orange-500" />
-                            <span>难度: {getDifficultyLabel(practice.difficulty)}</span>
+                            <span>{t.practice.dashboard.difficulty} {getDifficultyLabel(practice.difficulty)}</span>
                           </div>
                           {practice.test_mode === 'timed' && practice.time_limit && (
                             <div className="flex items-center">
                               <Clock className="w-4 h-4 mr-1 text-blue-500" />
-                              <span>{practice.time_limit}分钟限时</span>
+                              <span>{practice.time_limit}{t.practice.dashboard.timeLimit}</span>
                             </div>
                           )}
                           {practice.test_mode === 'normal' && practice.question_count && (
                             <div className="flex items-center">
                               <Clock className="w-4 h-4 mr-1 text-green-500" />
-                              <span>{practice.question_count}道题目</span>
+                              <span>{practice.question_count}{t.practice.dashboard.questions}</span>
                             </div>
                           )}
                         </div>
@@ -244,7 +252,7 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
                         <div className="flex items-center space-x-2 sm:space-x-3" onClick={(e) => e.stopPropagation()}>
                           <Link target="_blank" href={`/${locale}/practice/${practice.slug}`}>
                             <button className="px-2 py-1 sm:px-4 text-sm sm:text-base bg-gray-800 text-white rounded font-medium hover:bg-gray-700 transition-colors cursor-pointer">
-                              开始练习
+                              {t.practice.dashboard.startPractice}
                             </button>
                           </Link>
                           <button
@@ -252,8 +260,8 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
                             className="flex items-center px-2 py-1 sm:px-3 sm:py-2 text-sm sm:text-base text-gray-600 hover:text-gray-800 font-medium transition-colors cursor-pointer"
                           >
                             <Settings className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-                            <span className="hidden sm:inline">查看详细</span>
-                            <span className="sm:hidden">详细</span>
+                            <span className="hidden sm:inline">{t.practice.dashboard.viewDetails}</span>
+                            <span className="sm:hidden">{t.practice.dashboard.viewDetailsShort}</span>
                           </button>
                         </div>
                       </div>
@@ -279,12 +287,12 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
                     {loadingMore ? (
                       <>
                         <div className="w-4 h-4 animate-spin rounded-full border-2 border-gray-400 border-t-transparent mr-2"></div>
-                        加载中...
+                        {t.practice.dashboard.loadingMore}
                       </>
                     ) : (
                       <>
                         <ChevronDown className="w-4 h-4 mr-2" />
-                        加载更多 ({((practicesData?.pages[0] as PaginatedResponse<Practice>)?.pagination.totalCount || 0) - (practicesData?.pages?.reduce((total: number, page: unknown) => total + (page as PaginatedResponse<Practice>).data.length, 0) || 0)} 个剩余)
+                        {t.practice.dashboard.loadMore} ({((practicesData?.pages[0] as PaginatedResponse<Practice>)?.pagination.totalCount || 0) - (practicesData?.pages?.reduce((total: number, page: unknown) => total + (page as PaginatedResponse<Practice>).data.length, 0) || 0)} {t.practice.dashboard.remaining})
                       </>
                     )}
                   </Button>
@@ -294,7 +302,7 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
               {/* Total Count Info */}
               {(practicesData?.pages[0] as PaginatedResponse<Practice>)?.pagination.totalCount > 0 && (
                 <div className="text-center mt-4 text-sm text-gray-500">
-                  显示 {(practicesData?.pages?.reduce((total: number, page: unknown) => total + (page as PaginatedResponse<Practice>).data.length, 0) || 0)} / {((practicesData?.pages[0] as PaginatedResponse<Practice>)?.pagination.totalCount || 0)} 个练习
+                  {t.practice.dashboard.showing} {(practicesData?.pages?.reduce((total: number, page: unknown) => total + (page as PaginatedResponse<Practice>).data.length, 0) || 0)} {t.practice.dashboard.of} {((practicesData?.pages[0] as PaginatedResponse<Practice>)?.pagination.totalCount || 0)} {t.practice.dashboard.practices}
                 </div>
               )}
             </div>
@@ -322,19 +330,19 @@ export function PracticeDashboard({ locale, t }: PracticeDashboardProps) {
                   </div>
                 </div>
                 <h2 className="text-2xl font-semibold text-gray-400 mb-4">
-                  {activeTab === 'my' ? '还没有数学练习' : '暂无公开练习'}
+                  {activeTab === 'my' ? t.practice.dashboard.noMyPractices : t.practice.dashboard.noPublicPractices}
                 </h2>
                 <p className="text-gray-400 mb-8 max-w-md mx-auto">
                   {activeTab === 'my'
-                    ? '为孩子创建第一个数学练习，让学习变得更有趣！'
-                    : '目前还没有公开的练习，快去创建一个分享给大家吧！'
+                    ? t.practice.dashboard.noMyPracticesDesc
+                    : t.practice.dashboard.noPublicPracticesDesc
                   }
                 </p>
                 {activeTab === 'my' && (
                   <Link href={`/${locale}/practice/create`}>
                     <button className="inline-flex items-center px-4 cursor-pointer py-1 bg-gray-200 opacity-70 hover:opacity-100 text-gray-700 font-medium rounded-lg hover:bg-gray-500 hover:text-white transition-colors">
                       <Plus className="w-5 h-5 mr-2" />
-                      创建练习
+                      {t.practice.dashboard.createPractice}
                     </button>
                   </Link>
                 )}

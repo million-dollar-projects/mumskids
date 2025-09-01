@@ -1,19 +1,24 @@
 'use client'
 
+import { messages } from '@/i18n/messages';
+
 interface FooterProps {
   locale: string;
 }
 
 export function Footer({ locale }: FooterProps) {
+  // 获取翻译函数
+  const t = messages[locale as keyof typeof messages] || messages.zh;
+
   return (
     <footer className="mt-16">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 border-t border-gray-100">
         <div className="flex items-center justify-between mb-8">
           {/* Left links */}
           <div className="flex space-x-6">
-            <a href={`/${locale}/discover`} className="text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors">发现</a>
-            <a href="#" className="text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors">定价</a>
-            <a href="#" className="text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors">帮助</a>
+            <a href={`/${locale}/discover`} className="text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors">{t.landing.footer.discover}</a>
+            <a href="#" className="text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors">{t.landing.footer.pricing}</a>
+            <a href="#" className="text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors">{t.landing.footer.help}</a>
           </div>
           {/* Social icons */}
           <div className="flex space-x-6">
@@ -37,7 +42,7 @@ export function Footer({ locale }: FooterProps) {
         {/* Bottom link */}
         <div className="text-center">
           <a href="#" className="bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent hover:from-pink-500 hover:via-purple-500 hover:to-indigo-500 text-sm font-medium transition-all duration-300 hover:scale-105">
-            使用 LittlePlus 开始练习 →
+            {t.landing.footer.startWithLittlePlus}
           </a>
         </div>
       </div>

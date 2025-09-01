@@ -18,6 +18,8 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Practice, Reward, RewardCondition } from '@/types/practice';
+import { messages } from '@/i18n/messages';
+import { getDifficultyOptions, getCalculationTypeOptions } from '@/lib/practice-config';
 
 interface PracticeDetailSheetProps {
   practice: Practice | null;
@@ -39,25 +41,22 @@ export function PracticeDetailSheet({
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+
+  // 获取翻译函数
+  const t = messages[locale as keyof typeof messages] || messages.zh;
+
   // 获取难度标签
   const getDifficultyLabel = (difficulty: string) => {
-    const labels = {
-      'within10': '10以内',
-      'within20': '20以内',
-      'within50': '50以内',
-      'within100': '100以内'
-    };
-    return labels[difficulty as keyof typeof labels] || difficulty;
+    const difficultyOptions = getDifficultyOptions(locale);
+    const option = difficultyOptions.find(opt => opt.id === difficulty);
+    return option?.label || difficulty;
   };
 
   // 获取计算类型标签
   const getCalculationTypeLabel = (type: string) => {
-    const labels = {
-      'add': '加法',
-      'sub': '减法',
-      'addsub': '加减法'
-    };
-    return labels[type as keyof typeof labels] || type;
+    const calculationTypeOptions = getCalculationTypeOptions(locale);
+    const option = calculationTypeOptions.find(opt => opt.id === type);
+    return option?.label || type;
   };
 
   // 处理删除练习
@@ -142,7 +141,7 @@ export function PracticeDetailSheet({
                 <div className="flex items-center justify-between bg-purple-900/5 py-2 px-4 rounded">
                   <div className="flex items-center gap-3">
                     <Target className="w-5 h-5 text-purple-600" />
-                    <span className="font-medium text-gray-700">计算难度</span>
+                    <span className="font-medium text-gray-700">{t.practice.detailSheet.calculationDifficulty}</span>
                   </div>
                   <span className="text-gray-900 font-medium">
                     {getDifficultyLabel(practice.difficulty)}
@@ -152,7 +151,7 @@ export function PracticeDetailSheet({
                 <div className="flex items-center justify-between bg-purple-900/5 py-2 px-4 rounded">
                   <div className="flex items-center gap-3">
                     <Calculator className="w-5 h-5 text-blue-600" />
-                    <span className="font-medium text-gray-700">计算方式</span>
+                    <span className="font-medium text-gray-700">{t.practice.detailSheet.calculationType}</span>
                   </div>
                   <span className="text-gray-900 font-medium">
                     {getCalculationTypeLabel(practice.calculation_type)}
@@ -162,12 +161,12 @@ export function PracticeDetailSheet({
                 <div className="flex items-center justify-between bg-purple-900/5 py-2 px-4 rounded">
                   <div className="flex items-center gap-3">
                     <Timer className="w-5 h-5 text-green-600" />
-                    <span className="font-medium text-gray-700">练习方式</span>
+                    <span className="font-medium text-gray-700">{t.practice.detailSheet.practiceMode}</span>
                   </div>
                   <span className="text-gray-900 font-medium">
                     {practice.test_mode === 'normal'
-                      ? `普通模式 (${practice.question_count}题)`
-                      : `计时模式 (${practice.time_limit}分钟)`
+                      ? `${t.practice.detailSheet.normalMode} (${practice.question_count}${t.practice.detailSheet.questions})`
+                      : `${t.practice.detailSheet.timedMode} (${practice.time_limit}${t.practice.detailSheet.minutes})`
                     }
                   </span>
                 </div>
@@ -180,7 +179,7 @@ export function PracticeDetailSheet({
                     <div className=" p-0 rounded">
                       <div className="flex items-center justify-between mb-3">
                         <span className="font-medium text-gray-700">
-                          {practice.reward_distribution_mode === 'random' ? '随机奖励' : '自选奖励'}
+                          {practice.reward_distribution_mode === 'random' ? t.practice.detailSheet.randomRewards : t.practice.detailSheet.selectRewards}
                         </span>
                       </div>
 
@@ -208,19 +207,19 @@ export function PracticeDetailSheet({
                           <div className="mt-3 pt-2 border-t border-gray-200">
                             <div className="text-xs text-gray-500">
                               <Gift className="w-3 h-3 inline mr-1" />
-                              获得条件: {(() => {
+                              {t.practice.detailSheet.rewardCondition}: {(() => {
                                 const condition = practice.reward_condition;
                                 const parts = [];
 
                                 // 处理计时模式的条件
                                 if (condition.minCorrect) {
-                                  parts.push(`最少完成${condition.minCorrect}题`);
-                                  parts.push(`错误率不超过${condition.maxErrorRate}%`);
+                                  parts.push(`${t.practice.detailSheet.minCorrect}${condition.minCorrect}${t.practice.detailSheet.questions}`);
+                                  parts.push(`${t.practice.detailSheet.maxErrorRate}${condition.maxErrorRate}%`);
                                 };
 
                                 // 处理普通模式的条件
-                                if (condition.targetCorrect) parts.push(`答对${condition.targetCorrect}题`);
-                                if (condition.maxTime) parts.push(`${condition.maxTime}分钟内完成`);
+                                if (condition.targetCorrect) parts.push(`${t.practice.detailSheet.targetCorrect}${condition.targetCorrect}${t.practice.detailSheet.questions}`);
+                                if (condition.maxTime) parts.push(`${condition.maxTime}${t.practice.detailSheet.maxTime}`);
 
                                 return parts.join(', ');
                               })()}
@@ -237,7 +236,7 @@ export function PracticeDetailSheet({
               {/* Description */}
               {practice.description && (
                 <div className="space-y-2">
-                  <h3 className="text-lg font-semibold text-gray-900">练习描述</h3>
+                  <h3 className="text-lg font-semibold text-gray-900">{t.practice.detailSheet.description}</h3>
                   <p className="text-gray-600 leading-relaxed">
                     {practice.description}
                   </p>
@@ -249,7 +248,7 @@ export function PracticeDetailSheet({
                 <Link target="_blank" href={`/${locale}/practice/${practice.slug}`} className="block">
                   <Button className="w-full h-10 bg-gray-900 hover:bg-gray-800 text-white font-medium cursor-pointer">
                     <Play className="w-4 h-4 mr-2" />
-                    开始练习
+                    {t.practice.detailSheet.startPractice}
                   </Button>
                 </Link>
                 <div className="flex flex-col gap-2">
@@ -263,7 +262,7 @@ export function PracticeDetailSheet({
                     ) : (
                       <Copy className="w-4 h-4 mr-2" />
                     )}
-                    复制链接
+                    {t.practice.detailSheet.copyLink}
                   </Button>
                   {currentUserId && practice.created_by === currentUserId && (
                     <Button
@@ -272,7 +271,7 @@ export function PracticeDetailSheet({
                       onClick={() => setShowDeleteDialog(true)}
                     >
                       <Trash2 className="w-4 h-4 mr-2" />
-                      删除
+                      {t.practice.detailSheet.delete}
                     </Button>
                   )}
                 </div>
@@ -283,13 +282,13 @@ export function PracticeDetailSheet({
               <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>确认删除练习</AlertDialogTitle>
+                    <AlertDialogTitle>{t.practice.detailSheet.confirmDelete}</AlertDialogTitle>
                     <AlertDialogDescription>
-                      您确定要删除练习「{practice.title}」吗？此操作无法撤销，所有相关的练习记录也将被删除。
+                      {t.practice.detailSheet.deleteDescription.replace('{title}', practice.title)}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel disabled={isDeleting}>取消</AlertDialogCancel>
+                    <AlertDialogCancel disabled={isDeleting}>{t.practice.detailSheet.cancel}</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={handleDelete}
                       disabled={isDeleting}
@@ -298,10 +297,10 @@ export function PracticeDetailSheet({
                       {isDeleting ? (
                         <>
                           <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2"></div>
-                          删除中...
+                          {t.practice.detailSheet.deleting}
                         </>
                       ) : (
-                        '确认删除'
+                        t.practice.detailSheet.confirmDeleteAction
                       )}
                     </AlertDialogAction>
                   </AlertDialogFooter>
@@ -310,7 +309,7 @@ export function PracticeDetailSheet({
 
               {/* Creation Info */}
               <div className="text-xs text-gray-500 text-center pt-4 border-t">
-                创建于 {new Date(practice.created_at).toLocaleString('zh-CN')}
+                {t.practice.detailSheet.createdAt} {new Date(practice.created_at).toLocaleString(locale === 'zh' ? 'zh-CN' : 'en-US')}
               </div>
             </div>
           </>
