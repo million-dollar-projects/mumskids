@@ -1,7 +1,7 @@
 import { Card } from '@/components/ui/card';
 import { Target } from 'lucide-react';
 import { getDifficultyOptions, getCalculationTypeOptions } from '@/lib/practice-config';
-import { getThemeById, getDefaultTheme } from '@/lib/themes';
+import { getThemeById, getDefaultTheme, ThemeMessages } from '@/lib/themes';
 
 interface PracticeCardProps {
   childName?: string;
@@ -11,14 +11,7 @@ interface PracticeCardProps {
   size?: 'small' | 'large';
   theme?: string;
   locale?: string;
-  t?: {
-    practice: {
-      practiceCard: {
-        nickname: string;
-        calculation: string;
-      };
-    };
-  };
+  t?: ThemeMessages;
 }
 
 export function PracticeCard({
@@ -93,11 +86,11 @@ export function PracticeCard({
   const decorations = getDecorationSizes();
   
   // 获取多语言文案，如果没有传入 t，则使用默认值
-  const nicknameText = t?.practice.practiceCard.nickname || (locale === 'en' ? 'Nickname' : '昵称');
-  const calculationText = t?.practice.practiceCard.calculation || (locale === 'en' ? 'Calculation' : '运算');
+  const nicknameText = t?.practice?.practiceCard?.nickname || (locale === 'en' ? 'Nickname' : '昵称');
+  const calculationText = t?.practice?.practiceCard?.calculation || (locale === 'en' ? 'Calculation' : '运算');
   
   // 获取主题配置
-  const currentTheme = theme ? getThemeById(theme) : getDefaultTheme();
+  const currentTheme = theme ? getThemeById(theme, locale, t) : getDefaultTheme(locale, t);
   const themeGradient = currentTheme?.gradient || 'bg-gradient-to-br from-red-500 to-pink-500';
 
   return (

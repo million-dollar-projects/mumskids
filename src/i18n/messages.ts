@@ -83,6 +83,42 @@ export const messages = {
         "nickname": "昵称",
         "calculation": "运算"
       },
+      "themes": {
+        "themeLabel": "主题",
+        "selectTheme": "选择主题",
+        "rainbow": {
+          "name": "彩虹",
+          "description": "温暖的彩虹色彩"
+        },
+        "sunshine": {
+          "name": "阳光",
+          "description": "明亮的阳光色调"
+        },
+        "ocean": {
+          "name": "海洋",
+          "description": "清新的海洋蓝"
+        },
+        "forest": {
+          "name": "森林",
+          "description": "自然的森林绿"
+        },
+        "candy": {
+          "name": "糖果",
+          "description": "甜美的糖果色"
+        },
+        "lavender": {
+          "name": "薰衣草",
+          "description": "优雅的薰衣草紫"
+        },
+        "peach": {
+          "name": "蜜桃",
+          "description": "温柔的蜜桃色"
+        },
+        "mint": {
+          "name": "薄荷",
+          "description": "清爽的薄荷绿"
+        }
+      },
       "questionCount": "题目数量",
       "rewards": "奖励设置",
       "addReward": "添加奖励",
@@ -394,6 +430,42 @@ export const messages = {
       "practiceCard": {
         "nickname": "Nickname",
         "calculation": "Calculation"
+      },
+      "themes": {
+        "themeLabel": "Theme",
+        "selectTheme": "Select Theme",
+        "rainbow": {
+          "name": "Rainbow",
+          "description": "Warm rainbow colors"
+        },
+        "sunshine": {
+          "name": "Sunshine",
+          "description": "Bright sunshine tones"
+        },
+        "ocean": {
+          "name": "Ocean",
+          "description": "Fresh ocean blue"
+        },
+        "forest": {
+          "name": "Forest",
+          "description": "Natural forest green"
+        },
+        "candy": {
+          "name": "Candy",
+          "description": "Sweet candy colors"
+        },
+        "lavender": {
+          "name": "Lavender",
+          "description": "Elegant lavender purple"
+        },
+        "peach": {
+          "name": "Peach",
+          "description": "Gentle peach colors"
+        },
+        "mint": {
+          "name": "Mint",
+          "description": "Refreshing mint green"
+        }
       },
       "questionCount": "Number of Questions",
       "rewards": "Rewards",

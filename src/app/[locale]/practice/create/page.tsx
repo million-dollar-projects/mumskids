@@ -17,7 +17,7 @@ import { Footer } from '@/components/layout/footer';
 import { ThemeSelector } from '@/components/ui/theme-selector';
 import { messages } from '@/i18n/messages';
 import { useAuth } from '@/lib/auth/context';
-import { themes } from '@/lib/themes';
+import { getThemes } from '@/lib/themes';
 import { ChevronDown, Globe, Lock, Pencil, Target, Calculator, Timer } from 'lucide-react';
 import { PracticeCard } from '@/components/ui/practice-card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -81,7 +81,8 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
   const calculationTypeOptions = getCalculationTypeOptions(locale);
   const testModeOptions = getTestModeOptions(locale);
 
-  const currentTheme = themes.find(t => t.id === form.selectedTheme);
+  const currentThemes = getThemes(locale, t);
+  const currentTheme = currentThemes.find(theme => theme.id === form.selectedTheme);
   const pageBackgroundClass = currentTheme?.bgClass || 'bg-transparent';
   const dialogBackgroundClass = 'bg-white border-none shadow-none';
 
@@ -239,6 +240,10 @@ export default function CreatePracticePage({ params }: CreatePracticeProps) {
             <ThemeSelector
               selectedTheme={form.selectedTheme}
               onThemeChange={(themeId) => handleInputChange('selectedTheme', themeId)}
+              locale={locale}
+              t={t}
+              themeLabel={t.practice.themes.themeLabel}
+              selectThemeLabel={t.practice.themes.selectTheme}
             />
           </div>
 

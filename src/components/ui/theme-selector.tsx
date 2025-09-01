@@ -4,18 +4,34 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { themes, Theme } from '@/lib/themes';
+import { getThemes, getThemeById, ThemeMessages } from '@/lib/themes';
 import { ChevronsUpDown, Shuffle } from 'lucide-react';
 
 interface ThemeSelectorProps {
   selectedTheme: string;
   onThemeChange: (themeId: string) => void;
+  locale?: string;
+  t?: ThemeMessages;
+  themeLabel?: string;
+  selectThemeLabel?: string;
 }
 
-export function ThemeSelector({ selectedTheme, onThemeChange }: ThemeSelectorProps) {
+export function ThemeSelector({ 
+  selectedTheme, 
+  onThemeChange, 
+  locale = 'zh', 
+  t,
+  themeLabel,
+  selectThemeLabel 
+}: ThemeSelectorProps) {
   const [themeSheetOpen, setThemeSheetOpen] = useState(false);
 
-  const currentTheme = themes.find(t => t.id === selectedTheme);
+  const themes = getThemes(locale, t);
+  const currentTheme = getThemeById(selectedTheme, locale, t);
+
+  // 获取多语言文案，使用默认值作为后备
+  const themeLabelText = themeLabel || t?.practice?.themes?.themeLabel || (locale === 'en' ? 'Theme' : '主题');
+  const selectThemeLabelText = selectThemeLabel || t?.practice?.themes?.selectTheme || (locale === 'en' ? 'Select Theme' : '选择主题');
 
   const randomizeTheme = () => {
     const availableThemes = themes.filter(theme => theme.id !== selectedTheme);
@@ -33,7 +49,7 @@ export function ThemeSelector({ selectedTheme, onThemeChange }: ThemeSelectorPro
               <span className="text-lg">{currentTheme?.icon}</span>
             </div>
             <div>
-              <div className="text-sm text-gray-600">主题</div>
+              <div className="text-sm text-gray-600">{themeLabelText}</div>
               <div className="font-medium text-gray-900">{currentTheme?.name}</div>
             </div>
           </div>
@@ -49,7 +65,7 @@ export function ThemeSelector({ selectedTheme, onThemeChange }: ThemeSelectorPro
               </SheetTrigger>
               <SheetContent side="bottom" className="max-h-[75vh] overflow-y-auto">
                 <SheetHeader>
-                  <SheetTitle>选择主题</SheetTitle>
+                  <SheetTitle>{selectThemeLabelText}</SheetTitle>
                 </SheetHeader>
                 <div className="mt-6">
                   <div className="flex items-center justify-center space-x-4 overflow-x-auto pb-4">

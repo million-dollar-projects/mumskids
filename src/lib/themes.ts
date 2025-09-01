@@ -18,82 +18,161 @@ export interface Theme {
     description?: string;
 }
 
-// 儿童友好的主题配置 - 明亮护眼，可爱渐变
-export const themes: Theme[] = [
+export interface ThemeTranslation {
+    name: string;
+    description: string;
+}
+
+export interface ThemeMessages {
+    practice?: {
+        themes?: Record<string, ThemeTranslation> & {
+            themeLabel?: string;
+            selectTheme?: string;
+        };
+        practiceCard?: {
+            nickname: string;
+            calculation: string;
+        };
+        [key: string]: unknown;
+    };
+}
+
+// 基础主题配置 - 儿童友好的主题配置，明亮护眼，可爱渐变
+const baseThemes: Omit<Theme, 'name' | 'description'>[] = [
     {
         id: 'rainbow',
-        name: '彩虹',
         icon: '🌈',
         gradient: 'bg-gradient-to-br from-pink-300 via-purple-300 to-indigo-400',
-        bgClass: 'bg-gradient-to-br from-pink-200 via-purple-200 to-indigo-200',
-        description: '温暖的彩虹色彩'
+        bgClass: 'bg-gradient-to-br from-pink-200 via-purple-200 to-indigo-200'
     },
     {
         id: 'sunshine',
-        name: '阳光',
         icon: '☀️',
         gradient: 'bg-gradient-to-br from-yellow-300 to-orange-400',
-        bgClass: 'bg-gradient-to-br from-yellow-200 to-orange-200',
-        description: '明亮的阳光色调'
+        bgClass: 'bg-gradient-to-br from-yellow-200 to-orange-200'
     },
     {
         id: 'ocean',
-        name: '海洋',
         icon: '🌊',
         gradient: 'bg-gradient-to-br from-cyan-300 to-blue-400',
-        bgClass: 'bg-gradient-to-br from-cyan-200 to-blue-200',
-        description: '清新的海洋蓝'
+        bgClass: 'bg-gradient-to-br from-cyan-200 to-blue-200'
     },
     {
         id: 'forest',
-        name: '森林',
         icon: '🌳',
         gradient: 'bg-gradient-to-br from-lime-400 to-green-600',
-        bgClass: 'bg-gradient-to-br from-lime-200 to-green-300',
-        description: '自然的森林绿'
+        bgClass: 'bg-gradient-to-br from-lime-200 to-green-300'
     },
     {
         id: 'candy',
-        name: '糖果',
         icon: '🍭',
         gradient: 'bg-gradient-to-br from-pink-400 to-rose-400',
-        bgClass: 'bg-gradient-to-br from-pink-200 to-rose-200',
-        description: '甜美的糖果色'
+        bgClass: 'bg-gradient-to-br from-pink-200 to-rose-200'
     },
     {
         id: 'lavender',
-        name: '薰衣草',
         icon: '💜',
         gradient: 'bg-gradient-to-br from-indigo-300 to-purple-400',
-        bgClass: 'bg-gradient-to-br from-indigo-200 to-purple-200',
-        description: '优雅的薰衣草紫'
+        bgClass: 'bg-gradient-to-br from-indigo-200 to-purple-200'
     },
     {
         id: 'peach',
-        name: '蜜桃',
         icon: '🍑',
         gradient: 'bg-gradient-to-br from-rose-300 to-pink-400',
-        bgClass: 'bg-gradient-to-br from-rose-200 to-pink-200',
-        description: '温柔的蜜桃色'
+        bgClass: 'bg-gradient-to-br from-rose-200 to-pink-200'
     },
     {
         id: 'mint',
-        name: '薄荷',
         icon: '🌿',
         gradient: 'bg-gradient-to-br from-emerald-300 to-teal-400',
-        bgClass: 'bg-gradient-to-br from-emerald-200 to-teal-200',
-        description: '清爽的薄荷绿'
+        bgClass: 'bg-gradient-to-br from-emerald-200 to-teal-200'
     }
 ];
 
+// 多语言主题函数
+export const getThemes = (locale: string = 'zh', t?: ThemeMessages): Theme[] => {
+    const isZh = locale === 'zh';
+    
+    return baseThemes.map(theme => ({
+        ...theme,
+        name: t?.practice?.themes?.[theme.id]?.name || (isZh ? getDefaultThemeName(theme.id) : getDefaultThemeNameEn(theme.id)),
+        description: t?.practice?.themes?.[theme.id]?.description || (isZh ? getDefaultThemeDescription(theme.id) : getDefaultThemeDescriptionEn(theme.id))
+    }));
+};
+
+// 默认中文主题名称
+const getDefaultThemeName = (id: string): string => {
+    const names: Record<string, string> = {
+        rainbow: '彩虹',
+        sunshine: '阳光',
+        ocean: '海洋',
+        forest: '森林',
+        candy: '糖果',
+        lavender: '薰衣草',
+        peach: '蜜桃',
+        mint: '薄荷'
+    };
+    return names[id] || '主题';
+};
+
+// 默认英文主题名称
+const getDefaultThemeNameEn = (id: string): string => {
+    const names: Record<string, string> = {
+        rainbow: 'Rainbow',
+        sunshine: 'Sunshine',
+        ocean: 'Ocean',
+        forest: 'Forest',
+        candy: 'Candy',
+        lavender: 'Lavender',
+        peach: 'Peach',
+        mint: 'Mint'
+    };
+    return names[id] || 'Theme';
+};
+
+// 默认中文主题描述
+const getDefaultThemeDescription = (id: string): string => {
+    const descriptions: Record<string, string> = {
+        rainbow: '温暖的彩虹色彩',
+        sunshine: '明亮的阳光色调',
+        ocean: '清新的海洋蓝',
+        forest: '自然的森林绿',
+        candy: '甜美的糖果色',
+        lavender: '优雅的薰衣草紫',
+        peach: '温柔的蜜桃色',
+        mint: '清爽的薄荷绿'
+    };
+    return descriptions[id] || '主题描述';
+};
+
+// 默认英文主题描述
+const getDefaultThemeDescriptionEn = (id: string): string => {
+    const descriptions: Record<string, string> = {
+        rainbow: 'Warm rainbow colors',
+        sunshine: 'Bright sunshine tones',
+        ocean: 'Fresh ocean blue',
+        forest: 'Natural forest green',
+        candy: 'Sweet candy colors',
+        lavender: 'Elegant lavender purple',
+        peach: 'Gentle peach colors',
+        mint: 'Refreshing mint green'
+    };
+    return descriptions[id] || 'Theme description';
+};
+
+// 保持向后兼容的静态配置（默认中文）
+export const themes: Theme[] = getThemes('zh');
+
 // 获取主题的辅助函数
-export const getThemeById = (id: string): Theme | undefined => {
-    return themes.find(theme => theme.id === id);
+export const getThemeById = (id: string, locale: string = 'zh', t?: ThemeMessages): Theme | undefined => {
+    const themesWithLocale = getThemes(locale, t);
+    return themesWithLocale.find(theme => theme.id === id);
 };
 
 // 获取默认主题
-export const getDefaultTheme = (): Theme => {
-    return themes[0]; // 默认使用彩虹主题
+export const getDefaultTheme = (locale: string = 'zh', t?: ThemeMessages): Theme => {
+    const themesWithLocale = getThemes(locale, t);
+    return themesWithLocale[0]; // 默认使用彩虹主题
 };
 
 // 主题颜色配置
