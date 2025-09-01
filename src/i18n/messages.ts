@@ -100,6 +100,42 @@ export const messages = {
       "estimatedTime": "预计用时",
       "minutes": "分钟"
     },
+    "a4": {
+      "title": "A4 预览",
+      "regenerate": "重新生成",
+      "generating": "生成中...",
+      "print": "打印",
+      "practiceTitle": "练习标题",
+      "practiceTitlePlaceholder": "输入练习标题",
+      "childName": "小朋友姓名",
+      "childNamePlaceholder": "小朋友姓名",
+      "practiceSettings": "练习设置",
+      "calculationDifficulty": "计算难度",
+      "calculationType": "计算方式",
+      "questionCount": "题目个数",
+      "questionCountRange": "题目个数 (5-100)",
+      "questionCountPlaceholder": "输入题目数量 (5-100)",
+      "parentMessage": "显示家长寄语",
+      "parentMessageDesc": "开启后将在页面底部显示家长寄语填写区域",
+      "displaySettings": "显示设置",
+      "fontSize": "字体大小",
+      "boldDisplay": "粗体显示",
+      "horizontalSpacing": "水平间距",
+      "verticalSpacing": "垂直间距",
+      "studentInfo": {
+        "name": "姓名：",
+        "date": "日期：",
+        "time": "用时：",
+        "score": "得分："
+      },
+      "footer": {
+        "tagline": "LittlePlus - 让数学学习更有趣",
+        "difficulty": "难度：",
+        "type": "类型：",
+        "questions": "题目：",
+        "questionsUnit": "题"
+      }
+    },
     "quiz": {
       "question": "第 {current} 题，共 {total} 题",
       "submit": "提交答案",
@@ -244,6 +280,42 @@ export const messages = {
       "totalQuestions": "Total Questions",
       "estimatedTime": "Estimated Time",
       "minutes": "minutes"
+    },
+    "a4": {
+      "title": "A4 Preview",
+      "regenerate": "Regenerate",
+      "generating": "Generating...",
+      "print": "Print",
+      "practiceTitle": "Practice Title",
+      "practiceTitlePlaceholder": "Enter practice title",
+      "childName": "Child's Name",
+      "childNamePlaceholder": "Child's name",
+      "practiceSettings": "Practice Settings",
+      "calculationDifficulty": "Calculation Difficulty",
+      "calculationType": "Calculation Type",
+      "questionCount": "Number of Questions",
+      "questionCountRange": "Number of Questions (5-100)",
+      "questionCountPlaceholder": "Enter number of questions (5-100)",
+      "parentMessage": "Show Parent Message",
+      "parentMessageDesc": "Enable to show parent message area at the bottom of the page",
+      "displaySettings": "Display Settings",
+      "fontSize": "Font Size",
+      "boldDisplay": "Bold Display",
+      "horizontalSpacing": "Horizontal Spacing",
+      "verticalSpacing": "Vertical Spacing",
+      "studentInfo": {
+        "name": "Name:",
+        "date": "Date:",
+        "time": "Time:",
+        "score": "Score:"
+      },
+      "footer": {
+        "tagline": "LittlePlus - Make Math Learning More Fun",
+        "difficulty": "Difficulty:",
+        "type": "Type:",
+        "questions": "Questions:",
+        "questionsUnit": "Q"
+      }
     },
     "quiz": {
       "question": "Question {current} of {total}",

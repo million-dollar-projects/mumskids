@@ -19,9 +19,10 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import {
-  difficultyOptions,
-  calculationTypeOptions
+  getDifficultyOptions,
+  getCalculationTypeOptions
 } from '@/lib/practice-config';
+import { messages } from '@/i18n/messages';
 
 interface CreateA4Props {
   params: Promise<{ locale: string }>;
@@ -72,15 +73,16 @@ export default function CreateA4Page({ params }: CreateA4Props) {
     getLocale();
   }, [params]);
 
-  // A4页面暂时不需要国际化消息
-  // const t = messages[locale as keyof typeof messages] || messages.zh;
+  // 获取翻译函数
+  const t = messages[locale as keyof typeof messages] || messages.zh;
 
-  // A4页面无需登录验证
-  // useEffect(() => {
-  //   if (!loading && !user) {
-  //     router.push(`/${locale}/auth/login`);
-  //   }
-  // }, [user, loading, router, locale]);
+  // 当locale改变时，更新默认标题
+  useEffect(() => {
+    setSettings(prev => ({
+      ...prev,
+      title: locale === 'zh' ? '数学练习' : 'Math Practice'
+    }));
+  }, [locale]);
 
   const handleSettingChange = (field: keyof A4Settings, value: string | number | boolean | { horizontal: number; vertical: number }) => {
     setSettings(prev => ({
@@ -91,7 +93,7 @@ export default function CreateA4Page({ params }: CreateA4Props) {
 
   const handlePrint = useReactToPrint({
     contentRef: printRef,
-    documentTitle: `${settings.title}-${settings.childName || '练习'}`,
+    documentTitle: `${settings.title}-${settings.childName || (locale === 'zh' ? '练习' : 'Practice')}`,
     pageStyle: `
       @page {
         size: A4;
@@ -115,26 +117,6 @@ export default function CreateA4Page({ params }: CreateA4Props) {
     }, 800);
   };
 
-  // A4页面无需验证用户状态，直接显示内容
-  // if (loading) {
-  //   return (
-  //     <div className="min-h-screen bg-gradient-to-br from-sky-300 via-sky-200 to-blue-300">
-  //       <Header locale={locale} backgroundClass="bg-transparent" isFixed={true} />
-  //       <div className="child-container py-8 pt-24">
-  //         <div className="text-center">
-  //           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-  //           <p className="text-lg text-muted-foreground">{t.common.loading}</p>
-  //         </div>
-  //       </div>
-  //       <Footer locale={locale} />
-  //     </div>
-  //   );
-  // }
-
-  // if (!user) {
-  //   return null;
-  // }
-
   return (
     <>
       {/* 屏幕显示区域 */}
@@ -154,7 +136,7 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                 <div className="flex items-center mb-4">
                   <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                     <FileText className="w-5 h-5" />
-                    A4 预览
+                    {t.a4.title}
                   </h2>
                 </div>
 
@@ -163,7 +145,7 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                   transformOrigin: 'left top',
                   marginBottom: '-150px' // 减少底部空白
                 }}>
-                  <PrintableA4 ref={printRef} settings={settings} regenerateKey={regenerateKey} />
+                  <PrintableA4 ref={printRef} settings={{...settings, locale}} regenerateKey={regenerateKey} />
                 </div>
               </div>
               </div>
@@ -179,7 +161,7 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                       size="sm"
                       className="cursor-pointer flex-1"
                     >
-                      {isGenerating ? '生成中...' : '重新生成'}
+                      {isGenerating ? t.a4.generating : t.a4.regenerate}
                     </Button>
                     <Button
                       onClick={handlePrint}
@@ -187,7 +169,7 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                       className="cursor-pointer flex items-center gap-2 flex-1"
                     >
                       <Printer className="w-4 h-4" />
-                      打印
+                      {t.a4.print}
                     </Button>
                   </div>
                 </div>
@@ -198,13 +180,13 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                   {/* 练习标题 */}
                   <div className="space-y-1">
                     <Label htmlFor="title" className="text-sm font-medium text-gray-700 hidden">
-                      练习标题
+                      {t.a4.practiceTitle}
                     </Label>
                     <Input
                       id="title"
                       value={settings.title}
                       onChange={(e) => handleSettingChange('title', e.target.value)}
-                      placeholder="输入练习标题"
+                      placeholder={t.a4.practiceTitlePlaceholder}
                       className="w-full h-9 focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-none"
                     />
                   </div>
@@ -212,13 +194,13 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                   {/* 小朋友姓名 */}
                   <div className="space-y-1 mb-0">
                     <Label htmlFor="childName" className="text-sm font-medium text-gray-700 hidden">
-                      小朋友姓名
+                      {t.a4.childName}
                     </Label>
                     <Input
                       id="childName"
                       value={settings.childName}
                       onChange={(e) => handleSettingChange('childName', e.target.value)}
-                      placeholder="小朋友姓名"
+                      placeholder={t.a4.childNamePlaceholder}
                       maxLength={8}
                       className="w-full h-9 focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-none"
                     />
@@ -230,14 +212,14 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                   <Accordion type="single" collapsible className="w-full mb-0" value={openAccordion} onValueChange={setOpenAccordion}>
                     <AccordionItem value="practice">
                       <AccordionTrigger className="text-sm font-medium text-gray-700">
-                        练习设置
+                        {t.a4.practiceSettings}
                       </AccordionTrigger>
                       <AccordionContent className="space-y-4">
                         {/* 计算难度 */}
                         <div className="space-y-1.5">
                           <div className="flex items-center gap-2">
                             <Target className="w-4 h-4 text-gray-500" />
-                            <Label className="text-sm font-medium text-gray-700">计算难度</Label>
+                            <Label className="text-sm font-medium text-gray-700">{t.a4.calculationDifficulty}</Label>
                           </div>
                           <RadioGroup
                             value={settings.difficulty}
@@ -246,7 +228,7 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                             }
                             className="space-y-1"
                           >
-                            {difficultyOptions.map((option) => (
+                            {getDifficultyOptions(locale).map((option) => (
                               <div key={option.id} className="flex items-center space-x-2">
                                 <RadioGroupItem value={option.id} id={option.id} />
                                 <Label
@@ -264,7 +246,7 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                         <div className="space-y-1.5">
                           <div className="flex items-center gap-2">
                             <Calculator className="w-4 h-4 text-gray-500" />
-                            <Label className="text-sm font-medium text-gray-700">计算方式</Label>
+                            <Label className="text-sm font-medium text-gray-700">{t.a4.calculationType}</Label>
                           </div>
                           <RadioGroup
                             value={settings.calculationType}
@@ -273,7 +255,7 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                             }
                             className="space-y-1"
                           >
-                            {calculationTypeOptions.map((option) => (
+                            {getCalculationTypeOptions(locale).map((option) => (
                               <div key={option.id} className="flex items-center space-x-2">
                                 <RadioGroupItem value={option.id} id={option.id} />
                                 <Label
@@ -290,7 +272,7 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                         {/* 题目个数 */}
                         <div className="space-y-1.5">
                           <Label htmlFor="questionCount" className="text-sm font-medium text-gray-700">
-                            题目个数 (5-100)
+                            {t.a4.questionCountRange}
                           </Label>
                           <Input
                             id="questionCount"
@@ -304,7 +286,7 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                                 handleSettingChange('questionCount', value);
                               }
                             }}
-                            placeholder="输入题目数量 (5-100)"
+                            placeholder={t.a4.questionCountPlaceholder}
                             className="w-full h-9 focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-none"
                           />
                         </div>
@@ -317,14 +299,14 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                   {/* 家长寄语 */}
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <Label className="text-sm font-medium text-gray-700">显示家长寄语</Label>
+                      <Label className="text-sm font-medium text-gray-700">{t.a4.parentMessage}</Label>
                       <Switch
                         checked={settings.showParentMessage}
                         onCheckedChange={(checked) => handleSettingChange('showParentMessage', checked)}
                       />
                     </div>
                     <p className="text-xs text-gray-500">
-                      开启后将在页面底部显示家长寄语填写区域
+                      {t.a4.parentMessageDesc}
                     </p>
                   </div>
                 </div>
@@ -334,12 +316,12 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                   <Accordion type="single" collapsible className="w-full" value={openAccordion} onValueChange={setOpenAccordion}>
                     <AccordionItem value="appearance">
                       <AccordionTrigger className="text-sm font-medium text-gray-700">
-                        显示设置
+                        {t.a4.displaySettings}
                       </AccordionTrigger>
                       <AccordionContent className="space-y-4">
                         {/* 字体大小 */}
                         <div className="space-y-1">
-                          <Label className="text-xs text-gray-600">字体大小</Label>
+                          <Label className="text-xs text-gray-600">{t.a4.fontSize}</Label>
                           <div className="flex items-center space-x-3">
                             <Input
                               type="range"
@@ -358,7 +340,7 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                         
                         {/* 粗体设置 */}
                         <div className="flex items-center justify-between">
-                          <Label className="text-xs text-gray-600">粗体显示</Label>
+                          <Label className="text-xs text-gray-600">{t.a4.boldDisplay}</Label>
                           <Switch
                             checked={settings.isBold}
                             onCheckedChange={(checked) => handleSettingChange('isBold', checked)}
@@ -367,7 +349,7 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                         
                         {/* 水平间距 */}
                         <div className="space-y-1">
-                          <Label className="text-xs text-gray-600">水平间距</Label>
+                          <Label className="text-xs text-gray-600">{t.a4.horizontalSpacing}</Label>
                           <div className="flex items-center space-x-3">
                             <Input
                               type="range"
@@ -389,7 +371,7 @@ export default function CreateA4Page({ params }: CreateA4Props) {
 
                         {/* 垂直间距 */}
                         <div className="space-y-1">
-                          <Label className="text-xs text-gray-600">垂直间距</Label>
+                          <Label className="text-xs text-gray-600">{t.a4.verticalSpacing}</Label>
                           <div className="flex items-center space-x-3">
                             <Input
                               type="range"

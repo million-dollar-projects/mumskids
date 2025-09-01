@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useMemo } from 'react';
+import { messages } from '@/i18n/messages';
 
 interface Question {
   id: number;
@@ -21,6 +22,7 @@ interface A4Settings {
   showParentMessage: boolean;
   fontSize: number; // 练习题字体大小 (px)
   isBold: boolean; // 是否粗体显示练习题
+  locale?: string; // 添加语言环境参数
 }
 
 interface PrintableA4Props {
@@ -30,6 +32,10 @@ interface PrintableA4Props {
 
 export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
   ({ settings, regenerateKey }, ref) => {
+    // 获取翻译函数
+    const locale = settings.locale || 'zh';
+    const t = messages[locale as keyof typeof messages] || messages.zh;
+
     // 生成数学题目
     const generateQuestions = (settings: A4Settings): Question[] => {
       const { difficulty, calculationType, questionCount } = settings;
@@ -204,9 +210,30 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
         spacing: settings.spacing,
         showParentMessage: settings.showParentMessage,
         fontSize: settings.fontSize,
-        isBold: settings.isBold
+        isBold: settings.isBold,
+        locale: settings.locale
       });
     }, [settings.difficulty, settings.calculationType, settings.questionCount, regenerateKey]);
+
+    // 获取难度和类型的显示文本
+    const getDifficultyText = (difficulty: string) => {
+      switch (difficulty) {
+        case 'within10': return locale === 'zh' ? '10以内' : 'Within 10';
+        case 'within20': return locale === 'zh' ? '20以内' : 'Within 20';
+        case 'within50': return locale === 'zh' ? '50以内' : 'Within 50';
+        case 'within100': return locale === 'zh' ? '100以内' : 'Within 100';
+        default: return locale === 'zh' ? '10以内' : 'Within 10';
+      }
+    };
+
+    const getCalculationTypeText = (type: string) => {
+      switch (type) {
+        case 'add': return locale === 'zh' ? '加法' : 'Addition';
+        case 'sub': return locale === 'zh' ? '减法' : 'Subtraction';
+        case 'addsub': return locale === 'zh' ? '加减混合' : 'Mixed';
+        default: return locale === 'zh' ? '加法' : 'Addition';
+      }
+    };
 
     return (
       <div
@@ -264,7 +291,9 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
             color: '#666'
           }}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <span style={{fontSize: '14px', fontWeight: 'bold', minWidth: '35px'}}>姓名：</span>
+              <span style={{fontSize: '14px', fontWeight: 'bold', minWidth: '35px'}}>
+                {t.a4.studentInfo.name}
+              </span>
               <span style={{ 
                 borderBottom: '1px solid #333', 
                 flex: 1, 
@@ -280,7 +309,9 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
               </span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <span style={{fontSize: '14px', fontWeight: 'bold', minWidth: '35px'}}>日期：</span>
+              <span style={{fontSize: '14px', fontWeight: 'bold', minWidth: '35px'}}>
+                {t.a4.studentInfo.date}
+              </span>
               <span style={{ 
                 borderBottom: '1px solid #333', 
                 flex: 1, 
@@ -289,7 +320,9 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
               }}></span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <span style={{fontSize: '14px', fontWeight: 'bold', minWidth: '35px'}}>用时：</span>
+              <span style={{fontSize: '14px', fontWeight: 'bold', minWidth: '35px'}}>
+                {t.a4.studentInfo.time}
+              </span>
               <span style={{ 
                 borderBottom: '1px solid #333', 
                 flex: 1, 
@@ -298,7 +331,9 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
               }}></span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-              <span style={{fontSize: '14px', fontWeight: 'bold', minWidth: '35px'}}>得分：</span>
+              <span style={{fontSize: '14px', fontWeight: 'bold', minWidth: '35px'}}>
+                {t.a4.studentInfo.score}
+              </span>
               <span style={{ 
                 borderBottom: '1px solid #333', 
                 flex: 1, 
@@ -375,14 +410,13 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
           borderTop: '1px solid #eee',
           paddingTop: '5mm'
         }}>
-          <p style={{ margin: '0 0 3px 0' }}>LittlePlus - 让数学学习更有趣</p>
+          <p style={{ margin: '0 0 3px 0' }}>
+            {t.a4.footer.tagline}
+          </p>
           <p style={{ margin: '0' }}>
-            难度：{settings.difficulty === 'within10' ? '10以内' :
-              settings.difficulty === 'within20' ? '20以内' :
-                settings.difficulty === 'within50' ? '50以内' : '100以内'} |
-            类型：{settings.calculationType === 'add' ? '加法' :
-              settings.calculationType === 'sub' ? '减法' : '加减混合'} |
-            题目：{settings.questionCount}题
+            {t.a4.footer.difficulty}{getDifficultyText(settings.difficulty)} |
+            {t.a4.footer.type}{getCalculationTypeText(settings.calculationType)} |
+            {t.a4.footer.questions}{settings.questionCount}{t.a4.footer.questionsUnit}
           </p>
         </div>
       </div>
