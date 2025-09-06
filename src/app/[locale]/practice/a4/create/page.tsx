@@ -41,6 +41,8 @@ interface A4Settings {
   showParentMessage: boolean; // 是否显示家长寄语
   fontSize: number; // 练习题字体大小 (px)
   isBold: boolean; // 是否粗体显示练习题
+  carryPractice: boolean; // 是否进位练习（仅加法时有效）
+  borrowPractice: boolean; // 是否借位练习（仅减法时有效）
 }
 
 export default function CreateA4Page({ params }: CreateA4Props) {
@@ -62,7 +64,9 @@ export default function CreateA4Page({ params }: CreateA4Props) {
     },
     showParentMessage: false, // 默认不显示家长寄语
     fontSize: 16, // 默认16px字体大小
-    isBold: true // 默认粗体显示
+    isBold: true, // 默认粗体显示
+    carryPractice: false, // 默认不开启进位练习
+    borrowPractice: false // 默认不开启借位练习
   });
 
   useEffect(() => {
@@ -268,6 +272,44 @@ export default function CreateA4Page({ params }: CreateA4Props) {
                             ))}
                           </RadioGroup>
                         </div>
+
+                        {/* 进位练习选项 - 仅在加法时显示 */}
+                        {settings.calculationType === 'add' && (
+                          <div className="space-y-1.5">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Calculator className="w-4 h-4 text-gray-500" />
+                                <Label className="text-sm font-medium text-gray-700">{t.a4.carryPractice}</Label>
+                              </div>
+                              <Switch
+                                checked={settings.carryPractice}
+                                onCheckedChange={(checked) => handleSettingChange('carryPractice', checked)}
+                              />
+                            </div>
+                            <p className="text-xs text-gray-500 ml-6">
+                              {t.a4.carryPracticeDesc}
+                            </p>
+                          </div>
+                        )}
+
+                        {/* 借位练习选项 - 仅在减法时显示 */}
+                        {settings.calculationType === 'sub' && (
+                          <div className="space-y-1.5">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Calculator className="w-4 h-4 text-gray-500" />
+                                <Label className="text-sm font-medium text-gray-700">{t.a4.borrowPractice}</Label>
+                              </div>
+                              <Switch
+                                checked={settings.borrowPractice}
+                                onCheckedChange={(checked) => handleSettingChange('borrowPractice', checked)}
+                              />
+                            </div>
+                            <p className="text-xs text-gray-500 ml-6">
+                              {t.a4.borrowPracticeDesc}
+                            </p>
+                          </div>
+                        )}
 
                         {/* 题目个数 */}
                         <div className="space-y-1.5">

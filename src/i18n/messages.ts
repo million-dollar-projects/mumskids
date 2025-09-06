@@ -315,6 +315,10 @@ export const messages = {
       "boldDisplay": "粗体显示",
       "horizontalSpacing": "水平间距",
       "verticalSpacing": "垂直间距",
+      "carryPractice": "进位练习",
+      "carryPracticeDesc": "开启后生成需要进位的加法题目",
+      "borrowPractice": "借位练习", 
+      "borrowPracticeDesc": "开启后生成需要借位的减法题目",
       "studentInfo": {
         "name": "姓名：",
         "date": "日期：",
@@ -693,6 +697,10 @@ export const messages = {
       "boldDisplay": "Bold Display",
       "horizontalSpacing": "Horizontal Spacing",
       "verticalSpacing": "Vertical Spacing",
+      "carryPractice": "Carry Practice",
+      "carryPracticeDesc": "Enable to generate addition problems that require carrying",
+      "borrowPractice": "Borrow Practice",
+      "borrowPracticeDesc": "Enable to generate subtraction problems that require borrowing",
       "studentInfo": {
         "name": "Name:",
         "date": "Date:",
