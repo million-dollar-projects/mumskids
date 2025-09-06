@@ -22,6 +22,8 @@ interface A4Settings {
   showParentMessage: boolean;
   fontSize: number; // 练习题字体大小 (px)
   isBold: boolean; // 是否粗体显示练习题
+  carryPractice: boolean; // 是否进位练习（仅加法时有效）
+  borrowPractice: boolean; // 是否借位练习（仅减法时有效）
   locale?: string; // 添加语言环境参数
 }
 
@@ -38,7 +40,7 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
 
     // 生成数学题目
     const generateQuestions = (settings: A4Settings): Question[] => {
-      const { difficulty, calculationType, questionCount } = settings;
+      const { difficulty, calculationType, questionCount, carryPractice, borrowPractice } = settings;
       const questions: Question[] = [];
 
       // 根据难度等级设置数字范围和最小值
@@ -94,6 +96,20 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
 
       const config = getDifficultyConfig(difficulty);
 
+      // 检查是否需要进位（加法）：个位数相加大于等于10
+      const requiresCarry = (num1: number, num2: number): boolean => {
+        const ones1 = num1 % 10;  // 第一个数的个位数
+        const ones2 = num2 % 10;  // 第二个数的个位数
+        return (ones1 + ones2) >= 10;  // 个位数相加大于等于10需要进位
+      };
+
+      // 检查是否需要借位（减法）：被减数的个位数小于减数的个位数
+      const requiresBorrow = (num1: number, num2: number): boolean => {
+        const ones1 = num1 % 10;  // 被减数的个位数
+        const ones2 = num2 % 10;  // 减数的个位数
+        return ones1 < ones2;     // 被减数个位数小于减数个位数需要借位
+      };
+
       // 检查题目复杂度是否足够
       const isQuestionComplex = (num1: number, num2: number, operator: string, answer: number): boolean => {
         const maxPossible = config.maxNum;
@@ -111,50 +127,103 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
       // 生成单个题目
       const generateSingleQuestion = (type: 'add' | 'sub'): { num1: number; num2: number; operator: string; answer: number } => {
         let attempts = 0;
-        const maxAttempts = 50;
+        const maxAttempts = 100; // 增加尝试次数
         
         while (attempts < maxAttempts) {
           let num1: number, num2: number, operator: string, answer: number;
           
           if (type === 'add') {
-            // 加法：确保结果不超过maxNum，且具有一定复杂度
-            const minSum = Math.max(config.minSum, config.minNum1 + config.minNum2);
-            const maxSum = config.maxNum;
-            
-            // 先确定结果范围
-            answer = Math.floor(Math.random() * (maxSum - minSum + 1)) + minSum;
-            
-            // 基于结果生成两个加数
-            const minFirst = Math.max(config.minNum1, Math.ceil(answer * 0.3));
-            const maxFirst = Math.min(answer - config.minNum2, Math.floor(answer * 0.7));
-            
-            if (maxFirst >= minFirst) {
-              num1 = Math.floor(Math.random() * (maxFirst - minFirst + 1)) + minFirst;
-              num2 = answer - num1;
+            if (carryPractice) {
+              // 进位练习：直接生成需要进位的题目
+              // 确保个位数相加大于等于10
+              const ones1 = Math.floor(Math.random() * 9) + 1; // 1-9
+              const ones2 = Math.floor(Math.random() * ones1) + (10 - ones1); // 确保相加>=10
+              
+              // 生成十位数，根据难度调整
+              let tens1, tens2;
+              if (config.maxNum <= 10) {
+                // 10以内难度：十位数只能是0
+                tens1 = 0;
+                tens2 = 0;
+              } else if (config.maxNum <= 20) {
+                // 20以内难度：十位数可以是0或10
+                tens1 = Math.floor(Math.random() * 2) * 10; // 0, 10
+                tens2 = Math.floor(Math.random() * 2) * 10; // 0, 10
+              } else {
+                // 更高难度：正常生成十位数
+                tens1 = Math.floor(Math.random() * Math.min(9, Math.floor(config.maxNum / 10))) * 10;
+                tens2 = Math.floor(Math.random() * Math.min(9, Math.floor((config.maxNum - tens1) / 10))) * 10;
+              }
+              
+              num1 = tens1 + ones1;
+              num2 = tens2 + ones2;
+              answer = num1 + num2;
               operator = '+';
               
-              if (num2 >= config.minNum2 && isQuestionComplex(num1, num2, operator, answer)) {
+              // 确保结果在范围内
+              if (answer <= config.maxNum && num1 >= config.minNum1 && num2 >= config.minNum2) {
                 return { num1, num2, operator, answer };
+              }
+            } else {
+              // 非进位练习：生成不需要进位的题目
+              const minSum = Math.max(config.minSum, config.minNum1 + config.minNum2);
+              const maxSum = Math.min(config.maxNum, 18); // 限制在18以内，避免进位
+              
+              answer = Math.floor(Math.random() * (maxSum - minSum + 1)) + minSum;
+              
+              const minFirst = Math.max(config.minNum1, Math.ceil(answer * 0.3));
+              const maxFirst = Math.min(answer - config.minNum2, Math.floor(answer * 0.7));
+              
+              if (maxFirst >= minFirst) {
+                num1 = Math.floor(Math.random() * (maxFirst - minFirst + 1)) + minFirst;
+                num2 = answer - num1;
+                operator = '+';
+                
+                // 确保不需要进位
+                if (num2 >= config.minNum2 && !requiresCarry(num1, num2)) {
+                  return { num1, num2, operator, answer };
+                }
               }
             }
           } else {
-            // 减法：确保结果为正数，且具有一定复杂度
-            const minResult = config.minDifference;
-            const maxResult = Math.floor(config.maxNum * 0.6); // 减法结果不要太大
-            
-            answer = Math.floor(Math.random() * (maxResult - minResult + 1)) + minResult;
-            
-            // 基于结果生成被减数和减数
-            const minMinuend = Math.max(config.minNum1, answer + config.minNum2);
-            const maxMinuend = Math.min(config.maxNum, answer + Math.floor(config.maxNum * 0.4));
-            
-            if (maxMinuend >= minMinuend) {
-              num1 = Math.floor(Math.random() * (maxMinuend - minMinuend + 1)) + minMinuend;
-              num2 = num1 - answer;
+            if (borrowPractice) {
+              // 借位练习：直接生成需要借位的题目
+              // 确保被减数的个位数小于减数的个位数
+              const ones1 = Math.floor(Math.random() * 8) + 1; // 1-8
+              const ones2 = ones1 + Math.floor(Math.random() * (9 - ones1)) + 1; // 确保ones2 > ones1
+              
+              // 生成十位数
+              const tens1 = Math.floor(Math.random() * Math.min(9, Math.floor(config.maxNum / 10))) * 10;
+              const tens2 = Math.floor(Math.random() * Math.min(9, Math.floor((config.maxNum - tens1) / 10))) * 10;
+              
+              num1 = tens1 + ones1;
+              num2 = tens2 + ones2;
+              answer = num1 - num2;
               operator = '-';
               
-              if (num2 >= config.minNum2 && isQuestionComplex(num1, num2, operator, answer)) {
+              // 确保结果为正数且在范围内
+              if (answer > 0 && answer <= config.maxNum && num1 >= config.minNum1 && num2 >= config.minNum2) {
                 return { num1, num2, operator, answer };
+              }
+            } else {
+              // 非借位练习：生成不需要借位的题目
+              const minResult = config.minDifference;
+              const maxResult = Math.floor(config.maxNum * 0.6);
+              
+              answer = Math.floor(Math.random() * (maxResult - minResult + 1)) + minResult;
+              
+              const minMinuend = Math.max(config.minNum1, answer + config.minNum2);
+              const maxMinuend = Math.min(config.maxNum, answer + Math.floor(config.maxNum * 0.4));
+              
+              if (maxMinuend >= minMinuend) {
+                num1 = Math.floor(Math.random() * (maxMinuend - minMinuend + 1)) + minMinuend;
+                num2 = num1 - answer;
+                operator = '-';
+                
+                // 确保不需要借位
+                if (num2 >= config.minNum2 && !requiresBorrow(num1, num2)) {
+                  return { num1, num2, operator, answer };
+                }
               }
             }
           }
@@ -162,7 +231,7 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
           attempts++;
         }
         
-        // 如果无法生成复杂题目，使用基础逻辑但确保最小复杂度
+        // 如果无法生成符合要求的题目，使用基础逻辑
         if (type === 'add') {
           const num1 = Math.floor(Math.random() * (config.maxNum - config.minNum1)) + config.minNum1;
           const num2 = Math.floor(Math.random() * (config.maxNum - num1 - config.minNum2)) + config.minNum2;
@@ -204,6 +273,8 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
         difficulty: settings.difficulty,
         calculationType: settings.calculationType,
         questionCount: settings.questionCount,
+        carryPractice: settings.carryPractice,
+        borrowPractice: settings.borrowPractice,
         // 这些字段不影响题目生成，但需要传递以满足接口要求
         title: settings.title,
         childName: settings.childName,
@@ -213,7 +284,7 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
         isBold: settings.isBold,
         locale: settings.locale
       });
-    }, [settings.difficulty, settings.calculationType, settings.questionCount, regenerateKey]);
+    }, [settings.difficulty, settings.calculationType, settings.questionCount, settings.carryPractice, settings.borrowPractice, regenerateKey]);
 
     // 获取难度和类型的显示文本
     const getDifficultyText = (difficulty: string) => {
