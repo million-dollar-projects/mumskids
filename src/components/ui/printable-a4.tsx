@@ -151,8 +151,9 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
                 tens2 = Math.floor(Math.random() * 2) * 10; // 0, 10
               } else {
                 // 更高难度：正常生成十位数
-                tens1 = Math.floor(Math.random() * Math.min(9, Math.floor(config.maxNum / 10))) * 10;
-                tens2 = Math.floor(Math.random() * Math.min(9, Math.floor((config.maxNum - tens1) / 10))) * 10;
+                const maxTens = Math.floor(config.maxNum / 10);
+                tens1 = Math.floor(Math.random() * maxTens) * 10;
+                tens2 = Math.floor(Math.random() * maxTens) * 10;
               }
               
               num1 = tens1 + ones1;
@@ -166,23 +167,23 @@ export const PrintableA4 = React.forwardRef<HTMLDivElement, PrintableA4Props>(
               }
             } else {
               // 非进位练习：生成不需要进位的题目
-              const minSum = Math.max(config.minSum, config.minNum1 + config.minNum2);
-              const maxSum = Math.min(config.maxNum, 18); // 限制在18以内，避免进位
+              // 直接生成两个数字，确保个位数相加小于10
+              const maxTens = Math.floor(config.maxNum / 10);
+              const tens1 = Math.floor(Math.random() * maxTens) * 10;
+              const tens2 = Math.floor(Math.random() * maxTens) * 10;
               
-              answer = Math.floor(Math.random() * (maxSum - minSum + 1)) + minSum;
+              // 生成个位数，确保相加小于10
+              const ones1 = Math.floor(Math.random() * 8) + 1; // 1-8
+              const ones2 = Math.floor(Math.random() * (9 - ones1)) + 1; // 1 到 (9-ones1)
               
-              const minFirst = Math.max(config.minNum1, Math.ceil(answer * 0.3));
-              const maxFirst = Math.min(answer - config.minNum2, Math.floor(answer * 0.7));
+              num1 = tens1 + ones1;
+              num2 = tens2 + ones2;
+              answer = num1 + num2;
+              operator = '+';
               
-              if (maxFirst >= minFirst) {
-                num1 = Math.floor(Math.random() * (maxFirst - minFirst + 1)) + minFirst;
-                num2 = answer - num1;
-                operator = '+';
-                
-                // 确保不需要进位
-                if (num2 >= config.minNum2 && !requiresCarry(num1, num2)) {
-                  return { num1, num2, operator, answer };
-                }
+              // 确保结果在范围内且符合最小要求
+              if (answer <= config.maxNum && num1 >= config.minNum1 && num2 >= config.minNum2) {
+                return { num1, num2, operator, answer };
               }
             }
           } else {
